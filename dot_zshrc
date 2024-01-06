@@ -1,0 +1,31 @@
+# Start configuration added by Zim install {{{
+
+# --------------------
+# Zsh && Module configuration
+# --------------------
+
+# zim
+source ~/.config/zsh/zim.zsh
+# ssh
+source ~/.config/zsh/ssh.zsh
+# fzf
+source ~/.config/fzf/fzf.zsh
+# aliases
+source ~/.config/zsh/aliases.zsh
+# plugins
+source ~/.config/zsh/plugins.zsh
+# exa
+source ~/.config/exa/exa_colors.zsh
+
+# ------------------
+# Initialize modules
+# ------------------
+
+# zim initialize
+source ~/.config/zsh/init.zsh
+
+# ------------------------------
+# Post-init module configuration
+# ------------------------------
+
+# }}} End configuration added by Zim install
