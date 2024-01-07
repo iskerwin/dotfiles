@@ -1,6 +1,6 @@
-#################
-# path Aliases  #
-#################
+##############################
+# path Aliases  
+##############################
 
 alias tip='bat ~/.config/zsh/aliases.zsh'
 alias home='cd ~'
@@ -9,9 +9,9 @@ alias github='cd ~/Dropbox/GitHub'
 alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
 alias config='cd dotfiles/'
 
-###############
-# git Aliases #
-###############
+##############################
+# git Aliases 
+##############################
 
 alias add='git add .'
 alias log='git log --oneline --graph --decorate --all' # view commit history
@@ -24,9 +24,9 @@ alias clone='git clone'
 alias commit='git commit -m'                           # commit all staging area files to the local repository
 alias commitam='git commit -am'                        # commit all modified files to the local repository
 
-###################
-# homebrew Stuffs #
-###################
+##############################
+# homebrew Stuffs 
+##############################
 
 # alias update='brew cu -a -f -v --no-brew-update -y'
 alias update='brew update'
@@ -37,9 +37,9 @@ alias uninstall='brew uninstall'
 alias doctor="echo '\nDoctor? Doctor who?\n' && brew doctor"
 alias uud='update; upgrade; cleanup; doctor'
 
-#####################
-# utilities Aliases #
-#####################
+##############################
+# utilities Aliases 
+##############################
 
 alias q='exit'
 alias c='clear'
@@ -54,21 +54,21 @@ if (( ${+commands[dog]} )); then
 else
     alias dig='dig'
 fi
-
 alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias speed='networkQuality'
 alias screen='ct screen'
 alias telnet='ct telnet'
-alias backup="brew bundle dump --describe --force --file='~/dotfiels'"
+alias backup='brew bundle dump --describe --force --file="./Brewfile"'
 alias clean!="find . -type f -name '*.DS_Store' -ls -delete"
-alias restore!='brew bundle --file="~/dotfiels"'
-##################
-# plugin Aliases #
-##################
+alias restore!='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
 
+##############################
+# plugin Aliases 
+##############################
+
+alias o='open -R $(fd . --hidden --type=f | fzf)'
 alias jo='joshuto'
 alias sz='source ~/.zshrc'
-alias orf='open -R $(fd . --hidden --type=f | fzf)'
 alias zim='zimfw'
 alias czm='chezmoi'
 alias ccd='cd $(fd . --hidden --type=d | fzf)'
@@ -76,17 +76,17 @@ alias vim='vim $(fd . --hidden --type=f| fzf)'
 alias code='code $(fd . --hidden --type=f| fzf)'
 alias reload!='exec ${SHELL} -l'
 
-########################
-# colorize grep output #
-########################
+##############################
+# colorize grep output 
+##############################
 
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
-#######
-# exa #
-#######
+##############################
+# exa 
+##############################
 
 # Ensure exa is available
 if (( ${+commands[eza]} )); then
@@ -110,12 +110,12 @@ alias lc='ll -schanged'                         # Long format, newest status cha
 alias l.='ls -d .*'                             # all dotfiles
 alias tree='exa --tree --group-directories-first --icons'
 
-########
-# xxxx #
-########
+##############################
+# xxxx 
+##############################
 
 # not aliasing rm -i, but if safe-rm is available, use condom.
 # if safe-rmdir is available, the OS is suse which has its own terrible 'safe-rm' which is not what we want
 if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
-  alias rm=safe-rm
+    alias rm=safe-rm
 fi

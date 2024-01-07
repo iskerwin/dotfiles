@@ -1,18 +1,18 @@
-#-------------------------------
+##############################
 # git
-#-------------------------------
+##############################
 # Set a custom prefix for the generated aliases. The default prefix is 'G'.
 #zstyle ':zim:git' aliases-prefix 'g'
 
-#-------------------------------
+##############################
 # history
-#-------------------------------
+##############################
 # Remove older command from the history if a duplicate is to be added.
 setopt HIST_IGNORE_ALL_DUPS
 
-#-------------------------------
+##############################
 # input/output
-#-------------------------------
+##############################
 # Set editor default keymap to emacs (`-e`) or vi (`-v`)
 bindkey -e
 # Prompt for spelling correction of commands.
@@ -24,17 +24,17 @@ WORDCHARS=${WORDCHARS//[\/]}
 # Append `../` to your input for each `.` you type after an initial `..`
 zstyle ':zim:input' double-dot-expand yes
 
-#-------------------------------
+##############################
 # terminal
-#-------------------------------
+##############################
 # Set a custom terminal title format using prompt expansion escape sequences.
 # See http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Simple-Prompt-Escapes
 # If none is provided, the default '%n@%m: %~' is used.
 zstyle ':zim:termtitle' format '%1~'
 
-#-------------------------------
+##############################
 # zsh-autosuggestions
-#-------------------------------
+##############################
 # Disable automatic widget re-binding on each precmd. This can be set when
 # zsh-users/zsh-autosuggestions is the last module in your ~/.zimrc.
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
@@ -43,9 +43,9 @@ ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 # See https://github.com/zsh-users/zsh-autosuggestions/blob/master/README.md#suggestion-highlight-style
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#bd93f9,bg=#6272a4,bold,underline'
 
-#-------------------------------
+##############################
 # zsh-syntax-highlighting
-#-------------------------------
+##############################
 # Set what highlighters will be used.
 # See https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
 # ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
@@ -106,9 +106,9 @@ ZSH_HIGHLIGHT_STYLES[arg0]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[default]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[cursor]='standout'
 
-#-------------------------------
+##############################
 # zsh-autocomplete
-#-------------------------------
+##############################
 # Autocompletion
 zstyle -e ':autocomplete:list-choices:*' list-lines 'reply=( $(( LINES / 3 )) )'
 # Override history search.
