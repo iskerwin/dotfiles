@@ -18,6 +18,8 @@
 │  │  ├──  keymap.toml
 │  │  ├──  mimetype.toml
 │  │  └──  theme.toml
+│  ├──  ssh
+│  │  └──  ssh_config
 │  ├──  zsh
 │  │  ├──  aliases.zsh
 │  │  ├──  init.zsh
@@ -30,5 +32,6 @@
 ├──  dot_zshrc
 ├──  empty_dot_hushlogin
 ├──  encrypted_dot_gitconfig.age
-└──  encrypted_dot_ssh-agent.age
+├──  encrypted_dot_ssh-agent.age
+└──  README.md
 ```
