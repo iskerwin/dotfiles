@@ -28,7 +28,7 @@ alias commitam='git commit -am'                        # commit all modified fil
 # homebrew Stuffs 
 ##############################
 
-# alias update='brew cu -a -f -v --no-brew-update -y'
+alias update!='brew cu -a -f -v --no-brew-update -y'
 alias update='brew update'
 alias upgrade='brew upgrade'
 alias cleanup='brew cleanup'
