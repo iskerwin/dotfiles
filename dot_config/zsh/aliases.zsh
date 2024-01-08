@@ -7,7 +7,7 @@ alias home='cd ~'
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # pretty print the PATH
 alias github='cd ~/Dropbox/GitHub'
 alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
-alias config='cd dotfiles/'
+alias config='chezmoi cd'
 
 ##############################
 # git Aliases 

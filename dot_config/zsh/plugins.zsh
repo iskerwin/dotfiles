@@ -129,3 +129,8 @@ zstyle ':autocomplete:history-search-backward:*' list-lines 20
 }
 # bindkey '^R' .history-incremental-search-backward
 # bindkey '^S' .history-incremental-search-forward
+
+##############################
+# exa
+##############################
+source ~/.config/exa/exa_colors.zsh
