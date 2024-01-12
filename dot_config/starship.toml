@@ -1,15 +1,15 @@
 format = """
-[](fg:background bg:purple_bg)\
-[  ](bg:purple_bg)\
+[](fg:color_dark bg:color_purple)\
+[  ](bg:color_purple)\
 $hostname\
 $localip\
-[](fg:purple_bg bg:red_bg)\
+[](fg:color_purple bg:color_red)\
 $directory\
-[](fg:red_bg bg:orange_bg)\
+[](fg:color_red bg:color_orange)\
 $git_branch\
 $git_status\
 $git_metrics\
-[](fg:orange_bg bg:green_bg)\
+[](fg:color_orange bg:color_green1)\
 $c\
 $elixir\
 $elm\
@@ -23,15 +23,18 @@ $nim\
 $rust\
 $scala\
 $python\
-[](fg:green_bg bg:cyan_bg)\
+[](fg:color_green1 bg:color_cyan)\
 $docker_context\
-[](fg:cyan_bg bg:blue_bg)\
+[](fg:color_cyan bg:color_blue)\
 $time\
-[ ](fg:blue_bg)\
+[ ](fg:color_blue)\
 $sudo\
 $status
-[❯ ](bold green_fg)\
+[❯ ](bold color_green2)\
 """
+
+# A continuation prompt that displays two filled in arrows
+continuation_prompt = '▶▶ '
 
 # Wait 10 milliseconds for starship to check files under the current directory.
 scan_timeout = 10
@@ -45,18 +48,15 @@ palette = 'foo'
 # Define custom colors
 [palettes.foo]
 # Overwrite existing color
-red_bg     = '#B83B5E'
-red_fg     = '#FF5555'
-blue_bg    = '#205295'
-cyan_bg    = '#0C7B93'
-gray_fg    = '#6272A4'
-green_bg   = '#5F8D4E'
-green_fg   = '#50FA7B'
-orange_bg  = '#F08A5D'
-orange_fg  = '#FFB86C'
-purple_bg  = '#6A2C70'
-purple_fg  = '#BD93F9'
-background = '#282a36'
+color_red     = '#B83B5E'
+color_blue    = '#205295'
+color_cyan    = '#0C7B93'
+color_gray    = '#6272A4'
+color_green1  = '#5F8D4E'
+color_green2  = '#50FA7B'
+color_orange  = '#F08A5D'
+color_purple  = '#6A2C70'
+color_dark    = '#282a36'
 
 # An alternative to the username module which displays a symbol that
 # represents the current operating system
@@ -65,21 +65,21 @@ background = '#282a36'
 disabled   = false
 format     = '[$ssh_symbol $hostname ]($style)'
 ssh_only   = true
-ssh_symbol = '[ 󰌘 ](fg:green_fg bg:purple_bg)'
-style      = 'bg:purple_bg'
+ssh_symbol = '[ 󰌘 ](fg:color_green2 bg:color_purple)'
+style      = 'bg:color_purple'
 trim_at    = '.companyname.com'
 
 [localip]
 disabled = false
 format   = '[@ $localipv4 ]($style)'
 ssh_only = true
-style    = 'bg:purple_bg'
+style    = 'bg:color_purple'
 
 [directory]
 format            = '[ $path ]($style)[$read_only]($read_only_style)'
 read_only         = ' '
-read_only_style   = 'bg:red_bg'
-style             = 'bg:red_bg'
+read_only_style   = 'bg:color_red'
+style             = 'bg:color_red'
 truncation_length = 3
 truncation_symbol = '…/'
 use_os_path_sep   = true
@@ -104,124 +104,124 @@ use_os_path_sep   = true
 
 [git_branch]
 format = '[ $symbol$branch]($style)'
-style  = 'bg:orange_bg'
+style  = 'bg:color_orange'
 symbol = ' '
 
 [git_status]
-ahead       = '[ 󰶣 ${count}](bg:orange_bg)'
-behind      = '[ � ${count}](bg:orange_bg)'
+ahead       = '[ 󰶣 ${count}](bg:color_orange)'
+behind      = '[ � ${count}](bg:color_orange)'
 conflicted  = '󰇼'
-deleted     = '[  ](bg:orange_bg)'
-diverged    = '[ 󰹺 ](bg:orange_bg)[ 󰶣 ${ahead_count}](bg:orange_bg)[ 󰶡 ${behind_count}](bg:orange_bg)'
+deleted     = '[  ](bg:color_orange)'
+diverged    = '[ 󰹺 ](bg:color_orange)[ 󰶣 ${ahead_count}](bg:color_orange)[ 󰶡 ${behind_count}](bg:color_orange)'
 format      = '[ $all_status$ahead_behind ]($style)'
-modified    = '[  ](bg:orange_bg)'
-renamed     = '[ 󱞶 ](bg:orange_bg)'
-staged      = '[  \($count\)](bg:orange_bg)'
-stashed     = '[  ](bg:orange_bg)'
-style       = 'bg:orange_bg'
-typechanged = '[ 󰓦 ](bg:orange_bg)'
-untracked   = '[  ](bg:orange_bg)'
+modified    = '[  ](bg:color_orange)'
+renamed     = '[ 󱞶 ](bg:color_orange)'
+staged      = '[  \($count\)](bg:color_orange)'
+stashed     = '[  ](bg:color_orange)'
+style       = 'bg:color_orange'
+typechanged = '[ 󰓦 ](bg:color_orange)'
+untracked   = '[  ](bg:color_orange)'
 up_to_date  = ''
 
 [git_metrics]
-added_style        = 'bg:orange_bg'
-deleted_style      = 'bg:orange_bg'
+added_style        = 'bg:color_orange'
+deleted_style      = 'bg:color_orange'
 disabled           = false
 format             = '[+$added ]($added_style)[-$deleted ]($deleted_style)'
 only_nonzero_diffs = true
 
 [c]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [elixir]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [elm]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [golang]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [gradle]
 format = '[ $symbol($version) ]($style)'
-style = 'bg:green_bg'
+style = 'bg:color_green1'
 
 [haskell]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [java]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [julia]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [nodejs]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [nim]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = '󰆥 '
 
 [rust]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [scala]
 format = '[ $symbol($version) ]($style)'
-style  = 'bg:green_bg'
+style  = 'bg:color_green1'
 symbol = ' '
 
 [python]
 format             = '[ $symbol($version) ]($style)'
 pyenv_version_name = true
-style              = 'bg:green_bg'
+style              = 'bg:color_green1'
 symbol             = ' '
 
 [docker_context]
 format = '[ $symbol $context ]($style) $path'
-style  = 'bg:cyan_bg'
+style  = 'bg:color_cyan'
 symbol = ' '
 
 [time]
 disabled        = false
-format          = '[ 󱑓  $time ]($style)'
-style           = 'bg:blue_bg'
-time_format     = '%m/%d %a %R'
+format          = '[ 󱑓 $time ]($style)'
+style           = 'bg:color_blue'
+time_format     = '%R'
 utc_time_offset = '+8'
 
 [sudo]
 disabled = false
 format   = '[as $symbol]($style)'
-style    = 'bold green_fg'
+style    = 'bold color_green2'
 symbol   = '󰇄  '
 
 [status]
 disabled              = false
 format                = '[$symbol]($style)'
 map_symbol            = true
-not_executable_symbol = '[ ](red_fg)'
-not_found_symbol      = '[ ](orange_fg)'
+not_executable_symbol = '[ ](color_red)'
+not_found_symbol      = '[ ](color_orange)'
 pipestatus            = true
-sigint_symbol         = '[ ](purple_fg)'
-signal_symbol         = '[󱐋 ](green_fg)'
-style                 = 'fg:gray_fg'
-success_symbol        = '[ ](green_fg)'
-symbol                = '[ ](red_fg)'
+sigint_symbol         = '[ ](color_purple)'
+signal_symbol         = '[󱐋 ](color_green2)'
+style                 = 'fg:color_gray'
+success_symbol        = '[ ](color_green2)'
+symbol                = '[ ](color_red)'
