@@ -5,7 +5,7 @@
 alias tip='bat ~/.config/zsh/aliases.zsh'
 alias home='cd ~'
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # pretty print the PATH
-alias github='cd ~/Dropbox/Data/GitHub'
+alias github='cd /Users/kerwin/Library/CloudStorage/Dropbox/数据｜Data/GitHub/Rule'
 alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
 alias config='chezmoi cd'
 alias EC2='
