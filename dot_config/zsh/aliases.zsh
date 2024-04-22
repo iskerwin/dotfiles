@@ -8,6 +8,7 @@ alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # pretty print the PATH
 alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
 alias config='chezmoi cd'
 alias EC2='ssh -i "Ubuntu.pem" ubuntu@ec2-13-213-41-164.ap-southeast-1.compute.amazonaws.com'
+alias snell='cat ../etc/snell/config.conf'
 
 ##############################
 # git Aliases 
