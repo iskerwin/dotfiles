@@ -29,3 +29,4 @@ source ~/.config/zsh/init.zsh
 # ------------------------------
 
 # }}} End configuration added by Zim install
+export PATH=/opt/homebrew/bin:$PATH
