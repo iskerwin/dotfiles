@@ -9,6 +9,8 @@ alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
 alias config='chezmoi cd'
 alias EC2='ssh -i "Ubuntu.pem" ubuntu@ec2-13-213-41-164.ap-southeast-1.compute.amazonaws.com'
 alias snell='cat ../etc/snell/config.conf'
+alias lsdev='ls /dev/cu.*'
+alias screen='screen -fn /dev/cu.'
 
 ##############################
 # git Aliases 
