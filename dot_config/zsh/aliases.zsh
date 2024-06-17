@@ -1,5 +1,5 @@
 ##############################
-# path Aliases  
+# Path Aliases
 ##############################
 
 alias tip='bat ~/.config/zsh/aliases.zsh'
@@ -13,7 +13,7 @@ alias lsdev='ls /dev/cu.*'
 alias screen='screen -fn /dev/cu.'
 
 ##############################
-# git Aliases 
+# Git Aliases
 ##############################
 
 alias add='git add .'
@@ -28,10 +28,10 @@ alias commit='git commit -m'                           # commit all staging area
 alias commitam='git commit -am'                        # commit all modified files to the local repository
 
 ##############################
-# homebrew Stuffs 
+# Homebrew Stuffs
 ##############################
 
-alias update!='brew cu -a -f -v --no-brew-update -y'
+alias update-all='brew cu -a -f -v --no-brew-update -y'
 alias update='brew update'
 alias upgrade='brew upgrade'
 alias cleanup='brew cleanup'
@@ -41,13 +41,13 @@ alias doctor="echo '\nDoctor? Doctor who?\n' && brew doctor"
 alias uud='update; upgrade; cleanup; doctor'
 
 ##############################
-# utilities Aliases 
+# Utilities Aliases
 ##############################
 
 alias q='exit'
 alias c='clear'
 alias ip='ifconfig en0 | grep inet'
-alias ssh='ct ssh'
+# alias ssh='ct ssh'
 alias his='history | fzf'
 # alias myip='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'
 
@@ -59,14 +59,14 @@ else
 fi
 alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias speed='networkQuality'
-alias screen='ct screen'
-alias telnet='ct telnet'
+# alias screen='ct screen'
+# alias telnet='ct telnet'
 alias backup='brew bundle dump --describe --force --file="./Brewfile"'
-alias clean!="find . -type f -name '*.DS_Store' -ls -delete"
-alias restore!='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
+alias clean-all="find . -type f -name '*.DS_Store' -ls -delete"
+alias restore-brewfile='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
 
 ##############################
-# plugin Aliases 
+# Plugin Aliases
 ##############################
 
 alias o='open -R $(fd . --hidden --type=f | fzf)'
@@ -75,12 +75,12 @@ alias sz='source ~/.zshrc'
 alias zim='zimfw'
 alias czm='chezmoi'
 alias ccd='cd $(fd . --hidden --type=d | fzf)'
-alias vim='vim $(fd . --hidden --type=f| fzf)'
-alias code='code $(fd . --hidden --type=f| fzf)'
-alias reload!='exec ${SHELL} -l'
+alias vim='vim $(fd . --hidden --type=f | fzf)'
+alias code='code $(fd . --hidden --type=f | fzf)'
+alias reload-all='exec ${SHELL} -l'
 
 ##############################
-# colorize grep output 
+# Colorize Grep Output
 ##############################
 
 alias grep='grep --color=auto'
@@ -104,7 +104,7 @@ export EXA_COLORS='da=1;34:gm=1;34'
 
 alias la='ls -a'
 alias ll='ls -l'                                # Long format, git status
-alias  l='ll -a'                                # Long format, all files
+alias l='ll -a'                                 # Long format, all files
 alias lr='ll -T'                                # Long format, recursive as a tree
 alias lx='ll -sextension'                       # Long format, sort by extension
 alias lk='ll -ssize'                            # Long format, largest file size last
@@ -114,11 +114,10 @@ alias l.='ls -d .*'                             # all dotfiles
 alias tree='exa --tree --group-directories-first --icons'
 
 ##############################
-# xxxx 
+# Safe Remove
 ##############################
 
-# not aliasing rm -i, but if safe-rm is available, use condom.
-# if safe-rmdir is available, the OS is suse which has its own terrible 'safe-rm' which is not what we want
+# Not aliasing rm -i, but if safe-rm is available, use it
 if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
     alias rm=safe-rm
 fi
