@@ -79,7 +79,7 @@ alias czm='chezmoi'
 alias ccd='cd $(fd . --hidden --type=d | fzf)'
 alias vim='vim $(fd . --hidden --type=f | fzf)'
 alias code='code $(fd . --hidden --type=f | fzf)'
-alias reload-all='exec ${SHELL} -l'
+# alias reload-all='exec ${SHELL} -l'
 
 ##############################
 # Colorize Grep Output
@@ -94,16 +94,8 @@ alias fgrep='fgrep --color=auto'
 ##############################
 
 # Ensure exa is available
-if (( ${+commands[eza]} )); then
-    alias ls='eza --group-directories-first --icons'
-elif (( ${+commands[exa]} )); then
-    alias ls='exa --group-directories-first --git --time-style long-iso --icons'
-else
-    return 1
-fi
 
-export EXA_COLORS='da=1;34:gm=1;34'
-
+alias ls='eza --group-directories-first --icons'
 alias la='ls -a'
 alias ll='ls -l'                                # Long format, git status
 alias l='ll -a'                                 # Long format, all files
