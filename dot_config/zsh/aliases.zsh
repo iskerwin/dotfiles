@@ -57,8 +57,10 @@ if (( ${+commands[dog]} )); then
 else
     alias dig='dig'
 fi
-alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
+# alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias myip='curl http://ipecho.net/plain; echo'
 alias speed='networkQuality'
+alias weather='curl wttr.in'
 # alias screen='ct screen'
 # alias telnet='ct telnet'
 alias backup='brew bundle dump --describe --force --file="./Brewfile"'
