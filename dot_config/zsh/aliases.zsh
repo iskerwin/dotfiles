@@ -47,24 +47,14 @@ alias uud='update; upgrade; cleanup; doctor'
 alias q='exit'
 alias c='clear'
 alias ip='ifconfig en0 | grep inet'
-# alias ssh='ct ssh'
 alias his='history | fzf'
-# alias myip='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'
 
-# Ensure dog is available
-if (( ${+commands[dog]} )); then
-    alias dig='dog'
-else
-    alias dig='dig'
-fi
-# alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias myip='curl http://ipecho.net/plain; echo'
+# alias myip='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'
 alias speed='networkQuality'
 alias weather='curl wttr.in'
-# alias screen='ct screen'
-# alias telnet='ct telnet'
 alias backup='brew bundle dump --describe --force --file="./Brewfile"'
-alias clean-all="find . -type f -name '*.DS_Store' -ls -delete"
+alias clean-DS_Store="find . -type f -name '*.DS_Store' -ls -delete"
 alias restore-brewfile='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
 
 ##############################
@@ -76,10 +66,10 @@ alias jo='joshuto'
 alias sz='source ~/.zshrc'
 alias zim='zimfw'
 alias czm='chezmoi'
+alias czmcd='/Users/kerwin/.local/share/chezmoi'
 alias ccd='cd $(fd . --hidden --type=d | fzf)'
 alias vim='vim $(fd . --hidden --type=f | fzf)'
 alias code='code $(fd . --hidden --type=f | fzf)'
-# alias reload-all='exec ${SHELL} -l'
 
 ##############################
 # Colorize Grep Output
