@@ -21,7 +21,9 @@ zmodule environment
 #------------------------------------------------
 
 # Starship prompt for zsh
-zmodule joke/zim-starship
+# zmodule joke/zim-starship
+
+zmodule romkatv/powerlevel10k --use degit
 
 #------------------------------------------------
 # Completion
