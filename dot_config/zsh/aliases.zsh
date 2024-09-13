@@ -104,38 +104,3 @@ alias tree='exa --tree --group-directories-first --icons'
 if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
     alias rm=safe-rm
 fi
-
-
-# Screen aliases
-alias sn='screen -S'              # Create a new named session
-alias sl='screen -ls'             # List running sessions
-alias sr='screen -r'              # Reattach to a session
-alias ss='screen -S'              # Create or reattach to a session
-alias sx='screen -x'              # Attach to a running session in Multi-display mode
-
-# Function to create a new screen session or reattach if it exists
-function s() {
-    if [ -z "$1" ]; then
-        screen -ls
-    else
-        screen -DR "$1"
-    }
-}
-
-# Function to kill a screen session
-function sk() {
-    if [ -z "$1" ]; then
-        echo "Usage: sk <session-name>"
-    else
-        screen -S "$1" -X quit
-    fi
-}
-
-# Function to send a command to a screen session
-function ssend() {
-    if [ -z "$1" ] || [ -z "$2" ]; then
-        echo "Usage: ssend <session-name> <command>"
-    else
-        screen -S "$1" -X stuff "$2$(echo -ne '\015')"
-    fi
-}
