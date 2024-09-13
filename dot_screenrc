@@ -1,0 +1,29 @@
+# 设置 screen 的编码
+defutf8 on
+defencoding utf8
+encoding utf8 utf8
+
+# 关闭启动信息
+startup_message off
+
+# 设置滚动缓冲区大小
+defscrollback 10000
+
+# 设置使用 bright colors
+attrcolor b ".I"
+
+# 设置终端类型
+term screen-256color
+
+# 自动分离断开的会话
+autodetach on
+
+# 关闭视觉铃声
+vbell off
+
+# 设置 screen 热键前缀为 Ctrl-a
+escape ^Aa
+
+# 启用鼠标滚轮支持
+termcapinfo xterm* ti@:te@
+mousetrack on
