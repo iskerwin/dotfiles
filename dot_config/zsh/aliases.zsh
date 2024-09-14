@@ -79,6 +79,24 @@ alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
 ##############################
+# Screen
+##############################
+
+alias sn='screen -S'          # 创建新的 screen 会话或附加到已存在的会话
+alias sl='screen -ls'         # 列出所有 screen 会话
+alias sr='screen -r'          # 重新连接到指定的 screen 会话
+alias sm='screen -DR main'    # 创建或重新连接到名为"main"的会话
+alias sk='killall screen'     # 终止所有 screen 会话
+alias sd='screen -d'          # 分离当前 screen 会话
+alias snw='screen -X screen'  # 在当前 screen 会话中创建新窗口并执行命令
+alias snd='screen -dm'        # 创建新的 screen 会话，并立即分离
+
+# 在新的 screen 窗口中执行命令，并立即返回
+srun() {
+    screen -dm bash -c "$*"
+}
+
+##############################
 # exa 
 ##############################
 

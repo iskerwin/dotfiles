@@ -1,10 +1,24 @@
-# 设置 screen 的编码
+# 设置 Screen 的编码
 defutf8 on
 defencoding utf8
 encoding utf8 utf8
 
 # 关闭启动信息
 startup_message off
+
+# 日志记录设置
+# 设置日志文件的位置和格式
+logfile "/Users/kerwin/Documents/Screen/screenlog_%S_%Y%m%d_%n.log"
+# 启用时间戳
+logtstamp on
+# 设置时间戳格式
+logtstamp string "[ %Y-%m-%d %c:%s ]"
+# 启用日志记录
+deflog on
+
+# 设置默认的串口速率
+defbce on
+defnonblock 5
 
 # 设置滚动缓冲区大小
 defscrollback 10000
@@ -21,9 +35,12 @@ autodetach on
 # 关闭视觉铃声
 vbell off
 
-# 设置 screen 热键前缀为 Ctrl-a
+# 设置 Screen 热键前缀为 Ctrl-a
 escape ^Aa
 
 # 启用鼠标滚轮支持
 termcapinfo xterm* ti@:te@
 mousetrack on
+
+# 忽略大小写
+ignorecase on
