@@ -35,7 +35,7 @@ autodetach on
 # 关闭视觉铃声
 vbell off
 
-# 设置 Screen 热键前缀为 Ctrl-a
+# 设置 Screen 热键前缀为 Ctrl-A
 escape ^Aa
 
 # 启用鼠标滚轮支持
