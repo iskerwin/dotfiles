@@ -41,6 +41,7 @@ escape ^Aa
 # 启用鼠标滚轮支持
 termcapinfo xterm* ti@:te@
 mousetrack on
+termcapinfo xterm* 'hs:ts=\E]2;:fs=\007:ds=\E]2;screen\007'
 
 # 忽略大小写
 ignorecase on
