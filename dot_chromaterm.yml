@@ -1,30 +1,20 @@
 palette:
-  # 扩展的颜色方案
   Black: "#282a36"
   Grey: "#44475a"
   White: "#f8f8f2"
-  Dark: "#6272a4"
-  Teal: "#008080"
   Green: "#50fa7b"
   Orange: "#ffb86c"
   Pink: "#ff79c6"
   Purple: "#bd93f9"
   Red: "#ff5555"
   Yellow: "#f1fa8c"
-  Blue: "#0000ff"
-  LightBlue: "#add8e6"
-  DarkGreen: "#006400"
-  Gold: "#ffd700"
-  Magenta: "#ff00ff"
+  Blue: "#6495ED"
   Teal: "#008080"
-  Lavender: "#e6e6fa"
-  Coral: "#ff7f50"
-  Turquoise: "#40e0d0"
 
 rules:
   # 主机名
   - description: 主机名
-    regex: (?m)^(hostname|sysname)\s+(\S+)$
+    regex: (?m)^(hostname|sysname|system-name)\s+(\S+)$
     color: 
       1: f.White
       2: f.Yellow bold
@@ -32,27 +22,52 @@ rules:
 
   # 接口名称
   - description: 接口名称
-    regex: \b(?:(?:(?:Ten|Twenty-?Five|Forty|Hundred)?Gig(?:abit)?|Fast)Ethernet|Et|Fa|Gi|Te|Fo|Hu|[Ee]r?th|[Ff]a|[Gg]i|[Tt][Ee]|[Ff]o|[Hh]u|Mgmt|Management|Loop\s?back|Lo|Vlan|Vl|Port-channel|Po|Tunnel|Tu|Dialer|Di|BVI|Virtual-Template|Virtual-Access|Multilink|Null|Serial|ATM|POS|Ethernet|GE|10GE|XGE|40GE|100GE|Eth-Trunk|Bridge-Aggregation|smartgroup|Satellite|AG|AS|BE|MFR|NVE|VL|VX|BD)\s*[-\d\/.:]+(:\d+)?(?:\s*[,.]?\s*\d+(?:\s*[.-]\s*\d+)*)?\b
+    regex: \b(?:(?:(?:Ten|Twenty-?Five|Forty|Hundred)?Gig(?:abit)?|Fast)Ethernet|Et|Fa|Gi|Te|Fo|Hu|Lo|Vlan|Port-channel|Po|Tunnel|Tu|Dialer|Di|BVI|Virtual-Template|Virtual-Access|Eth-Trunk|Bridge-Aggregation|smartgroup|Satellite|AG|AS|BE|MFR|NVE|VL|VX|BD|Cellular|Serial|ATM|POS|ge-|xe-|et-|fte-|xle-)\s*[-\d\/.:]+(:\d+)?(?:\s*[,.]?\s*\d+(?:\s*[.-]\s*\d+)*)?\b
     color: f.Purple
 
-  # 接口状态
-  - description: 接口状态
-    regex: \b((?:admin(?:istratively)?[\s-]?)?(?:up|down|shutdown|disabled|enabled|connected|disconnected|err-disabled|inactive|active|standby|hot-standby|failed|ok|error|unknown|not\s+present|unplugged|plugged|full-duplex|half-duplex|auto))\b
-    color:
-      "up|connected|enabled|active|ok": f.Green bold
-      "down|shutdown|disabled|disconnected|err-disabled|inactive|standby|failed|error|unplugged": f.Red bold
-      "unknown|not present|auto": f.Yellow italic
-      "full-duplex": f.Teal
-      "half-duplex": f.Orange
+# 接口和链路状态规则（拆分）
+  - description: 接口状态 - 正常
+    regex: \b((?:admin(?:istratively)?[\s-]?)?(up|connected|enabled|active))\b
+    color: f.Green bold
+
+  - description: 接口状态 - 关闭
+    regex: \b((?:admin(?:istratively)?[\s-]?)?(down|shutdown|disabled|disconnected))\b
+    color: f.Red bold
+
+  - description: 接口状态 - 错误禁用
+    regex: \b(err-disabled)\b
+    color: f.DarkRed bold
+
+  - description: 接口状态 - 非活动或待机
+    regex: \b(inactive|standby|hot-standby)\b
+    color: f.Orange bold
+
+  # 新增接口速度和双工模式规则
+  - description: 接口速度和双工模式
+    regex: \b(\d+(?:G|M|K)?(?:[Bb](?:ps)?)?(?:-(?:[Ff]ull|[Hh]alf))?)\b
+    color: f.LightGreen italic
+
+  # 新增接口错误计数器规则
+  - description: 接口错误计数器
+    regex: \b((?:CRC|collision|error|discard)\s*(?:count|a?s)?:?\s*\d+)\b
+    color: f.Pink italic
+
+  # 新增接口流量统计规则
+  - description: 接口流量统计
+    regex: \b((?:input|output|in|out)(?:put)?\s*(?:rate|packets|bytes):?\s*[\d.]+(?:\s*[kKmMgGtT]?(?:[Bb](?:ps)?|pps))?)\b
+    color: f.Purple italic
 
   # IP地址和子网掩码
   - description: IPv4地址和子网掩码
-    regex: \b(?:\d{1,3}\.){3}\d{1,3}(?:\/\d{1,2}|\s+\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})?\b
-    color: f.Teal
+    regex: \b((?:\d{1,3}\.){3}\d{1,3})((?:\/\d{1,2})|(?:\s+(?:\d{1,3}\.){3}\d{1,3}))?\b
+    color:
+      1: f.Blue
+      2: f.Orange
+    exclusive: true
 
   - description: IPv6地址
-    regex: \b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,7}:\b|\b(?:[A-Fa-f0-9]{1,4}:){1,6}:[A-Fa-f0-9]{1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,5}(?::[A-Fa-f0-9]{1,4}){1,2}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,4}(?::[A-Fa-f0-9]{1,4}){1,3}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,3}(?::[A-Fa-f0-9]{1,4}){1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,2}(?::[A-Fa-f0-9]{1,4}){1,5}\b|\b[A-Fa-f0-9]{1,4}:(?::[A-Fa-f0-9]{1,4}){1,6}\b|\b:(?:(?::[A-Fa-f0-9]{1,4}){1,7}|:)\b|\b::(?:[A-Fa-f0-9]{1,4}:){0,5}(?:[A-Fa-f0-9]{1,4}(?::[A-Fa-f0-9]{1,4})?|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\b|\b(?:[A-Fa-f0-9]{1,4}:){1,4}:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b
-    color: f.Blue
+    regex: \b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,7}:\b|\b(?:[A-Fa-f0-9]{1,4}:){1,6}:[A-Fa-f0-9]{1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,5}(?::[A-Fa-f0-9]{1,4}){1,2}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,4}(?::[A-Fa-f0-9]{1,4}){1,3}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,3}(?::[A-Fa-f0-9]{1,4}){1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,2}(?::[A-Fa-f0-9]{1,4}){1,5}\b|\b[A-Fa-f0-9]{1,4}:(?::[A-Fa-f0-9]{1,4}){1,6}\b|\b:(?:(?::[A-Fa-f0-9]{1,4}){1,7}|:)\b
+    color: f.Teal
 
   # 协议和服务
   - description: 路由协议
@@ -60,13 +75,13 @@ rules:
     color: f.Orange bold
 
   - description: 网络服务和协议
-    regex: \b(HSRP|VRRP|GLBP|STP|RSTP|MSTP|PVST\+|LACP|CDP|LLDP|NTP|SNMP|TACACS\+|RADIUS|SSH|Telnet|FTP|TFTP|HTTP|HTTPS|DNS|DHCP|ARP|ICMP|SMTP|POP3|IMAP)\b
-    color: f.Magenta
+    regex: \b(HSRP|VRRP|GLBP|STP|RSTP|MSTP|PVST\+|LACP|CDP|LLDP|NTP|SNMP|TACACS\+|RADIUS|SSH|Telnet|FTP|TFTP|HTTP|HTTPS|DNS|DHCP|ARP|ICMP)\b
+    color: f.Pink
 
   # VLAN配置
   - description: VLAN ID和名称
     regex: (?<=\bvlan\s)\d+|(?<=\bname\s).+
-    color: f.LightBlue
+    color: f.Blue
 
   # ACL和防火墙规则
   - description: ACL和防火墙规则
@@ -75,7 +90,7 @@ rules:
 
   # 路由配置
   - description: 路由配置
-    regex: \b(route|ip route|ipv6 route|next-hop|metric|distance|administrative distance|redistribute|default-information originate)\b
+    regex: \b(ip route|ipv6 route|next-hop|metric|distance|administrative distance|redistribute|default-information originate)\b
     color: f.Green
 
   # 安全配置
@@ -86,12 +101,12 @@ rules:
   # QoS配置
   - description: QoS配置
     regex: \b(qos|policy-map|class-map|service-policy|priority|bandwidth|shape|police|match|set dscp|set precedence|random-detect)\b
-    color: f.DarkGreen
+    color: f.Purple
 
   # 无线网络配置
   - description: 无线网络配置
     regex: \b(ssid|wlan|radio|channel|power|beacon|dtim|rts|cts|fragmentation|802\.11[abgn]?|wifi|access\spoint|controller)\b
-    color: f.Gold
+    color: f.Yellow
 
   # VPN配置
   - description: VPN配置
@@ -101,26 +116,26 @@ rules:
   # SDN和虚拟化
   - description: SDN和虚拟化配置
     regex: \b(sdn|openflow|nve|vxlan|evpn|vtep|vni|overlay|underlay|fabric|segment\srouting|srv6)\b
-    color: f.Turquoise
+    color: f.Teal
 
   # 系统级命令
   - description: 系统级命令
-    regex: \b(show|configure|set|clear|debug|no|enable|disable|exit|end|commit|rollback|save|write memory)\b
+    regex: \b(show|display|configure|set|clear|debug|no|enable|disable|exit|end|commit|rollback|save|write memory|top)\b
     color: f.White bold
 
   # 配置模式
   - description: 配置模式
-    regex: ^\s*(config|configure|conf)(\s+terminal|\s+t)?\s*$|^\s*(interface|router|line|vlan|class-map|policy-map)\s+.*$
+    regex: ^\s*(config|configure|conf|edit)(\s+terminal|\s+t|\s+private)?\s*$|^\s*(interface|router|line|vlan|class-map|policy-map|zone|system)\s+.*$
     color: f.Teal bold
 
   # 协议特定关键字
   - description: BGP关键字
     regex: \b(neighbor|remote-as|update-source|ebgp-multihop|route-reflector-client|address-family)\b
-    color: f.Coral
+    color: f.Orange
 
   - description: OSPF关键字
     regex: \b(area|network|router-id|passive-interface|default-information|lsa|spf|stub|nssa)\b
-    color: f.Lavender
+    color: f.Pink
 
   # 硬件特定
   - description: 硬件组件
@@ -133,15 +148,33 @@ rules:
     color: f.Orange italic
 
   # MAC地址
+  - description: MAC地址
     regex: \b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b
-    color: f.Teal italic
+    color: f.Blue italic
 
   # 注释
   - description: 注释
-    regex: ^\s*(!|#|\/\/).*$
+    regex: (?m)^(\s*(?:!|#|\/\/|\[).*(?:\])?$)
     color: f.Grey italic
+    exclusive: true
+
+  # URL
+  - description: URL
+    regex: \b((?:https?:\/\/|www\.)(?:[\w-]+\.)+[\w-]+(?:\/[\w-./?%&=]*)?)\b
+    color: f.Green underline
+    exclusive: true
 
   # 错误和警告
   - description: 错误和警告消息
     regex: \b(Error|Warning|Failed|Failure|Critical|Alert|Emergency)\b
     color: f.Red bold underline
+
+  # 厂商特定命令
+  - description: 厂商特定命令
+    regex: \b(switchport|spanning-tree|set cli|set chassis|system-view|config system|config router)\b
+    color: f.Purple
+
+  # 协议版本号
+  - description: 协议版本号
+    regex: \b(v1|v2|v3|v4|v5|v6)\b
+    color: f.Blue
