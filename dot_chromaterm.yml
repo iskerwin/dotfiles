@@ -1,121 +1,147 @@
-# @format
-
 palette:
-  # Dracula theme colors
+  # 扩展的颜色方案
   Black: "#282a36"
   Grey: "#44475a"
   White: "#f8f8f2"
   Dark: "#6272a4"
-  Cyan: "#8be9fd"
+  Teal: "#008080"
   Green: "#50fa7b"
   Orange: "#ffb86c"
   Pink: "#ff79c6"
   Purple: "#bd93f9"
   Red: "#ff5555"
   Yellow: "#f1fa8c"
+  Blue: "#0000ff"
+  LightBlue: "#add8e6"
+  DarkGreen: "#006400"
+  Gold: "#ffd700"
+  Magenta: "#ff00ff"
+  Teal: "#008080"
+  Lavender: "#e6e6fa"
+  Coral: "#ff7f50"
+  Turquoise: "#40e0d0"
 
 rules:
-  # General
-  - description: hostname
-    regex: (?<=hostname\s)[^\s].*
-    color: f.Yellow bold
+  # 主机名
+  - description: 主机名
+    regex: (?m)^(hostname|sysname)\s+(\S+)$
+    color: 
+      1: f.White
+      2: f.Yellow bold
     exclusive: true
 
-  - description: version number
-    regex: (?<=version\s).*$|(?<=version=).*$
-    color: f.Orange bold
-    exclusive: true
-
-  - description: MAC address
-    regex: ([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4}).*|[a-fA-F0-9]{2}((:|-)[a-fA-F0-9]{2}){5}
+  # 接口名称
+  - description: 接口名称
+    regex: \b(?:(?:(?:Ten|Twenty-?Five|Forty|Hundred)?Gig(?:abit)?|Fast)Ethernet|Et|Fa|Gi|Te|Fo|Hu|[Ee]r?th|[Ff]a|[Gg]i|[Tt][Ee]|[Ff]o|[Hh]u|Mgmt|Management|Loop\s?back|Lo|Vlan|Vl|Port-channel|Po|Tunnel|Tu|Dialer|Di|BVI|Virtual-Template|Virtual-Access|Multilink|Null|Serial|ATM|POS|Ethernet|GE|10GE|XGE|40GE|100GE|Eth-Trunk|Bridge-Aggregation|smartgroup|Satellite|AG|AS|BE|MFR|NVE|VL|VX|BD)\s*[-\d\/.:]+(:\d+)?(?:\s*[,.]?\s*\d+(?:\s*[.-]\s*\d+)*)?\b
     color: f.Purple
 
-  # IP Addresses
-  - description: ip address v4
-    regex: \b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/\d+)?\b
-    color: f.Purple bold
+  # 接口状态
+  - description: 接口状态
+    regex: \b((?:admin(?:istratively)?[\s-]?)?(?:up|down|shutdown|disabled|enabled|connected|disconnected|err-disabled|inactive|active|standby|hot-standby|failed|ok|error|unknown|not\s+present|unplugged|plugged|full-duplex|half-duplex|auto))\b
+    color:
+      "up|connected|enabled|active|ok": f.Green bold
+      "down|shutdown|disabled|disconnected|err-disabled|inactive|standby|failed|error|unplugged": f.Red bold
+      "unknown|not present|auto": f.Yellow italic
+      "full-duplex": f.Teal
+      "half-duplex": f.Orange
 
-  - description: subnet mask
-    regex: \s255\.\d{1,3}\.\d{1,3}\.\d{1,3}
+  # IP地址和子网掩码
+  - description: IPv4地址和子网掩码
+    regex: \b(?:\d{1,3}\.){3}\d{1,3}(?:\/\d{1,2}|\s+\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})?\b
+    color: f.Teal
+
+  - description: IPv6地址
+    regex: \b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,7}:\b|\b(?:[A-Fa-f0-9]{1,4}:){1,6}:[A-Fa-f0-9]{1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,5}(?::[A-Fa-f0-9]{1,4}){1,2}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,4}(?::[A-Fa-f0-9]{1,4}){1,3}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,3}(?::[A-Fa-f0-9]{1,4}){1,4}\b|\b(?:[A-Fa-f0-9]{1,4}:){1,2}(?::[A-Fa-f0-9]{1,4}){1,5}\b|\b[A-Fa-f0-9]{1,4}:(?::[A-Fa-f0-9]{1,4}){1,6}\b|\b:(?:(?::[A-Fa-f0-9]{1,4}){1,7}|:)\b|\b::(?:[A-Fa-f0-9]{1,4}:){0,5}(?:[A-Fa-f0-9]{1,4}(?::[A-Fa-f0-9]{1,4})?|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\b|\b(?:[A-Fa-f0-9]{1,4}:){1,4}:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b
+    color: f.Blue
+
+  # 协议和服务
+  - description: 路由协议
+    regex: \b(BGP|OSPF|EIGRP|RIP|ISIS|MPLS|LDP|RSVP|BFD|PIM|IGMP|MSDP)\b
     color: f.Orange bold
-    exclusive: true
 
-  # Interfaces
-  - description: interface physical
-    regex: "^Physical interface: [a-zA-Z0-9/-]+"
+  - description: 网络服务和协议
+    regex: \b(HSRP|VRRP|GLBP|STP|RSTP|MSTP|PVST\+|LACP|CDP|LLDP|NTP|SNMP|TACACS\+|RADIUS|SSH|Telnet|FTP|TFTP|HTTP|HTTPS|DNS|DHCP|ARP|ICMP|SMTP|POP3|IMAP)\b
+    color: f.Magenta
+
+  # VLAN配置
+  - description: VLAN ID和名称
+    regex: (?<=\bvlan\s)\d+|(?<=\bname\s).+
+    color: f.LightBlue
+
+  # ACL和防火墙规则
+  - description: ACL和防火墙规则
+    regex: \b(permit|deny|access-list|rule|acl|firewall\spolicy)\b
+    color: f.Red bold
+
+  # 路由配置
+  - description: 路由配置
+    regex: \b(route|ip route|ipv6 route|next-hop|metric|distance|administrative distance|redistribute|default-information originate)\b
     color: f.Green
 
-  - description: interface status
-    regex: \b(?<!-)(up|Up|UP|ON|on|On|in)(?!-)\b|\b(?<!-)(down|Down|DOWN|OFF|Off|off|out)(?!-)\b
-    color:
-      1: f.Green bold
-      2: f.Red italic
+  # 安全配置
+  - description: 安全相关配置
+    regex: \b(encryption|key|secret|password|md5|sha256|aes|des|3des|rsa|authentication|authorization|accounting)\b
+    color: f.Pink bold
 
-  - description: interface name
-    regex: \b((Fast|Gigabit|TenGigabit|FortyGigabit|TwentyFiveGigabit|HundredGigabit|Bundle\-)?Ethernet|Mgmt)(\s\d+)?([\/a-zA-Z0-9\._-]+)?\b
-    color: f.Purple
+  # QoS配置
+  - description: QoS配置
+    regex: \b(qos|policy-map|class-map|service-policy|priority|bandwidth|shape|police|match|set dscp|set precedence|random-detect)\b
+    color: f.DarkGreen
 
-  - description: virtual interface
-    regex: '\b([lL]oopback|LOOPBACK|\bagg\b|[Aa]ggregate[Pp]ort|port-group|SSLVPN|SSL VPN)(\s\d+)?\b|\b(?<!-)(vlan|Vlan|VLAN)(?!-)(\s\d+)?\b'
-    color: f.Purple
-    exclusive: true
+  # 无线网络配置
+  - description: 无线网络配置
+    regex: \b(ssid|wlan|radio|channel|power|beacon|dtim|rts|cts|fragmentation|802\.11[abgn]?|wifi|access\spoint|controller)\b
+    color: f.Gold
 
-  - description: interface description
-    regex: ^(\s*)(description[:]?|Description[:]?)\s.*$
-    color: f.Dark italic
-    exclusive: true
+  # VPN配置
+  - description: VPN配置
+    regex: \b(vpn|ipsec|gre|l2tp|pptp|crypto|isakmp|esp|tunnel|transform-set|phase1|phase2)\b
+    color: f.Purple italic
 
-  - description: interface shutdown status
-    regex: (shutdown)|(no\sshutdown)
-    color:
-      1: f.Red bold strike invert
-      2: f.Green
-    exclusive: true
+  # SDN和虚拟化
+  - description: SDN和虚拟化配置
+    regex: \b(sdn|openflow|nve|vxlan|evpn|vtep|vni|overlay|underlay|fabric|segment\srouting|srv6)\b
+    color: f.Turquoise
 
-  # VLANs and Trunking
-  - description: vlan description
-    regex: \sname\s.*
+  # 系统级命令
+  - description: 系统级命令
+    regex: \b(show|configure|set|clear|debug|no|enable|disable|exit|end|commit|rollback|save|write memory)\b
+    color: f.White bold
+
+  # 配置模式
+  - description: 配置模式
+    regex: ^\s*(config|configure|conf)(\s+terminal|\s+t)?\s*$|^\s*(interface|router|line|vlan|class-map|policy-map)\s+.*$
+    color: f.Teal bold
+
+  # 协议特定关键字
+  - description: BGP关键字
+    regex: \b(neighbor|remote-as|update-source|ebgp-multihop|route-reflector-client|address-family)\b
+    color: f.Coral
+
+  - description: OSPF关键字
+    regex: \b(area|network|router-id|passive-interface|default-information|lsa|spf|stub|nssa)\b
+    color: f.Lavender
+
+  # 硬件特定
+  - description: 硬件组件
+    regex: \b(linecard|module|power\ssupply|fan|temperature|cpu|memory|flash|nvram)\b
     color: f.Yellow italic
-    exclusive: true
 
-  - description: switchport mode
-    regex: \b(?<!-)(access|Access|ACCESS)(?!-)\b|\b(trunk|Trunk|TRUNK)\b
-    color:
-      1: f.Cyan
-      2: f.Purple bold
-
-  - description: switchport trunk Allowed
-    regex: only(\s\d+,).*
+  # 日志级别
+  - description: 日志级别
+    regex: \b(emergencies|alerts|critical|errors|warnings|notifications|informational|debugging)\b
     color: f.Orange italic
-    exclusive: true
 
-  - description: switchport trunk Native
-    regex: \b([nN]ative)\b
-    color: f.Orange
-    exclusive: true
+  # MAC地址
+    regex: \b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b
+    color: f.Teal italic
 
-  # Routing
-  - description: route type
-    regex: \s(C|R|L|O|B|I|V|N1|E1|SU|IA|E2|L1|L2)\s
-    color: f.Yellow
+  # 注释
+  - description: 注释
+    regex: ^\s*(!|#|\/\/).*$
+    color: f.Grey italic
 
-  - description: default route
-    regex: S\*
-    color: f.Orange
-
-  # Security
-  - description: access-list name
-    regex: (ip\s)?access-(list[s]?|group)\s?([a-zA-Z0-9_-]+)?
-    color: f.Purple bold
-    exclusive: true
-
-  - description: access-list rules type
-    regex: \s(ahp|eigrp|esp|gre|ge|dscp|next-hop|le|icmp|igmp|ip|ipinip|nos|ospf|pcp|pim|tcp|udp|eq|gt|lt|neq|range)\s
-    color: f.Cyan
-
-  # Error logs
-  - description: error log
-    regex: (\%ARP-4-DUPADDR:|%DHCPD-4-PING_CONFLICT:|%ARP-4-ARPCHANGEMAC:)|(%DHCPD-4-LEASETHRESHOLD:)
-    color:
-      1: f.Red
-      2: f.Yellow
+  # 错误和警告
+  - description: 错误和警告消息
+    regex: \b(Error|Warning|Failed|Failure|Critical|Alert|Emergency)\b
+    color: f.Red bold underline
