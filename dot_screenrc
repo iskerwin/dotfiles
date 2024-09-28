@@ -1,7 +1,7 @@
 # 设置 Screen 的编码
 defutf8 on
 defencoding utf8
-encoding utf8 utf8
+encoding utf8
 
 # 关闭启动信息
 startup_message off
