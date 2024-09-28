@@ -1,13 +1,14 @@
 palette:
+  Red: "#ff5555"
+  Blue: "#009FBD"
   Grey: "#999999"
+  Pink: "#ff79c6"
+  Teal: "#219C90"
   Green: "#50fa7b"
   Orange: "#ffb86c"
-  Pink: "#ff79c6"
   Purple: "#bd93f9"
-  Red: "#ff5555"
   Yellow: "#f1fa8c"
-  Blue: "#6495ED"
-  Teal: "#008080"
+
 
 rules:
   # 主机名
