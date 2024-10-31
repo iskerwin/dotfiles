@@ -10,7 +10,7 @@ alias snell='cat ../etc/snell/config.conf'
 alias ssh='ct screen ssh'
 # alias sshls='awk '/^Host / {print $2}' ~/.ssh/config'
 alias sshls='grep "^Host " ~/.ssh/config'
-alias sshconf='code ~/.ssh/config'
+alias sshconf='vim ~/.ssh/config'
 
 ##############################
 # Git Aliases
@@ -68,6 +68,9 @@ alias zim='zimfw'
 alias czm='chezmoi'
 alias config='chezmoi cd'
 alias ccd='cd $(fd . --hidden --type=d | fzf)'
+alias f='fzf'
+alias vf='vim $(fzf)'
+alias cf='code $(fzf)'
 
 ##############################
 # Colorize Grep Output
