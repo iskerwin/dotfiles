@@ -15,9 +15,6 @@ export FZF_IGNORE_DIRS=(
     .gradle
     .m2
     Library
-    Pictures
-    Movies
-    Music
     Applications
     Public
 )
