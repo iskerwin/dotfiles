@@ -1,0 +1,29 @@
+Host KLS_S7805C
+  HostName 121.33.38.210
+  User ruijie
+  Port 20001
+
+Host KLS_EG3000SE
+  HostName 121.33.38.210
+  User ruijie
+  Port 20007
+
+Host KLS_WS7204-A
+  HostName 121.33.38.210
+  User ruijie
+  Port 20004
+
+Host KLS_Z5100
+  HostName 121.33.38.210
+  User ruijie
+  Port 20005
+
+Host KLS_M7008-WSM
+  HostName 183.6.92.43
+  User ruijie
+  Port 20003
+
+Host KLS_SG7008L
+  HostName 183.6.92.43
+  User ruijie
+  Port 20002

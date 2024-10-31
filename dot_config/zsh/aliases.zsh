@@ -6,10 +6,11 @@ alias tip='bat ~/.config/zsh/aliases.zsh'
 alias home='cd ~'
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # pretty print the PATH
 alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
-alias config='chezmoi cd'
-alias EC2='ssh -i "Ubuntu.pem" ubuntu@ec2-13-213-41-164.ap-southeast-1.compute.amazonaws.com'
 alias snell='cat ../etc/snell/config.conf'
-alias lsdev='ls /dev/cu.*'
+alias ssh='ct screen ssh'
+# alias sshls='awk '/^Host / {print $2}' ~/.ssh/config'
+alias sshls='grep "^Host " ~/.ssh/config'
+alias sshconf='code ~/.ssh/config'
 
 ##############################
 # Git Aliases
@@ -48,8 +49,8 @@ alias c='clear'
 alias ip='ifconfig en0 | grep inet'
 alias his='history | fzf'
 
-alias myip='curl http://ipecho.net/plain; echo'
-# alias myip='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'
+alias myip_in='curl http://ipecho.net/plain; echo'
+alias myip_out='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'
 alias speed='networkQuality'
 alias weather='curl wttr.in'
 alias backup='brew bundle dump --describe --force --file="./Brewfile"'
@@ -65,10 +66,8 @@ alias jo='joshuto'
 alias sz='source ~/.zshrc'
 alias zim='zimfw'
 alias czm='chezmoi'
-alias czmcd='/Users/kerwin/.local/share/chezmoi'
+alias config='chezmoi cd'
 alias ccd='cd $(fd . --hidden --type=d | fzf)'
-alias vim='vim $(fd . --hidden --type=f | fzf)'
-alias code='code $(fd . --hidden --type=f | fzf)'
 
 ##############################
 # Colorize Grep Output
@@ -90,6 +89,7 @@ alias sk='killall screen'     # 终止所有 screen 会话
 alias sd='screen -d'          # 分离当前 screen 会话
 alias snw='screen -X screen'  # 在当前 screen 会话中创建新窗口并执行命令
 alias snd='screen -dm'        # 创建新的 screen 会话，并立即分离
+alias lsdev='ls /dev/cu.*'
 
 # 在新的 screen 窗口中执行命令，并立即返回
 srun() {

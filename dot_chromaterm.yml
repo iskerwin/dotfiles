@@ -21,40 +21,49 @@ rules:
 
   # 接口名称
   - description: 接口名称
-    regex: \b(?:(?:(?:Ten|Twenty-?Five|Forty|Hundred)?Gig(?:abit)?|Fast)Ethernet|Et|Fa|Gi|Te|Fo|Hu|Lo|Vlan|Port-channel|Po|Tunnel|Tu|Dialer|Di|BVI|Virtual-Template|Virtual-Access|Eth-Trunk|Bridge-Aggregation|smartgroup|Satellite|AG|AS|BE|MFR|NVE|VL|VX|BD|Cellular|Serial|ATM|POS|ge-|xe-|et-|fte-|xle-)\s*[-\d\/.:]+(:\d+)?(?:\s*[,.]?\s*\d+(?:\s*[.-]\s*\d+)*)?\b
+    regex: (?i)\b(?:(?:(?:Ten|Twenty-?Five|Forty|Hundred)?Gig(?:abit)?|Fast)Ethernet|Et|Fa|Gi|Te|Fo|Hu|Lo|Port-channel|Po|Tunnel|Tu|Dialer|Di|BVI|Virtual-Template|Virtual-Access|Eth-Trunk|Bridge-Aggregation|smartgroup|Satellite|AG|AS|BE|MFR|NVE|VL|VX|BD|Cellular|Serial|ATM|POS|ge-|xe-|et-|fte-|xle-)\s*[-\d\/.:]+(:\d+)?(?:\s*[,.]?\s*\d+(?:\s*[.-]\s*\d+)*)?\b
     color: f.Purple
+
+  # 接口类型
+  - description: 接口类型
+    regex: (?i)fiber
+    color: f.Pink
+
+  - description: 接口类型
+    regex: (?i)copper
+    color: f.Yellow
 
 # 接口和链路状态规则（拆分）
   - description: 接口状态 - 正常
-    regex: \b((?:admin(?:istratively)?[\s-]?)?(?:\w+-)*(up|connected|enabled|active))(?:-\w+)*\b
+    regex: (?i)\b((?:admin(?:istratively)?[\s-]?)?(?:\w+-)*(up|connected|enabled|active|yes|auto|on))(?:-\w+)*\b
     color: f.Green bold
 
   - description: 接口状态 - 关闭
-    regex: \b((?:admin(?:istratively)?[\s-]?)?(?:\w+-)*(down|shutdown|disabled|disconnected))(?:-\w+)*\b
+    regex: (?i)\b((?:admin(?:istratively)?[\s-]?)?(?:\w+-)*(down|shutdown|disabled|disconnected|no|off))(?:-\w+)*\b
     color: f.Red bold
 
   - description: 接口状态 - 错误禁用
-    regex: \b(?:\w+-)*((err-disabled)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(err-disabled)(?:-\w+)*\b
     color: f.Red bold
 
   - description: 接口状态 - 非活动或待机
-    regex: \b(?:\w+-)*(inactive|standby|hot-standby)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(inactive|standby|hot-standby)(?:-\w+)*\b
     color: f.Orange bold
-
-  # 新增接口速度和双工模式规则
-  - description: 接口速度和双工模式
-    regex: \b(\d+(?:G|M|K)?(?:[Bb](?:ps)?)?(?:-(?:[Ff]ull|[Hh]alf))?)\b
-    color: f.LightGreen italic
 
   # 新增接口错误计数器规则
   - description: 接口错误计数器
-    regex: \b((?:\w+-)*(CRC|collision|error|discard)(?:-\w+)*\s*(?:count|a?s)?:?\s*\d+)\b
+    regex: (?i)\b(?:\w+-)*(\d+ (CRC|collisions?|error|discard))(?:-\w+)*\b
     color: f.Pink italic
+    exclusive: true
 
   # 新增接口流量统计规则
-  - description: 接口流量统计
-    regex: \b((?:input|output|in|out)(?:put)?\s*(?:rate|packets|bytes):?\s*[\d.]+(?:\s*[kKmMgGtT]?(?:[Bb](?:ps)?|pps))?)\b
+  - description: 接口流量统计(in)
+    regex: (?i)\b(?:\w+-)*(\d+ input errors|BW \d+ Kbit|\d+ packets input|input rate \d+ bits/sec|input peak rate[:] \d+ bits/sec)(?:-\w+)*\b
     color: f.Purple italic
+
+  - description: 接口流量统计(out)
+    regex: (?i)\b(?:\w+-)*(\d+ output errors|BW \d+ Kbit|\d+ packets output|output rate \d+ bits/sec|output peak rate[:] \d+ bits/sec)(?:-\w+)*\b
+    color: f.Blue italic
 
   # URL
   - description: URL
@@ -76,84 +85,85 @@ rules:
 
   # 协议和服务
   - description: 路由协议
-    regex: \b(?:\w+-)*(BGP|OSPF|EIGRP|RIP|ISIS|MPLS|LDP|RSVP|BFD|PIM|IGMP|MSDP)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(BGP|OSPF|EIGRP|RIP|ISIS|MPLS|LDP|RSVP|BFD|PIM|IGMP|MSDP)(?:-\w+)*\b
     color: f.Orange bold
 
   - description: 网络服务和协议
-    regex: \b(?:\w+-)*(HSRP|VRRP|GLBP|STP|RSTP|MSTP|PVST\+|LACP|CDP|LLDP|NTP|SNMP|TACACS\+|RADIUS|SSH|Telnet|FTP|TFTP|HTTP|HTTPS|DNS|DHCP|ARP|ICMP)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(HSRP|VRRP|GLBP|STP|RSTP|MSTP|PVST\+|LACP|CDP|LLDP|NTP|SNMP|TACACS\+|RADIUS|SSH|SSHD|Telnet|FTP|TFTP|HTTP|HTTPS|DNS|DHCP|ARP|ICMP|UDP|TCP|MTP)(?:-\w+)*\b
     color: f.Pink
 
   # VLAN配置
   - description: VLAN ID和名称
-    regex: (?<=\bvlan\s)\d+|(?<=\bname\s).+
-    color: f.Blue
+    regex: (?i)\b(?:\w+-)*(VLAN|Native|Allowed|Active|trunk|access|lists)(?:-\w+)*\b
+    color: f.Teal
+    exclusive: true
 
   # ACL和防火墙规则
   - description: ACL和防火墙规则
-    regex: \b(?:\w+-)*(permit|deny|access-list|rule|acl|firewall|policy)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(permit|deny|access-list|rule|acl|firewall|policy|in)(?:-\w+)*\b
     color: f.Green bold
 
   - description: ACL和防火墙规则
-    regex: \b(?:\w+-)*(deny)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(deny|out)(?:-\w+)*\b
     color: f.Red bold
 
   # 路由配置
   - description: 路由配置
-    regex: \b(?:\w+-)*(ip route|ipv6 route|next-hop|metric|distance|administrative distance|redistribute|default-information originate)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(ip route|ipv6 route|nat_pool|next-hop|metric|distance|administrative distance|redistribute|default-information originate)(?:-\w+)*\b
     color: f.Green
 
   # 安全配置
   - description: 安全相关配置
-    regex: \b(?:\w+-)*(encryption|key|secret|service|username|password|md5|sha256|aes|des|3des|rsa|authentication|authorization|accounting)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(encryption|key|secret|service|username|password|privilege|md5|sha256|sha1-96|sha1|sha2-256|sha2-512|aes|des|3des|rsa|authentication|authorization|accounting)(?:-\w+)*\b
     color: f.Pink bold
 
   # QoS配置
   - description: QoS配置
-    regex: \b(?:\w+-)*(qos|policy-map|class-map|service-policy|priority|bandwidth|shape|police|match|set dscp|set precedence|random-detect)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(qos|policy-map|class-map|service-policy|priority|bandwidth|shape|police|match|set dscp|set precedence|random-detect)(?:-\w+)*\b
     color: f.Purple
 
   # 无线网络配置
   - description: 无线网络配置
-    regex: \b(?:\w+-)*(ssid|wlan|wlansec|group|radio|channel|power|beacon|dtim|rts|cts|fragmentation|802\.11[abgn]?|wifi|access\spoint|controller)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(ssid|wlan|wlansec|group|radio|channel|power|beacon|dtim|rts|cts|fragmentation|802\.11[abgn]?|wifi|access\spoint|controller)(?:-\w+)*\b
     color: f.Yellow
 
   # VPN配置
   - description: VPN配置
-    regex: \b(?:\w+-)*(vpn|ipsec|gre|l2tp|pptp|crypto|isakmp|esp|tunnel|Tunnel|transform-set|phase1|phase2)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(vpn|ipsec|gre|l2tp|pptp|crypto|isakmp|esp|tunnel|Tunnel|transform-set|phase1|phase2)(?:-\w+)*\b
     color: f.Purple italic
 
   # SDN和虚拟化
   - description: SDN和虚拟化配置
-    regex: \b(?:\w+-)*(sdn|openflow|nve|vxlan|evpn|vtep|vni|overlay|underlay|fabric|segment\srouting|srv6)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(sdn|openflow|nve|vxlan|evpn|vtep|vni|overlay|underlay|fabric|segment\srouting|srv6)(?:-\w+)*\b
     color: f.Teal
 
   # 系统级命令
   - description: 系统级命令
-    regex: \b(?:\w+-)*(show|display|configure|set|clear|debug|no|enable|disable|exit|end|commit|rollback|save|write memory|top)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(ip|show|display|configure|set|clear|debug|enable|disable|exit|end|commit|rollback|save|write memory|top)(?:-\w+)*\b
     color: f.Yellow bold
 
   # 配置模式
   - description: 配置模式
-    regex: ^\s*(config|configure|conf|edit)(\s+terminal|\s+t|\s+private)?\s*$|^\s*(interface|router|line|vlan|class-map|policy-map|zone|system)\s+.*$
+    regex: (?i)^\s*(config|configure|conf|edit)(\s+terminal|\s+t|\s+private)?\s*$|^\s*(interface|router|line|class-map|policy-map|zone|system)\s+.*$
     color: f.Teal bold
 
   # 协议特定关键字
   - description: BGP关键字
-    regex: \b(?:\w+-)*(neighbor|remote-as|update-source|ebgp-multihop|route-reflector-client|address-family)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(neighbor|remote-as|update-source|ebgp-multihop|route-reflector-client|address-family)(?:-\w+)*\b
     color: f.Orange
 
   - description: OSPF关键字
-    regex: \b(?:\w+-)*(area|network|router-id|passive-interface|default-information|lsa|spf|stub|nssa)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(area|network|router-id|passive-interface|default-information|lsa|spf|stub|nssa)(?:-\w+)*\b
     color: f.Pink
 
   # 硬件特定
   - description: 硬件组件
-    regex: \b(?:\w+-)*(linecard|module|power\ssupply|fan|temperature|cpu|memory|flash|nvram)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(linecard|module|server|filter|file|hmac-algorithm|userinfo|buffered|power\ssupply|fan|temperature|cpu|memory|flash|nvram)(?:-\w+)*\b
     color: f.Yellow italic
 
   # 日志级别
   - description: 日志级别
-    regex: \b(?:\w+-)*(emergencies|alerts|critical|errors|warnings|notifications|informational|debugging)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(emergencies|alerts|critical|errors|warnings|notifications|informational|debugging)(?:-\w+)*\b
     color: f.Orange italic
 
   # MAC地址
@@ -169,15 +179,23 @@ rules:
 
   # 错误和警告
   - description: 错误和警告消息
-    regex: \b(?:\w+-)*(Error|Warning|Failed|Failure|Critical|Alert|Emergency)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(Error|Warning|Failed|Failure|Critical|Alert|Emergency|dropped)(?:-\w+)*\b
     color: f.Red bold underline
 
   # 厂商特定命令
   - description: 厂商特定命令
-    regex: \b(?:\w+-)*(switchport|spanning-tree|set cli|set chassis|system-view|config system|config router)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(switchport|spanning-tree|set cli|set chassis|system-view|config system|config router)(?:-\w+)*\b
     color: f.Purple
 
   # 协议版本号
   - description: 协议版本号
-    regex: \b(?:\w+-)*(version)(?:-\w+)*\b
+    regex: (?i)\b(?:\w+-)*(version)(?:-\w+)*\b
     color: f.Orange
+
+  - description: 日期时间
+    regex: (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})
+    color: f.Yellow
+
+  - description: 运行时长
+    regex: ((?:\d+\s+(?:year|month|week|day|hour|minute|second)s?,?\s*)+)
+    color: f.Yellow
