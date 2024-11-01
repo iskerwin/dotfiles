@@ -41,7 +41,7 @@ else
 fi
 
 # 设置补全触发器为反斜杠
-export FZF_COMPLETION_TRIGGER='\\'
+export FZF_COMPLETION_TRIGGER=']'
 
 # ===== 外观和功能配置 =====
 export FZF_DEFAULT_OPTS='
@@ -87,6 +87,8 @@ export FZF_DEFAULT_OPTS='
 # 确保目录存在
 [ -d ~/.config/fzf ] || mkdir -p ~/.config/fzf
 source ~/.config/fzf/type.zsh
+source ~/.config/fzf/completion.zsh
+source ~/.config/fzf/key-bindings.zsh
 
 # 清理函数
 fzfcleanup() {

@@ -66,21 +66,21 @@ alias gm='git merge'                              # Merge
 ##############################
 
 # Homebrew Package Management
-alias update='brew update'                         # Update Homebrew
-alias upgrade='brew upgrade'                       # Upgrade packages
-alias cleanup='brew cleanup'                       # Clean old versions
-alias install='brew install'                       # Install package
+alias update='brew update'                        # Update Homebrew
+alias upgrade='brew upgrade'                      # Upgrade packages
+alias cleanup='brew cleanup'                      # Clean old versions
+alias install='brew install'                      # Install package
 alias uninstall='brew uninstall'                  # Remove package
 alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'  # Check system
 alias update-all='brew cu -a -f -v --no-brew-update -y'      # Update all casks
-alias uud='update; upgrade; cleanup; doctor'       # Full system update
+alias uud='update; upgrade; cleanup; doctor'      # Full system update
 
 # System Information
 alias ip='ifconfig en0 | grep inet'               # Show local IP
 alias myip_in='curl http://ipecho.net/plain; echo'  # Internal IP
 alias myip_out='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'  # External IP
-alias speed='networkQuality'                       # Network speed test
-alias weather='curl wttr.in'                      # Show weather
+alias speed='networkQuality'                      # Network speed test
+alias weather='curl wttr.in/Guangzhou'            # Show weather
 alias lsdev='ls /dev/cu.*'                        # List serial devices
 
 ##############################

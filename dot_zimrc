@@ -7,22 +7,6 @@
 #------------------------------------------------
 # Modules
 #------------------------------------------------
-# Provides a convenient way to load ssh-agent.
-zmodule ssh
-# Applies correct bindkeys for input events.
-zmodule input
-# Sets a custom terminal title.
-zmodule termtitle
-# Sets sane Zsh built-in environment options.
-zmodule environment
-
-#------------------------------------------------
-# Prompt
-#------------------------------------------------
-
-# Starship prompt for zsh
-# zmodule joke/zim-starship
-
 zmodule romkatv/powerlevel10k --use degit
 
 #------------------------------------------------
