@@ -1,127 +1,146 @@
 ##############################
-# Path Aliases
+# File Navigation
 ##############################
 
-alias tip='bat ~/.config/zsh/aliases.zsh'
+# Directory Navigation
 alias home='cd ~'
-alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # pretty print the PATH
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ccd='cd $(fd . --hidden --type=d | fzf)'  # Interactive directory navigation with fzf
 alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
-alias snell='cat ../etc/snell/config.conf'
-alias ssh='ct screen ssh'
-# alias sshls='awk '/^Host / {print $2}' ~/.ssh/config'
-alias sshls='grep "^Host " ~/.ssh/config'
-alias sshconf='vim ~/.ssh/config'
+
+# Directory Listing (using eza/exa)
+alias ls='eza --group-directories-first --icons'
+alias la='ls -a'                                # List all files including hidden
+alias ll='ls -l'                                # Long format
+alias l='ll -a'                                 # Long format, all files
+alias lr='ll -T'                                # Long format, recursive as tree
+alias lx='ll -sextension'                       # Sort by extension
+alias lk='ll -ssize'                            # Sort by size
+alias lt='ll -smodified'                        # Sort by modification time
+alias lc='ll -schanged'                         # Sort by change time
+alias l.='ls -d .*'                             # List only dotfiles
+alias tree='exa --tree --group-directories-first --icons'
 
 ##############################
-# Git Aliases
+# File Operations
 ##############################
 
-alias add='git add .'
-alias log='git log --oneline --graph --decorate --all' # view commit history
-alias pull='git pull origin'
-alias push='git push origin'
-alias stat='git status'                                # 'status' is protected name so using 'stat' instead
-alias diff='git diff --name-only --diff-filter=d | xargs bat --diff'
-alias fetch='git fetch'
-alias clone='git clone'
-alias commit='git commit -m'                           # commit all staging area files to the local repository
-alias commitam='git commit -am'                        # commit all modified files to the local repository
+# File Finding and Opening
+alias o='open -R $(fd . --hidden --type=f | fzf)'  # Open file in default app
+alias vf='vim $(fzf)'                              # Open file in vim
+alias cf='code $(fzf)'                             # Open file in VS Code
+alias jo='joshuto'                                 # File manager
+
+# Safe Remove Operations
+if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
+    alias rm='safe-rm'
+fi
+alias clean-ds='find . -type f -name "*.DS_Store" -ls -delete'  # Remove .DS_Store files
 
 ##############################
-# Homebrew Stuffs
+# Git Operations
 ##############################
 
-alias update-all='brew cu -a -f -v --no-brew-update -y'
-alias update='brew update'
-alias upgrade='brew upgrade'
-alias cleanup='brew cleanup'
-alias install='brew install'
-alias uninstall='brew uninstall'
-alias doctor="echo '\nDoctor? Doctor who?\n' && brew doctor"
-alias uud='update; upgrade; cleanup; doctor'
+alias g='git'
+alias ga='git add'
+alias add='git add .'                              # Add all changes
+alias log='git log --oneline --graph --decorate --all'  # Pretty git log
+alias pull='git pull origin'                       # Pull from origin
+alias push='git push origin'                       # Push to origin
+alias stat='git status'                           # Show status
+alias diff='git diff --name-only --diff-filter=d | xargs bat --diff'  # Show changes
+alias fetch='git fetch'                           # Fetch updates
+alias clone='git clone'                           # Clone repository
+alias commit='git commit -m'                      # Commit with message
+alias commitam='git commit -am'                   # Add and commit modified files
+alias gb='git branch'                             # List branches
+alias gco='git checkout'                          # Checkout branch/commit
+alias grb='git rebase'                            # Rebase
+alias gm='git merge'                              # Merge
 
 ##############################
-# Utilities Aliases
+# System Operations
 ##############################
 
-alias q='exit'
-alias c='clear'
-alias ip='ifconfig en0 | grep inet'
-alias his='history | fzf'
+# Homebrew Package Management
+alias update='brew update'                         # Update Homebrew
+alias upgrade='brew upgrade'                       # Upgrade packages
+alias cleanup='brew cleanup'                       # Clean old versions
+alias install='brew install'                       # Install package
+alias uninstall='brew uninstall'                  # Remove package
+alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'  # Check system
+alias update-all='brew cu -a -f -v --no-brew-update -y'      # Update all casks
+alias uud='update; upgrade; cleanup; doctor'       # Full system update
 
-alias myip_in='curl http://ipecho.net/plain; echo'
-alias myip_out='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'
-alias speed='networkQuality'
-alias weather='curl wttr.in'
-alias backup='brew bundle dump --describe --force --file="./Brewfile"'
-alias clean-DS_Store="find . -type f -name '*.DS_Store' -ls -delete"
-alias restore-brewfile='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
-
-##############################
-# Plugin Aliases
-##############################
-
-alias o='open -R $(fd . --hidden --type=f | fzf)'
-alias jo='joshuto'
-alias sz='source ~/.zshrc'
-alias zim='zimfw'
-alias czm='chezmoi'
-alias config='chezmoi cd'
-alias ccd='cd $(fd . --hidden --type=d | fzf)'
-alias f='fzf'
-alias vf='vim $(fzf)'
-alias cf='code $(fzf)'
+# System Information
+alias ip='ifconfig en0 | grep inet'               # Show local IP
+alias myip_in='curl http://ipecho.net/plain; echo'  # Internal IP
+alias myip_out='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'  # External IP
+alias speed='networkQuality'                       # Network speed test
+alias weather='curl wttr.in'                      # Show weather
+alias lsdev='ls /dev/cu.*'                        # List serial devices
 
 ##############################
-# Colorize Grep Output
+# SSH Management
 ##############################
 
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
+alias ssh='ct screen ssh'                         # SSH with screen support
+alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
+alias sshconf='vim ~/.ssh/config'                 # Edit SSH config
 
 ##############################
-# Screen
+# Screen Management
 ##############################
 
-alias sn='screen -S'          # 创建新的 screen 会话或附加到已存在的会话
-alias sl='screen -ls'         # 列出所有 screen 会话
-alias sr='screen -r'          # 重新连接到指定的 screen 会话
-alias sm='screen -DR main'    # 创建或重新连接到名为"main"的会话
-alias sk='killall screen'     # 终止所有 screen 会话
-alias sd='screen -d'          # 分离当前 screen 会话
-alias snw='screen -X screen'  # 在当前 screen 会话中创建新窗口并执行命令
-alias snd='screen -dm'        # 创建新的 screen 会话，并立即分离
-alias lsdev='ls /dev/cu.*'
+alias sn='screen -S'                              # Create/attach screen session
+alias sl='screen -ls'                             # List screen sessions
+alias sr='screen -r'                              # Reattach to screen
+alias sm='screen -DR main'                        # Main screen session
+alias sk='killall screen'                         # Kill all screens
+alias sd='screen -d'                              # Detach screen
+alias snw='screen -X screen'                      # New window in current session
+alias snd='screen -dm'                            # Create detached session
 
-# 在新的 screen 窗口中执行命令，并立即返回
+# Run command in new screen window
 srun() {
     screen -dm bash -c "$*"
 }
 
 ##############################
-# exa 
+# Development Tools
 ##############################
 
-# Ensure exa is available
+# Package Management
+alias czm='chezmoi'                               # Dotfiles manager
+alias config='chezmoi cd'                         # Go to dotfiles directory
+alias zim='zimfw'                                 # Zim framework manager
+alias backup='brew bundle dump --describe --force --file="./Brewfile"'  # Backup brew packages
+alias restore-brewfile='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
 
-alias ls='eza --group-directories-first --icons'
-alias la='ls -a'
-alias ll='ls -l'                                # Long format, git status
-alias l='ll -a'                                 # Long format, all files
-alias lr='ll -T'                                # Long format, recursive as a tree
-alias lx='ll -sextension'                       # Long format, sort by extension
-alias lk='ll -ssize'                            # Long format, largest file size last
-alias lt='ll -smodified'                        # Long format, newest modification time last
-alias lc='ll -schanged'                         # Long format, newest status change (ctime) last
-alias l.='ls -d .*'                             # all dotfiles
-alias tree='exa --tree --group-directories-first --icons'
+# Search and Grep
+alias f='fzf'                                     # Fuzzy finder
+alias grep='grep --color=auto'                    # Colorized grep
+alias egrep='egrep --color=auto'                  # Extended grep
+alias fgrep='fgrep --color=auto'                  # Fixed grep
+alias his='history | fzf'                         # Search command history
+
+# FZF File Type Search
+alias fzfc='fzf_type code'                        # Search code files
+alias fzfd='fzf_type doc'                         # Search documents
+alias fzfi='fzf_type image'                       # Search images
+alias fzfv='fzf_type video'                       # Search videos
+alias fzfa='fzf_type audio'                       # Search audio files
+alias fzfcf='fzf_type config'                     # Search config files
 
 ##############################
-# Safe Remove
+# Miscellaneous
 ##############################
 
-# Not aliasing rm -i, but if safe-rm is available, use it
-if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
-    alias rm=safe-rm
-fi
+alias q='exit'                                    # Quick exit
+alias c='clear'                                   # Clear screen
+alias sz='source ~/.zshrc'                        # Reload zsh config
+alias tip='bat ~/.config/zsh/aliases.zsh'         # Show aliases
+alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH

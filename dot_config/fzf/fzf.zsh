@@ -15,8 +15,10 @@ export FZF_IGNORE_DIRS=(
     .gradle
     .m2
     Library
+    Library/Logs
     Applications
     Public
+    .DS_Store
 )
 
 # 构建 fd 命令的排除参数
@@ -38,97 +40,8 @@ else
     export FZF_DEFAULT_COMMAND="rg --files --hidden --follow ${RG_OPTS[@]}"
 fi
 
-# CTRL-T 命令
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-# 自定义补全触发器
+# 设置补全触发器为反斜杠
 export FZF_COMPLETION_TRIGGER='\\'
-
-# ===== 文件类型搜索函数 =====
-# 搜索指定扩展名的文件
-# 按文件类型搜索的函数
-fzf_type() {
-    local type="$1"
-    case "$type" in
-        "code")
-            echo "Searching for code files..."
-            if command -v fd > /dev/null; then
-                fd --type f -e py -e js -e ts -e java -e cpp -e c -e go -e rs -e rb -e php | fzf --multi
-            else
-                rg --files | grep -i "\.\(py\|js\|ts\|java\|cpp\|c\|go\|rs\|rb\|php\)$" | fzf --multi
-            fi
-            ;;
-        "doc")
-            echo "Searching for document files..."
-            if command -v fd > /dev/null; then
-                fd --type f -e md -e txt -e pdf -e doc -e docx -e xls -e xlsx -e ppt -e pptx | fzf --multi
-            else
-                rg --files | grep -i "\.\(md\|txt\|pdf\|doc\|docx\|xls\|xlsx\|ppt\|pptx\)$" | fzf --multi
-            fi
-            ;;
-        "config")
-            echo "Searching for config files..."
-            if command -v fd > /dev/null; then
-                fd --type f -e json -e yaml -e yml -e toml -e ini -e conf | fzf --multi
-            else
-                rg --files | grep -i "\.\(json\|yaml\|yml\|toml\|ini\|conf\)$" | fzf --multi
-            fi
-            ;;
-        "image")
-            echo "Searching for image files..."
-            if command -v fd > /dev/null; then
-                fd --type f -e jpg -e jpeg -e png -e gif -e svg -e webp | fzf --multi
-            else
-                rg --files | grep -i "\.\(jpg\|jpeg\|png\|gif\|svg\|webp\)$" | fzf --multi
-            fi
-            ;;
-        "video")
-            echo "Searching for video files..."
-            if command -v fd > /dev/null; then
-                fd --type f -e mp4 -e mkv -e avi -e mov -e wmv | fzf --multi
-            else
-                rg --files | grep -i "\.\(mp4\|mkv\|avi\|mov\|wmv\)$" | fzf --multi
-            fi
-            ;;
-        "audio")
-            echo "Searching for audio files..."
-            if command -v fd > /dev/null; then
-                fd --type f -e mp3 -e wav -e flac -e m4a -e ogg | fzf --multi
-            else
-                rg --files | grep -i "\.\(mp3\|wav\|flac\|m4a\|ogg\)$" | fzf --multi
-            fi
-            ;;
-        *)
-            echo "Usage: fzf_type <type>"
-            echo "Available types: code, doc, config, image, video, audio"
-            return 1
-            ;;
-    esac
-}
-
-# 搜索指定扩展名的文件
-fzf_ext() {
-    local ext="$1"
-    if [[ -z "$ext" ]]; then
-        echo "Usage: fzf_ext <extension>"
-        return 1
-    fi
-    
-    echo "Searching for .$ext files..."
-    if command -v fd > /dev/null; then
-        fd --type f -e "$ext" | fzf --multi
-    else
-        rg --files | grep -i "\.$ext$" | fzf --multi
-    fi
-}
-
-# 创建常用别名
-alias fzfc='fzf_type code'    # 搜索代码文件
-alias fzfd='fzf_type doc'     # 搜索文档
-alias fzfi='fzf_type image'   # 搜索图片
-alias fzfv='fzf_type video'   # 搜索视频
-alias fzfa='fzf_type audio'   # 搜索音频
-alias fzfcf='fzf_type config' # 搜索配置文件
 
 # ===== 外观和功能配置 =====
 export FZF_DEFAULT_OPTS='
@@ -154,6 +67,9 @@ export FZF_DEFAULT_OPTS='
     --bind="ctrl-u:half-page-up"
     --bind="ctrl-a:select-all"
     --bind="ctrl-y:execute-silent(echo {+} | pbcopy)"
+    --bind="ctrl-o:execute-silent(open -R {+})"
+    --bind="ctrl-e:execute(code {+})"
+
     
     --color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9
     --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9
@@ -161,19 +77,16 @@ export FZF_DEFAULT_OPTS='
     --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4
     --color=border:#6272a4,label:#6272a4
     
-    --header="╭──────────────── Controls ────────────────╮
-│ CTRL-R: reload • CTRL-/: toggle preview  │
-│ CTRL-A: select all • CTRL-Y: copy        │
-╰──────────────────────────────────────────╯"
+    --header="
+╭───────────────── Controls ──────────────────╮
+│ CTRL-R: reload   • CTRL-Y: copy             │
+│ CTRL-O: open dir • CTRL-E: open with vscode │
+╰─────────────────────────────────────────────╯"
 '
 
-# ===== 补全和按键绑定 =====
 # 确保目录存在
 [ -d ~/.config/fzf ] || mkdir -p ~/.config/fzf
-
-# 加载补全和按键绑定
-[ -f ~/.config/fzf/completion.zsh ] && source ~/.config/fzf/completion.zsh
-[ -f ~/.config/fzf/key-bindings.zsh ] && source ~/.config/fzf/key-bindings.zsh
+source ~/.config/fzf/type.zsh
 
 # 清理函数
 fzfcleanup() {
