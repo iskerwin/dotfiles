@@ -27,9 +27,6 @@ alias tree='eza --tree --group-directories-first --icons'
 # File Operations
 ##############################
 
-# File Finding and Opening
-alias jo='joshuto'                              # File manager
-
 # Safe Remove Operations
 if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
     alias rm='safe-rm'
@@ -110,14 +107,15 @@ srun() {
 ##############################
 
 # Package Management
-alias czm='chezmoi'                               # Dotfiles manager
-alias config='chezmoi cd'                         # Go to dotfiles directory
-alias zim='zimfw'                                 # Zim framework manager
 alias backup='brew bundle dump --describe --force --file="./Brewfile"'  # Backup brew packages
 alias restore-brewfile='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
 
+# Alias management
+alias aliases='~/.config/zsh/scripts/alias-viewer.sh' # Show all aliases in table format
+alias als='aliases' # Short form for aliases command
+alias alg='aliases -s' # Search through aliases
+
 # Search and Grep
-alias f='fzf'                                     # Fuzzy finder
 alias grep='grep --color=auto'                    # Colorized grep
 alias egrep='egrep --color=auto'                  # Extended grep
 alias fgrep='fgrep --color=auto'                  # Fixed grep
@@ -126,7 +124,88 @@ alias fgrep='fgrep --color=auto'                  # Fixed grep
 # Miscellaneous
 ##############################
 
-alias sz='source ~/.zshrc'                        # Reload zsh config
-alias exec='exec zsh'                             # Restart Zsh
+alias rz='source ~/.zshrc'                        # Reload zsh config
 alias tip='bat ~/.config/zsh/aliases.zsh'         # Show aliases
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
+
+##############################
+# chezmoi
+##############################
+
+# Check if required commands are available
+[[ $+commands[chezmoi] ]] || return 0
+
+#
+# Completion and path handling
+#
+
+# Enable zsh completion for chezmoi
+source <(chezmoi completion zsh)
+
+# Standardized $0 handling for script location
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+#
+# Basic commands
+#
+
+# Basic operations
+alias ch="chezmoi"              # Base command shortcut
+alias chcd="chezmoi cd"         # Navigate to chezmoi source directory
+alias chst="chezmoi status"     # Show status of managed files
+alias chdoc="chezmoi doctor"    # Check chezmoi installation and configuration
+
+#
+# Source file management
+#
+
+# Adding and editing files
+alias cha="chezmoi add"         # Add a new file to chezmoi
+alias chr="chezmoi re-add"      # Update source state from target
+alias che="chezmoi edit"        # Edit a managed file
+alias chea="chezmoi edit --apply" # Edit and apply changes immediately
+
+#
+# Diff and sync commands
+#
+
+# View and apply changes
+alias chd="chezmoi diff"        # Show pending changes
+alias chap="chezmoi apply -v"      # Apply pending changes to target
+alias chf="chezmoi apply --force" # Force apply changes
+
+# Update and upgrade
+alias chup="chezmoi update"     # Update from source repo
+alias chug="chezmoi upgrade"    # Upgrade chezmoi to latest version
+
+#
+# Git integration
+#
+
+# Check if git is available
+if (( $+commands[git] )); then
+    # Load git aliases from external file
+    source <(alias | awk -F "='" -f "${0:h}/alias.awk")
+    
+    # Git operations
+    alias chg="chezmoi git --"  # Execute git commands in chezmoi repo
+    alias chgp="chezmoi git -- push" # Push changes to remote
+    alias chgl="chezmoi git -- pull" # Pull changes from remote
+    alias chgs="chezmoi git -- status" # Git status in chezmoi repo
+    alias chga="chezmoi git -- add" # Stage changes in chezmoi repo
+    alias chgc="chezmoi git -- commit" # Commit changes in chezmoi repo
+fi
+
+#
+# Additional helpful commands
+#
+
+# Show managed paths
+alias chls="chezmoi managed"    # List managed files
+alias chfg="chezmoi forgot"     # Show unmanaged files
+alias chmrg="chezmoi merge"     # Merge changes from source to target
+
+# Debug and information
+alias chv="chezmoi verify"      # Verify chezmoi configuration
+alias chdt="chezmoi data"       # Show template data
