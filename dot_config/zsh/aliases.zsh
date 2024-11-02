@@ -8,7 +8,6 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
-alias ccd='cd $(fd . --hidden --type=d | fzf)'  # Interactive directory navigation with fzf
 alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
 
 # Directory Listing (using eza/exa)
@@ -29,16 +28,13 @@ alias tree='exa --tree --group-directories-first --icons'
 ##############################
 
 # File Finding and Opening
-alias o='open -R $(fd . --hidden --type=f | fzf)'  # Open file in default app
-alias vf='vim $(fzf)'                              # Open file in vim
-alias cf='code $(fzf)'                             # Open file in VS Code
-alias jo='joshuto'                                 # File manager
+alias jo='joshuto'                              # File manager
 
 # Safe Remove Operations
 if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
     alias rm='safe-rm'
 fi
-alias clean-ds='find . -type f -name "*.DS_Store" -ls -delete'  # Remove .DS_Store files
+alias clean-ds='fd -H -I -t f ".DS_Store" --exec rm -f {}'  # Remove .DS_Store files
 
 ##############################
 # Git Operations
@@ -125,22 +121,12 @@ alias f='fzf'                                     # Fuzzy finder
 alias grep='grep --color=auto'                    # Colorized grep
 alias egrep='egrep --color=auto'                  # Extended grep
 alias fgrep='fgrep --color=auto'                  # Fixed grep
-alias his='history | fzf'                         # Search command history
-
-# FZF File Type Search
-alias fzfc='fzf_type code'                        # Search code files
-alias fzfd='fzf_type doc'                         # Search documents
-alias fzfi='fzf_type image'                       # Search images
-alias fzfv='fzf_type video'                       # Search videos
-alias fzfa='fzf_type audio'                       # Search audio files
-alias fzfcf='fzf_type config'                     # Search config files
 
 ##############################
 # Miscellaneous
 ##############################
 
-alias q='exit'                                    # Quick exit
-alias c='clear'                                   # Clear screen
 alias sz='source ~/.zshrc'                        # Reload zsh config
+alias exec='exec zsh'                             # Restart Zsh
 alias tip='bat ~/.config/zsh/aliases.zsh'         # Show aliases
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
