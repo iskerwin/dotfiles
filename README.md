@@ -1,37 +1,19 @@
 ```
- .
-├──  dot_config
-│  ├──  bat
-│  │  └──  config
-│  ├──  exa
-│  │  ├──  aliases.zsh
-│  │  └──  exa_colors.zsh
-│  ├──  fzf
-│  │  ├──  completion.zsh
-│  │  ├──  fzf.zsh
-│  │  └──  key-bindings.zsh
-│  ├──  joshuto
-│  │  ├──  bookmarks.toml
-│  │  ├──  executable_preview_file.sh
-│  │  ├──  icons.toml
-│  │  ├──  joshuto.toml
-│  │  ├──  keymap.toml
-│  │  ├──  mimetype.toml
-│  │  └──  theme.toml
-│  ├──  ssh
-│  │  └──  ssh_config
-│  ├──  zsh
-│  │  ├──  aliases.zsh
-│  │  ├──  init.zsh
-│  │  ├──  plugins.zsh
-│  │  ├──  ssh.zsh
-│  │  └──  zim.zsh
-│  └──  starship.toml
-├──  dot_chromaterm.yml
-├──  dot_zimrc
+ .
+├──  dot_config
+│   ├──  bat
+│   │   └──  config
+│   ├── 󰢬 ssh
+│   │   └──  ssh_config
+│   └──  zsh
+│       └──  aliases.zsh
+├──  private_dot_ssh
+│   └──  config
+├──  dot_chromaterm.yml
+├──  dot_p10k.zsh
+├──  dot_screenrc
 ├──  dot_zshrc
 ├──  empty_dot_hushlogin
-├──  encrypted_dot_gitconfig.age
-├──  encrypted_dot_ssh-agent.age
+├──  private_dot_zimrc
 └──  README.md
 ```
