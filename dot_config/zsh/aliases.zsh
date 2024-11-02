@@ -21,7 +21,7 @@ alias lk='ll -ssize'                            # Sort by size
 alias lt='ll -smodified'                        # Sort by modification time
 alias lc='ll -schanged'                         # Sort by change time
 alias l.='ls -d .*'                             # List only dotfiles
-alias tree='exa --tree --group-directories-first --icons'
+alias tree='eza --tree --group-directories-first --icons'
 
 ##############################
 # File Operations
