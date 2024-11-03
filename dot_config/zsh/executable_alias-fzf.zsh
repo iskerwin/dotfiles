@@ -71,12 +71,12 @@ function alias_finder() {
     '
     BEGIN {FS="="}
     function get_type(cmd) {
-        if (cmd ~ /^(cd |ls|tree)/) return "navigation"
+        if (cmd ~ /^(cd |ls|ll|tree|eza)/) return "navigation"
         if (cmd ~ /^(rm|clean)/) return "file-ops"
-        if (cmd ~ /^(git |g)/) return "git"
+        if (cmd ~ /^git/) return "git"
         if (cmd ~ /^(brew |ip|speed|weather)/) return "system"
-        if (cmd ~ /^ssh/) return "ssh"
-        if (cmd ~ /^screen /) return "screen"
+        if (cmd ~ /(ssh|.ssh)/) return "ssh"
+        if (cmd ~ /screen/) return "screen"
         if (cmd ~ /^(grep|backup|restore)/) return "dev"
         if (cmd ~ /^(chezmoi |ch)/) return "chezmoi"
         return "misc"
