@@ -1,5 +1,4 @@
 #!/usr/bin/env zsh
-
 # Configuration for visual appearance and behavior
 HEADER_STYLE=$(echo -e "\033[1;34m") # Bold Blue
 NAME_STYLE=$(echo -e "\033[36m")     # Cyan
@@ -11,7 +10,6 @@ SEPARATOR_STYLE=$(echo -e "\033[90m") # Gray
 # Main function for the alias finder interface
 function alias_finder() {
     local header_text="${HEADER_STYLE}Controls │ ENTER: copy alias • CTRL-E: copy command${CMD_STYLE}"
-
     # Get system clipboard command
     local copy_cmd
     case "$(uname)" in
@@ -27,7 +25,17 @@ function alias_finder() {
     '
     BEGIN {
         FS="="
-        # 预定义所有分类的标题，确保统一的格式和图标
+        # 预定义所有分类的标题和顺序
+        order[1] = "navigation"
+        order[2] = "file-ops"
+        order[3] = "git"
+        order[4] = "system"
+        order[5] = "ssh"
+        order[6] = "screen"
+        order[7] = "dev"
+        order[8] = "chezmoi"
+        order[9] = "misc"
+        
         headers["navigation"] = "─────── 󰆓 File Navigation ───────"
         headers["file-ops"]   = "─────── 󰆓 File Operations ───────"
         headers["git"]        = "─────── 󰊢 Git Operations ────────"
@@ -38,19 +46,19 @@ function alias_finder() {
         headers["chezmoi"]    = "─────────── 󰋊 Chezmoi ───────────"
         headers["misc"]       = "──────── 󰘓 Miscellaneous ────────"
     }
-
+    
     function classify_command(cmd) {
         if (cmd ~ /^(cd |ls|ll|tree|eza)/) return "navigation"
         if (cmd ~ /^(rm|clean)/) return "file-ops"
         if (cmd ~ /^git/) return "git"
-        if (cmd ~ /^(brew |ip|speed|weather)/) return "system"
+        if (cmd ~ /(brew |ip|ifconfig|speed|weather)/) return "system"
         if (cmd ~ /(ssh|.ssh)/) return "ssh"
         if (cmd ~ /screen/) return "screen"
-        if (cmd ~ /^(grep|backup|restore)/) return "dev"
+        if (cmd ~ /(grep|backup|restore)/) return "dev"
         if (cmd ~ /^(chezmoi |ch)/) return "chezmoi"
         return "misc"
     }
-
+    
     !/^#/ {
         name=$1
         sub(/^alias /, "", name)
@@ -64,13 +72,10 @@ function alias_finder() {
             cmd_style, command)
         types[type] = 1
     }
-
+    
     END {
-        # 按固定顺序输出分类
-        order_list = "navigation file-ops git system ssh screen dev chezmoi misc"
-        split(order_list, order, " ")
-        
-        for (i in order) {
+        # 按照预定义顺序输出分类
+        for (i = 1; i <= length(order); i++) {
             type = order[i]
             if (types[type]) {
                 printf "%s%s%s\n%s", \
@@ -88,6 +93,7 @@ function alias_finder() {
         --pointer '󰮺' \
         --marker '󰄲' \
         --header "$header_text" \
+        --preview-window "${PREVIEW_WINDOW_SIZE}:hidden" \
         --bind "ctrl-e:execute-silent(echo -n {3..} | $copy_cmd)+abort" \
         --bind "enter:execute-silent(echo {1} | $copy_cmd)+abort" \
         --color 'fg:250,fg+:252,bg+:235,hl:110,hl+:110' \

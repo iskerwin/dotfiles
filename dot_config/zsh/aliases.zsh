@@ -123,7 +123,6 @@ alias fgrep='fgrep --color=auto'                  # Fixed grep
 ##############################
 
 alias rz='source ~/.zshrc'                        # Reload zsh config
-alias tip='bat ~/.config/zsh/aliases.zsh'         # Show aliases
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
 
 ##############################

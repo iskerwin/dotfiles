@@ -10,6 +10,7 @@ plug "zsh-users/zsh-syntax-highlighting"
 plug "zsh-users/zsh-history-substring-search"
 plug "zap-zsh/supercharge"
 plug "romkatv/powerlevel10k"
+plug "Aloxaf/fzf-tab"
 
 
 #########################
