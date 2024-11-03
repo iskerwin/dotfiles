@@ -3,9 +3,13 @@
 ├──  dot_config
 │   ├──  bat
 │   │   └──  config
+│   ├──  fzf
+│   │   ├──  fzf.zsh
+│   │   └──  type.zsh
 │   ├── 󰢬 ssh
 │   │   └──  ssh_config
 │   └──  zsh
+│       ├──  alias.awk
 │       └──  aliases.zsh
 ├──  private_dot_ssh
 │   └──  config
@@ -14,6 +18,5 @@
 ├──  dot_screenrc
 ├──  dot_zshrc
 ├──  empty_dot_hushlogin
-├──  private_dot_zimrc
 └──  README.md
 ```

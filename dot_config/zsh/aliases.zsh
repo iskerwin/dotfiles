@@ -111,7 +111,7 @@ alias backup='brew bundle dump --describe --force --file="./Brewfile"'  # Backup
 alias restore-brewfile='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
 
 # Alias management
-alias als='eval "$(~/.config/zsh/scripts/alias.sh)"'
+alias af='source ~/.config/zsh/alias-fzf.zsh'
 
 # Search and Grep
 alias grep='grep --color=auto'                    # Colorized grep
@@ -129,20 +129,6 @@ alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
 ##############################
 # chezmoi
 ##############################
-
-# Check if required commands are available
-[[ $+commands[chezmoi] ]] || return 0
-
-#
-# Completion and path handling
-#
-
-# Enable zsh completion for chezmoi
-source <(chezmoi completion zsh)
-
-# Standardized $0 handling for script location
-0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/$0}"
 
 #
 # Basic commands
