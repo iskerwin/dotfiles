@@ -36,15 +36,15 @@ function alias_finder() {
         order[8] = "chezmoi"
         order[9] = "misc"
         
-        headers["navigation"] = "─────── 󰆓 File Navigation ───────"
-        headers["file-ops"]   = "─────── 󰆓 File Operations ───────"
-        headers["git"]        = "─────── 󰊢 Git Operations ────────"
-        headers["system"]     = "────── 󰜫 System Operations ──────"
-        headers["ssh"]        = "─────── 󰣀 SSH Management ────────"
-        headers["screen"]     = "────── 󰄝 Screen Management ──────"
-        headers["dev"]        = "────── 󰅨 Development Tools ──────"
-        headers["chezmoi"]    = "─────────── 󰋊 Chezmoi ───────────"
-        headers["misc"]       = "──────── 󰘓 Miscellaneous ────────"
+        headers["navigation"] = "=========== 󰆓 File Navigation ==========="
+        headers["file-ops"]   = "=========== 󰆓 File Operations ==========="
+        headers["git"]        = "=========== 󰊢 Git Operations ============"
+        headers["system"]     = "========== 󰜫 System Operations =========="
+        headers["ssh"]        = "=========== 󰣀 SSH Management ============"
+        headers["screen"]     = "========== 󰄝 Screen Management =========="
+        headers["dev"]        = "========== 󰅨 Development Tools =========="
+        headers["chezmoi"]    = "=============== 󰋊 Chezmoi ==============="
+        headers["misc"]       = "============ 󰘓 Miscellaneous ============"
     }
     
     function classify_command(cmd) {
