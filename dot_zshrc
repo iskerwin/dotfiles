@@ -4,7 +4,7 @@
 #########################
 # Zap Plugins           #
 #########################
-plug "zsh-users/zsh-completions"
+# plug "zsh-users/zsh-completions"
 plug "zsh-users/zsh-autosuggestions"
 plug "zsh-users/zsh-syntax-highlighting"
 plug "zsh-users/zsh-history-substring-search"
@@ -21,12 +21,12 @@ autoload -Uz compinit
 compinit
 
 # Completion options
-zstyle ':completion:*' menu select  # Enable menu-style completion
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'  # Case-insensitive completion
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"  # Colored completion menu
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*:descriptions' format '%F{green}-- %d --%f'
+# zstyle ':completion:*' menu select  # Enable menu-style completion
+# zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'  # Case-insensitive completion
+# zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"  # Colored completion menu
+# zstyle ':completion:*' verbose yes
+# zstyle ':completion:*' group-name ''
+# zstyle ':completion:*:descriptions' format '%F{green}-- %d --%f'
 
 #########################
 # History Settings      #
@@ -52,9 +52,9 @@ setopt PUSHD_SILENT
 # Config Files          #
 #########################
 # Load additional configuration files if they exist
-[[ ! -f ~/.config/zsh/aliases.zsh ]] || source ~/.config/zsh/aliases.zsh  # Aliases
-[[ ! -f ~/.config/fzf/fzf.zsh ]] || source ~/.config/fzf/fzf.zsh          # Fuzzy finder
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh                              # Powerlevel10k config
+[ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh    # Aliases
+[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh          # Fuzzy finder custom
+[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                # Powerlevel10k config
 
 #########################
 # Environment Variables #

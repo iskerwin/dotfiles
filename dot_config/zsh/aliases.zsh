@@ -192,3 +192,5 @@ alias chmrg="chezmoi merge"     # Merge changes from source to target
 # Debug and information
 alias chv="chezmoi verify"      # Verify chezmoi configuration
 alias chdt="chezmoi data"       # Show template data
+
+alias f="fzf"
