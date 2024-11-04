@@ -15,13 +15,13 @@ alias ls='eza --group-directories-first --icons'
 alias la='ls -a'                                # List all files including hidden
 alias ll='ls -l'                                # Long format
 alias l='ll -a'                                 # Long format, all files
-alias lr='ll -T'                                # Long format, recursive as tree
+alias lr='ll -T --level=2'                      # Long format, recursive as tree
 alias lx='ll -sextension'                       # Sort by extension
 alias lk='ll -ssize'                            # Sort by size
 alias lt='ll -smodified'                        # Sort by modification time
 alias lc='ll -schanged'                         # Sort by change time
 alias l.='ls -d .*'                             # List only dotfiles
-alias tree='eza --tree --group-directories-first --icons'
+alias tree='eza --tree -level=2 --group-directories-first --icons'
 
 ##############################
 # File Operations
