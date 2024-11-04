@@ -62,6 +62,8 @@ show_file_or_dir_preview="if [ -d {} ]; then eza --tree --color=always {} | head
 export FZF_DEFAULT_OPTS="--preview '$show_file_or_dir_preview'"
 export FZF_CTRL_T_OPTS="--preview '$show_file_or_dir_preview'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -200'"
+# 禁用 CTRL-R 历史记录的预览
+export FZF_CTRL_R_OPTS="--preview-window=hidden"
 
 # ===== 外观和功能配置 =====
 export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
