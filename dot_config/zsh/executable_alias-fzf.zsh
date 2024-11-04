@@ -9,15 +9,8 @@ SEPARATOR_STYLE=$(echo -e "\033[90m") # Gray
 
 # Main function for the alias finder interface
 function alias_finder() {
-    local header_text="${HEADER_STYLE}Controls │ ENTER: copy alias • CTRL-E: copy command${CMD_STYLE}"
-    # Get system clipboard command
-    local copy_cmd
-    case "$(uname)" in
-        "Darwin") copy_cmd="pbcopy" ;; # macOS
-        "Linux") copy_cmd="xclip -selection clipboard 2>/dev/null || xsel -b 2>/dev/null || clipcopy 2>/dev/null" ;; # Linux with fallbacks
-        *) copy_cmd="clip.exe" ;; # Windows
-    esac
-
+    local header_text="${HEADER_STYLE}Controls │ ENTER: input alias • CTRL-E: input command${CMD_STYLE}"
+    
     # Process and display aliases using awk
     alias | awk -v name_style="$NAME_STYLE" -v arrow_style="$ARROW_STYLE" \
             -v cmd_style="$CMD_STYLE" -v type_style="$TYPE_STYLE" \
@@ -94,10 +87,17 @@ function alias_finder() {
         --marker '󰄲' \
         --header "$header_text" \
         --preview-window "${PREVIEW_WINDOW_SIZE}:hidden" \
-        --bind "ctrl-e:execute-silent(echo -n {3..} | $copy_cmd)+abort" \
-        --bind "enter:execute-silent(echo {1} | $copy_cmd)+abort" \
+        --bind "ctrl-e:execute(echo -n {3..} | tr -d '\n' > $HOME/.fzf-alias-tmp)+abort" \
+        --bind "enter:execute(echo {1} | tr -d '\n' > $HOME/.fzf-alias-tmp)+abort" \
         --color 'fg:250,fg+:252,bg+:235,hl:110,hl+:110' \
         --color 'info:110,prompt:109,spinner:110,pointer:167,marker:215'
+
+    # If selected, read the temporary file and output to the command line
+    if [ -f "$HOME/.fzf-alias-tmp" ]; then
+        local result=$(cat "$HOME/.fzf-alias-tmp")
+        rm "$HOME/.fzf-alias-tmp"
+        print -z "$result"
+    fi
 }
 
 # Execute the main function
