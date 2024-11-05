@@ -27,3 +27,8 @@ Host KLS_SG7008L
   HostName 183.6.92.43
   User ruijie
   Port 20002
+
+Host Development-Host
+  Hostname 2.2.2.2
+  IdentityFile ~/.ssh/development-host
+  #_Desc For Development
