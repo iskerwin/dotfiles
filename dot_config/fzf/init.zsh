@@ -97,6 +97,7 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
 │ CTRL-O: open dir • CTRL-E: vscode   │
 ╰─────────────────────────────────────╯'
 "
+[ -f ~/.config/fzf/ssh-fzf.zsh ] && source ~/.config/fzf/ssh-fzf.zsh    # Better completion for ssh in Zsh with FZF
 
 # 清理函数
 fzfcleanup() {

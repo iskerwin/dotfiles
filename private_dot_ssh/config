@@ -22,6 +22,7 @@ Host KLS_M7008-WSM
   HostName 183.6.92.43
   User ruijie
   Port 20003
+  #_Desc KLS_ZBZX
 
 Host KLS_SG7008L
   HostName 183.6.92.43
@@ -29,6 +30,15 @@ Host KLS_SG7008L
   Port 20002
 
 Host Example
-  Hostname 2.2.2.2
-  IdentityFile ~/.ssh/example-host
-  #_Desc For Example
+  HostName example.com                    
+  User user                                
+  Port 22                                        
+  IdentityFile ~/.ssh/id_rsa                     
+  ControlMaster auto                             
+  ControlPath ~/.ssh/controlmasters/%h-%p-%r     
+  ControlPersist 10m                             
+  ForwardAgent yes                               
+  LocalForward 8080 127.0.0.1:80                 
+  RemoteForward 9090 127.0.0.1:3306              
+  ProxyCommand ssh -q -W %h:%p jump.example.com  
+  #_Desc example

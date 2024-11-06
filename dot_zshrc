@@ -65,9 +65,8 @@ setopt PUSHD_SILENT
 # Config Files          #
 #########################
 # Load additional configuration files if they exist
-[ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh    # Aliases
 [ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh          # Fuzzy finder custom
-[ -f ~/.config/ssh/ssh-fzf.zsh ] && source ~/.config/ssh/ssh-fzf.zsh    # Better completion for ssh in Zsh with FZF
+[ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh    # Aliases
 [ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                # Powerlevel10k config
 
 #########################
