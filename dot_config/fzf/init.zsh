@@ -75,15 +75,14 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
     --info=inline
     --separator='─'
     --preview-window='right:60%:wrap'
-    --bind='ctrl-/:toggle-preview'
     --border-label=' 🔍 Fuzzy Finder '
     --border-label-pos=3
     --prompt='  '
     --pointer='▶'
     --marker='✓'
+    --bind='ctrl-/:toggle-preview'
     --bind='ctrl-d:half-page-down'
     --bind='ctrl-u:half-page-up'
-    --bind='ctrl-a:select-all'
     --bind='ctrl-y:execute-silent(echo {+} | pbcopy)'
     --bind='ctrl-o:execute-silent(open -R {+})'
     --bind='ctrl-e:execute(code {+})'
@@ -94,9 +93,9 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
     --color=border:#6272a4,label:#6272a4
     --header='
 ╭───────────── Controls ──────────────╮
-│ CTRL-R: reload   • CTRL-Y: copy     │
+│ CTRL-/: preview  • CTRL-Y: copy     │
 │ CTRL-O: open dir • CTRL-E: vscode   │
-╰───────────────────────────────────--╯'
+╰─────────────────────────────────────╯'
 "
 
 # 清理函数
