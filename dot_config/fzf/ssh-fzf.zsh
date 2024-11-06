@@ -66,9 +66,15 @@ _fzf_complete_ssh() {
     --header-lines=2 \
     --prompt="SSH Remote > " \
     --preview 'host=$(echo {} | awk "{print \$1}"); 
-              echo -e "\033[1;34m=== SSH Config ===\033[0m";
-              ssh -G $host 2>/dev/null | grep -i -E "^(hostname |port |user |identityfile |controlmaster |forwardagent |localforward |remoteforward |proxycommand )" | column -t' \
-    --preview-window=right:50% \
+          echo -e "\033[1;34m=== SSH Config ===\033[0m";
+          ssh -G $host 2>/dev/null | grep -i -E "^(hostname|port|user|identityfile|controlmaster|forwardagent|localforward|remoteforward|proxycommand) " |  sed -E '\''s/^hostname/HostName/;s/^port/Port/;s/^user/User/;s/^identityfile/IdentityFile/;s/^controlmaster/ControlMaster/;s/^forwardagent/ForwardAgent/;s/^localforward/LocalForward/;s/^remoteforward/RemoteForward/;s/^proxycommand/ProxyCommand/'\'' | column -t;
+          echo -e "\n\033[1;34m===Description===\033[0m";
+          desc=$(echo {} | awk "{print \$5}");
+          if [ -z "$desc" ]; then
+            echo "No description available";
+          else
+            echo "$desc";
+          fi'\    --preview-window=right:50% \
     -- "$@" < <(__fzf_list_hosts)
 }
 

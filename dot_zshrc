@@ -39,7 +39,7 @@ zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-syntax-highlighting
 
 # Load utility plugins
-# zinit light Aloxaf/fzf-tab     # Fuzzy tab completion
+zinit light Aloxaf/fzf-tab     # Fuzzy tab completion
 
 #########################
 # History Settings      #
