@@ -35,7 +35,7 @@ Host KLS_SG7008L
   #_Desc 凯乐石直播中心
 
 Host Example
-  HostName example.com                    
+  HostName 192.168.111.111                    
   User user                                
   Port 22                                        
   IdentityFile ~/.ssh/id_rsa                     
