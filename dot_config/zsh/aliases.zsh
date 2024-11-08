@@ -11,17 +11,19 @@ alias .....='cd ../../../..'
 alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
 
 # Directory Listing (using eza/exa)
-alias ls='eza --group-directories-first --icons'
-alias la='ls -a'                                # List all files including hidden
+alias ls='eza --group-directories-first --icons --git --time-style=long-iso'
+alias la='ls -a -l'                             # List all files including hidden
+alias ld='la -D'                                # List only dirs
+alias lf='la -f'                                # List only files
 alias ll='ls -l'                                # Long format
-alias l='ll -a'                                 # Long format, all files
 alias lr='ll -T --level=2'                      # Long format, recursive as tree
 alias lx='ll -sextension'                       # Sort by extension
 alias lk='ll -ssize'                            # Sort by size
 alias lt='ll -smodified'                        # Sort by modification time
 alias lc='ll -schanged'                         # Sort by change time
 alias l.='ls -d .*'                             # List only dotfiles
-alias tree='eza --tree -level=2 --group-directories-first --icons'
+alias l='ll -a --git-ignore'                    # Long format, all files
+alias tree='eza --tree --level=2 --group-directories-first --icons'
 
 ##############################
 # File Operations

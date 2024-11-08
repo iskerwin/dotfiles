@@ -67,7 +67,7 @@ setopt PUSHD_SILENT
 # Load additional configuration files if they exist
 [ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh          # Fuzzy finder custom
 [ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh    # Aliases
-[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                # Powerlevel10k config
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh                            # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 
 #########################
 # Environment Variables #
