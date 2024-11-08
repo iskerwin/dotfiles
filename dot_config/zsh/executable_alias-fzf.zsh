@@ -18,7 +18,7 @@ function alias_finder() {
     '
     BEGIN {
         FS="="
-        # 预定义所有分类的标题和顺序
+        # Predefined titles and order for all categories
         order[1] = "navigation"
         order[2] = "file-ops"
         order[3] = "git"
@@ -67,7 +67,7 @@ function alias_finder() {
     }
     
     END {
-        # 按照预定义顺序输出分类
+        # Output categories in a predefined order
         for (i = 1; i <= length(order); i++) {
             type = order[i]
             if (types[type]) {

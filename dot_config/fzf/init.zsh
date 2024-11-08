@@ -1,6 +1,6 @@
 # ~/.config/fzf/init.zsh
 
-# ===== 基础设置 =====
+# ===== Basic settings =====
 # Setup fzf path
 if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
     PATH="${PATH:+${PATH}:}/opt/homebrew/opt/fzf/bin"
@@ -9,8 +9,8 @@ fi
 # Load fzf
 source <(fzf --zsh)
 
-# ===== 基础命令配置 =====
-# 定义要排除的目录和文件
+# ===== Basic command configuration =====
+# Define the directories and files you want to exclude
 export FZF_IGNORE_DIRS=(
     .m2
     .npm
@@ -32,18 +32,18 @@ export FZF_IGNORE_DIRS=(
     __pycache__
 )
 
-# 构建 fd 命令的排除参数
+# Build exclude parameters for fd command
 FZF_FD_OPTS=()
 for dir in "${FZF_IGNORE_DIRS[@]}"; do
     FZF_FD_OPTS+=(--exclude "$dir")
 done
 
-# 设置基础命令
+# Set basic commands
 if command -v fd > /dev/null; then
     export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --max-depth 8 ${FZF_FD_OPTS[@]}"
     export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --max-depth 8 ${FZF_FD_OPTS[@]}"
 else
-    # 构建 rg 的排除参数
+    # Build exclude parameters for rg command
     RG_OPTS=()
     for dir in "${FZF_IGNORE_DIRS[@]}"; do
         RG_OPTS+=(--glob "!$dir/*")
@@ -51,21 +51,21 @@ else
     export FZF_DEFAULT_COMMAND="rg --files --hidden --follow ${RG_OPTS[@]}"
 fi
 
-# 设置补全触发器为反斜杠
+# Set completion trigger
 export FZF_COMPLETION_TRIGGER='\'
 
-# ===== 预览配置 =====
-# 定义预览命令
+# ===== Preview configuration =====
+# Define preview commands
 show_file_or_dir_preview="if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat -n --color=always --line-range :500 {}; fi"
 
-# 设置不同模式的预览选项
+# Set preview options for different modes
 export FZF_DEFAULT_OPTS="--preview '$show_file_or_dir_preview'"
 export FZF_CTRL_T_OPTS="--preview '$show_file_or_dir_preview'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -200'"
-# 禁用 CTRL-R 历史记录的预览
+# Disable preview of CTRL-R history
 export FZF_CTRL_R_OPTS="--preview-window=hidden"
 
-# ===== 外观和功能配置 =====
+# ===== Appearance configuration =====
 export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
     --height=90%
     --layout=reverse
@@ -99,9 +99,9 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
 "
 
 [ -f ~/.config/fzf/fzf-ssh.zsh ] && source ~/.config/fzf/fzf-ssh.zsh                  # Better completion for ssh in Zsh with FZF
-[ -f ~/.config/fzf/fzf-tab-colors.zsh ] && source ~/.config/fzf/fzf-tab-colors.zsh    # Dracula color scheme
+[ -f ~/.config/fzf/fzf-tab-colors.zsh ] && source ~/.config/fzf/fzf-tab-colors.zsh    # Dracula color scheme for fzf-tab
 
-# 清理函数
+# Cleaning function
 fzfcleanup() {
     unset FZF_IGNORE_DIRS
     unset FZF_FD_EXCLUDE

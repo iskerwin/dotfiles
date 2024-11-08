@@ -86,7 +86,7 @@ __fzf_list_hosts() {
 # Enhanced SSH completion
 _fzf_complete_ssh() {
     _fzf_complete --ansi --border --cycle \
-        --height 90% \
+        --height 80% \
         --reverse \
         --header-lines=2 \
         --prompt="SSH Remote > " \
@@ -127,7 +127,7 @@ _fzf_complete_ssh_post() {
 # Enhanced FZF completion for TELNET
 _fzf_complete_telnet() {
     _fzf_complete --ansi --border --cycle \
-        --height 90% \
+        --height 80% \
         --reverse \
         --header-lines=2 \
         --prompt='Telnet Remote > ' \
