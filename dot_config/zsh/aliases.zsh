@@ -3,6 +3,7 @@
 ##############################
 
 # Directory Navigation
+alias cd='z'
 alias home='cd ~'
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -84,7 +85,6 @@ alias lsdev='ls /dev/cu.*'                          # List serial devices
 
 alias ssh='ct screen ssh'                         # SSH with screen support
 alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
-alias sshconf='vim ~/.ssh/config'                 # Edit SSH config
 
 ##############################
 # Screen Management
@@ -157,7 +157,7 @@ alias chea="chezmoi edit --apply"  # Edit and apply changes immediately
 
 # View and apply changes
 alias chd="chezmoi diff"           # Show pending changes
-alias chap="chezmoi apply -v"      # Apply pending changes to target
+alias chay="chezmoi apply -v"      # Apply pending changes to target
 alias chf="chezmoi apply --force"  # Force apply changes
 
 # Update and upgrade
@@ -188,7 +188,6 @@ fi
 
 # Show managed paths
 alias chls="chezmoi managed"    # List managed files
-alias chfg="chezmoi forgot"     # Show unmanaged files
 alias chmrg="chezmoi merge"     # Merge changes from source to target
 
 # Debug and information
@@ -196,3 +195,4 @@ alias chv="chezmoi verify"      # Verify chezmoi configuration
 alias chdt="chezmoi data"       # Show template data
 
 alias f="fzf"
+alias c='clear'
