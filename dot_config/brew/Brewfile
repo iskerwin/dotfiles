@@ -1,0 +1,114 @@
+tap "alienator88/cask"
+tap "buo/cask-upgrade"
+tap "danielgatis/imgcat"
+tap "homebrew/bundle"
+tap "homebrew/services"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Breadth-first version of find
+brew "bfs"
+# Core application library for C
+brew "glib"
+# Manage your dotfiles across multiple diverse machines, securely
+brew "chezmoi"
+# Modern, maintained replacement for ls
+brew "eza"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# Render markdown on the CLI
+brew "glow"
+# GNU Pretty Good Privacy (PGP) package
+brew "gnupg"
+# ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
+brew "libheif"
+# C/C++ seam carving library
+brew "liblqr"
+# Tools and libraries to manipulate images in many formats
+brew "imagemagick"
+# Update of iperf: measures TCP, UDP, and SCTP bandwidth
+brew "iperf3"
+# Ranger-like terminal file manager written in Rust
+brew "joshuto"
+# Show markdown documents on text terminals
+brew "mdcat"
+# Menu-driven communications program
+brew "minicom"
+# Open source visual route tracking CLI tool
+brew "nexttrace"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.11"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
+# Terminal multiplexer with VT100/ANSI terminal emulation
+brew "screen"
+# Log file highlighter
+brew "tailspin"
+# User interface to the TELNET protocol
+brew "telnet"
+# Terminal multiplexer
+brew "tmux"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
+# Ultra fast grep with query UI, fuzzy search, archive search, and more
+brew "ugrep"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+# Chromium based browser
+cask "arc"
+# Dictionary and translator app
+cask "easydict"
+cask "font-jetbrains-mono-nerd-font"
+# Free and open-source media player
+cask "iina"
+# Terminal emulator as alternative to Apple's Terminal app
+cask "iterm2"
+# Menu bar manager
+cask "jordanbaird-ice"
+# Utility to open, create and modify archive files
+cask "maczip"
+# App to write, plan, collaborate, and get organised
+cask "notion"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
+# Utility to uninstall apps and remove leftover files from old/uninstalled apps
+cask "pearcleaner"
+# Customise and maintain app icons
+cask "pictogram"
+# Control your tools with a few keystrokes
+cask "raycast"
+# Simple menu bar app to view and interact with reminders
+cask "reminders-menubar"
+# Remote desktop control and monitoring tool
+cask "sunloginclient"
+# Messaging app with a focus on speed and security
+cask "telegram"
+# Open-source code editor
+cask "visual-studio-code"
+# Free messaging and calling application
+cask "wechat"
+vscode "adpyke.codesnap"
+vscode "amazonwebservices.codewhisperer-for-command-line-companion"
+vscode "christian-kohler.path-intellisense"
+vscode "dracula-theme.theme-dracula"
+vscode "dzhavat.bracket-pair-toggler"
+vscode "esbenp.prettier-vscode"
+vscode "foxundermoon.shell-format"
+vscode "github.copilot"
+vscode "github.copilot-chat"
+vscode "jamiewoodio.cisco"
+vscode "kisstkondoros.vscode-gutter-preview"
+vscode "mhutchie.git-graph"
+vscode "ms-vscode-remote.remote-ssh"
+vscode "ms-vscode-remote.remote-ssh-edit"
+vscode "ms-vscode.remote-explorer"
+vscode "oderwat.indent-rainbow"
+vscode "pkief.material-icon-theme"
+vscode "pomdtr.excalidraw-editor"
+vscode "purocean.drawio-preview"
+vscode "ryu1kn.partial-diff"
+vscode "usernamehw.errorlens"
+vscode "xlthu.pangu-markdown"
+vscode "y-ysss.cisco-config-highlight"
+vscode "yzhang.markdown-all-in-one"

@@ -109,8 +109,8 @@ srun() {
 ##############################
 
 # Package Management
-alias backup='brew bundle dump --describe --force --file="./Brewfile"'  # Backup brew packages
-alias restore-brewfile='brew bundle --file="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AppList/Brewfile"'
+alias backup='brew bundle dump --describe --force --file="~/.config/brew/Brewfile"'  # Backup brew packages
+alias restore-brewfile='brew bundle --file="~/.config/brew/Brewfile"' #Restore brew packages
 
 # Alias management
 alias af='source ~/.config/zsh/alias-fzf.zsh'
