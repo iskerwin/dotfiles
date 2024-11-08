@@ -98,8 +98,8 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
 ╰─────────────────────────────────────╯'
 "
 
-[ -f ~/.config/fzf/fzf-ssh.zsh ] && source ~/.config/fzf/fzf-ssh.zsh                  # Better completion for ssh in Zsh with FZF
 [ -f ~/.config/fzf/fzf-tab-colors.zsh ] && source ~/.config/fzf/fzf-tab-colors.zsh    # Dracula color scheme for fzf-tab
+[ -f ~/.config/fzf/fzf-ssh.zsh ] && source ~/.config/fzf/fzf-ssh.zsh                  # Better completion for ssh in Zsh with FZF
 
 # Cleaning function
 fzfcleanup() {

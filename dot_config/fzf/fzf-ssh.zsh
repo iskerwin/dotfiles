@@ -1,14 +1,13 @@
 # ZSH Plugin for SSH with FZF integration
 # Global configurations with improved fzf preview
-export FZF_DEFAULT_OPTS="
-    $FZF_DEFAULT_OPTS
-    --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
-    --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
-    --header='
-╭──────────── Controls ──────────╮
-│ CTRL-E: edit   •  CTRL-Y: copy │
-╰────────────────────────────────╯'
-"
+# export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
+#     --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
+#     --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
+#     --header='
+# ╭──────────── Controls ──────────╮
+# │ CTRL-E: edit   •  CTRL-Y: copy │
+# ╰────────────────────────────────╯'
+# "
 
 # Base directory configurations with zsh style parameter expansion
 : "${SSH_DIR:=$HOME/.ssh}"
