@@ -75,7 +75,7 @@ __fzf_list_hosts() {
 # Enhanced SSH completion with custom bindings and header
 _fzf_complete_ssh() {
     _fzf_complete --ansi --border --cycle \
-        --height 80% \
+        --height 90% \
         --reverse \
         --header-lines=2 \
         --header='
@@ -107,6 +107,65 @@ _fzf_complete_ssh() {
                 s/^controlpersist/ControlPersist/
                 '\'' | 
             column -t;
+
+            # Get SSH connection details
+            ssh_config=$(ssh -G $host 2>/dev/null)
+            key_file=$(echo "$ssh_config" | grep "^identityfile " | head -n1 | cut -d" " -f2)
+            real_hostname=$(echo "$ssh_config" | grep "^hostname " | head -n1 | cut -d" " -f2)
+            user=$(echo "$ssh_config" | grep "^user " | head -n1 | cut -d" " -f2)
+            port=$(echo "$ssh_config" | grep "^port " | head -n1 | cut -d" " -f2)
+            port=${port:-22}  # Default to port 22 if not specified
+
+            # Handle special cases like github.com
+            if [[ $host == *"github.com"* ]]; then
+                test_host="git@github.com"
+            else
+                test_host="$host"
+            fi
+
+            echo -e "\n\033[1;34m=== KEY STATUS ===\033[0m"
+            if [ -f "${key_file/#\~/$HOME}" ]; then
+                echo -e "\033[0;32m✓\033[0m Key exists: $key_file"
+                key_perms=$(stat -f "%Lp" "${key_file/#\~/$HOME}" 2>/dev/null)
+                if [ "$key_perms" = "600" ]; then
+                    echo -e "\033[0;32m✓\033[0m Key permissions correct (600)"
+                else
+                    echo -e "\033[0;31m✗\033[0m Key permissions incorrect: $key_perms (should be 600)"
+                fi
+            else
+                echo -e "\033[0;31m✗\033[0m Key not found: $key_file"
+            fi
+
+            echo -e "\n\033[1;34m=== CONNECTIVITY TEST ===\033[0m"
+            if nc -z -w 2 $real_hostname $port >/dev/null 2>&1; then
+                echo -e "\033[0;32m✓\033[0m Port $port is open on $real_hostname"
+                
+                # Try SSH connection with perl-based timeout
+                ssh_output=$(perl -e '\''
+                    eval {
+                        local $SIG{ALRM} = sub { die "timeout\n" };
+                        alarm 3; # Set an alarm signal for 3 seconds
+                        $output = `ssh -T -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=no $ARGV[0] 2>&1`;
+                        alarm 0;
+                        print $output;
+                    };
+                    if ($@ eq "timeout\n") {
+                        exit 1;
+                    }
+                '\'' "$test_host")
+                ssh_status=$?
+                
+                if [ $ssh_status -eq 0 ] || [[ $ssh_output == *"successfully authenticated"* ]]; then
+                    echo -e "\033[0;32m✓\033[0m SSH authentication successful"
+                    echo -e "\033[0;90m$ssh_output\033[0m"
+                else
+                    echo -e "\033[0;31m✗\033[0m SSH authentication failed"
+                    echo -e "\033[0;90m$ssh_output\033[0m"
+                fi
+            else
+                echo -e "\033[0;31m✗\033[0m Cannot reach $real_hostname:$port"
+            fi
+
             echo -e "\n\033[1;34m=== DESCRIPTION ===\033[0m"
             desc=$(echo {} | awk "{print \$4}")
             echo "${desc:-No description available}"
@@ -118,7 +177,7 @@ _fzf_complete_ssh() {
 # Enhanced TELNET completion with custom bindings and header
 _fzf_complete_telnet() {
     _fzf_complete --ansi --border --cycle \
-        --height 80% \
+        --height 90% \
         --reverse \
         --header-lines=2 \
         --header='
@@ -128,7 +187,58 @@ _fzf_complete_telnet() {
         --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
         --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
         --prompt='Telnet Remote > ' \
-        --preview 'echo "Port: 23\nProtocol: TELNET\nHost: {1}\nHostName: {2}"' \
+        --preview 'host=$(echo {1});
+            real_host=$(echo {2});
+            port=23;
+
+            echo -e "\033[1;34m=== HOST INFO ===\033[0m"
+            printf "%-12s %s\n" "Host:" "$host"
+            printf "%-12s %s\n" "Hostname:" "$real_host"
+            printf "%-12s %s\n" "Port:" "$port"
+            printf "%-12s %s\n" "Protocol:" "TELNET"
+
+            echo -e "\n\033[1;34m=== CONNECTIVITY TEST ===\033[0m"
+            if nc -z -w 2 $real_host $port >/dev/null 2>&1; then
+                echo -e "\033[0;32m✓\033[0m Port $port is open on $real_host"
+                
+                # Try telnet connection with perl-based timeout
+                telnet_output=$(perl -e '\''
+                    eval {
+                        local $SIG{ALRM} = sub { die "timeout\n" };
+                        alarm 3;
+                        $output = `echo "quit" | telnet $ARGV[0] $ARGV[1] 2>&1`;
+                        alarm 0;
+                        print $output;
+                    };
+                    if ($@ eq "timeout\n") {
+                        exit 1;
+                    }
+                '\'' "$real_host" "$port" | grep -v "^Trying" | head -n 3)
+                telnet_status=$?
+                
+                if [ $telnet_status -eq 0 ] && [[ $telnet_output == *"Connected to"* ]]; then
+                    echo -e "\033[0;32m✓\033[0m Telnet connection successful"
+                    echo -e "\033[0;90m$telnet_output\033[0m"
+                else
+                    echo -e "\033[0;31m✗\033[0m Telnet connection failed"
+                    echo -e "\033[0;90m$telnet_output\033[0m"
+                fi
+            else
+                echo -e "\033[0;31m✗\033[0m Cannot reach $real_host:$port"
+            fi
+            
+            # Try resolving hostname
+            echo -e "\n\033[1;34m=== DNS RESOLUTION ===\033[0m"
+            if ip=$(dig +short $real_host); then
+                if [ -n "$ip" ]; then
+                    echo -e "\033[0;32m✓\033[0m Resolves to: $ip"
+                else
+                    echo -e "\033[0;31m✗\033[0m Could not resolve hostname"
+                fi
+            else
+                echo -e "\033[0;31m✗\033[0m DNS lookup failed"
+            fi
+            ' \
         --preview-window=right:50% \
         -- "$@" < <(__fzf_list_hosts)
 }
