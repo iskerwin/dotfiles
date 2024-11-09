@@ -39,21 +39,9 @@ _fzf_complete_ssh() {
                 '"'"' | 
             column -t
 
-            # Get SSH connection details
+            # Get SSH connection details for key status check
             ssh_config=$(ssh -G $host 2>/dev/null)
             key_file=$(echo "$ssh_config" | grep "^identityfile " | head -n1 | cut -d" " -f2)
-            real_hostname=$(echo "$ssh_config" | grep "^hostname " | head -n1 | cut -d" " -f2)
-            user=$(echo "$ssh_config" | grep "^user " | head -n1 | cut -d" " -f2)
-            port=$(echo "$ssh_config" | grep "^port " | head -n1 | cut -d" " -f2)
-            port=${port:-22}
-
-            echo -e "\n\033[1;34m=== CONNECTION INFO ===\033[0m"
-            echo -e "Host:\t\t$real_hostname"
-            echo -e "Port:\t\t${port:-22}"
-            echo -e "User:\t\t${user:-$(whoami)}"
-            if [ -n "$key_file" ]; then
-                echo -e "Key File:\t$key_file"
-            fi
 
             if [ -n "$key_file" ]; then
                 echo -e "\n\033[1;34m=== KEY STATUS ===\033[0m"
@@ -77,6 +65,11 @@ _fzf_complete_ssh() {
                     echo -e "\033[0;31m✗\033[0m Key not found: $key_file"
                 fi
             fi
+
+            # Rest of the connectivity and authentication tests remain the same
+            real_hostname=$(echo "$ssh_config" | grep "^hostname " | head -n1 | cut -d" " -f2)
+            port=$(echo "$ssh_config" | grep "^port " | head -n1 | cut -d" " -f2)
+            port=${port:-22}
 
             echo -e "\n\033[1;34m=== CONNECTIVITY TEST ===\033[0m"
             if nc -z -w 2 $real_hostname $port >/dev/null 2>&1; then
@@ -246,6 +239,12 @@ add_ssh_host() {
 delete_ssh_host() {
     print -P "%F{blue}Select a host to delete:%f"
     local selected=$(list_ssh_hosts | fzf --header-lines=2 \
+        --header='
+╭──────────── Controls ──────────╮
+│ CTRL-E: edit   •  CTRL-Y: copy │
+╰────────────────────────────────╯' \
+        --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
+        --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
         --preview 'host=$(echo {} | awk "{print \$1}"); 
             echo -e "\033[1;31m=== Warning ===\033[0m"
             echo -e "You are about to delete this host configuration!\n"
