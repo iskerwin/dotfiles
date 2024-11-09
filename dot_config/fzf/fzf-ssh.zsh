@@ -191,129 +191,116 @@ _fzf_complete_ssh() {
                 echo -e "\n${HEADER_COLOR}=== $1 ===\033[0m"
             }
 
+            print_detail() {
+                echo -e "${DETAIL_COLOR}$1\033[0m"
+            }
+
             run_ssh_command() {
                 timeout $ssh_timeout ssh -o BatchMode=yes -o ConnectTimeout=$connect_timeout "$@"
             }
 
-            # Get host from selection
+            # Get host and basic info
             host=$(echo {} | awk "{print \$1}")
-
-            # Get all SSH config at once
             ssh_config=$(ssh -G $host 2>/dev/null)
             real_hostname=$(echo "$ssh_config" | grep "^hostname " | head -n1 | cut -d" " -f2)
             port=$(echo "$ssh_config" | grep "^port " | head -n1 | cut -d" " -f2)
             port=${port:-22}
             key_file=$(echo "$ssh_config" | grep "^identityfile " | head -n1 | cut -d" " -f2)
+            
+            # Start with host summary
+            print_header "HOST SUMMARY"
+            {
+                echo "Host: $host"
+                echo "HostName: $real_hostname"
+                echo "Port: $port"
+                [ -n "$key_file" ] && echo "Key: $key_file"
+            } | column -t
+            
+            desc=$(echo {} | awk "{print \$4}")
+            [ -n "$desc" ] && print_detail "$desc"
 
-            print_header "SSH Config"
-            echo "$ssh_config" | 
-            grep -i -E "^(hostname|port|user|identityfile|controlmaster|forwardagent|localforward|remoteforward|proxycommand|serveraliveinterval|serveralivecountmax|tcpkeepalive|compressioncontrolpath|controlpersist) " |
+            # Check connectivity first
+            print_header "CONNECTIVITY"
+            if ! nc -z -w $connect_timeout $real_hostname $port >/dev/null 2>&1; then
+                echo -e "$ERROR_ICON Cannot reach $real_hostname:$port"
+                exit 0
+            fi
+            echo -e "$SUCCESS_ICON Connected to $real_hostname:$port"
+
+            # Check key status if exists
+            if [ -n "$key_file" ]; then
+                print_header "KEY STATUS"
+                expanded_key="${key_file/#\~/$HOME}"
+                
+                if [ ! -f "$expanded_key" ]; then
+                    echo -e "$ERROR_ICON Key not found: $key_file"
+                else
+                    echo -e "$SUCCESS_ICON Key exists: $key_file"
+                    key_perms=$(stat -f "%Lp" "$expanded_key" 2>/dev/null)
+                    [ "$key_perms" = "600" ] && \
+                        echo -e "$SUCCESS_ICON Permissions OK (600)" || \
+                        echo -e "$ERROR_ICON Invalid permissions: $key_perms (should be 600)"
+                    
+                    if ssh-keygen -l -f "$expanded_key" >/dev/null 2>&1; then
+                        key_info=$(ssh-keygen -l -f "$expanded_key" 2>/dev/null)
+                        echo -e "$SUCCESS_ICON Valid key format"
+                        print_detail "$key_info"
+                    else
+                        echo -e "$ERROR_ICON Invalid key format"
+                    fi
+                fi
+            fi
+
+            # Authentication check
+            print_header "AUTHENTICATION"
+            if [[ $real_hostname == "github.com" ]]; then
+                ssh_output=$(ssh -T git@github.com -o ConnectTimeout=$connect_timeout 2>&1)
+                if [[ $ssh_output == *"successfully authenticated"* ]]; then
+                    echo -e "$SUCCESS_ICON GitHub authentication successful"
+                    print_detail "$ssh_output"
+                else
+                    echo -e "$ERROR_ICON GitHub authentication failed"
+                    print_detail "$ssh_output"
+                fi
+            elif ssh -o BatchMode=yes -o ConnectTimeout=$connect_timeout "$host" exit 2>/dev/null; then
+                echo -e "$SUCCESS_ICON Authentication successful"
+                
+                # Get system info more efficiently
+                system_info=$(run_ssh_command "$host" '"'"'
+                    echo "OS: $(uname -sr 2>/dev/null)"
+                    echo "Load: $(uptime | sed '"'"'s/.*load average: //'"'"')"
+                    echo "Memory: $(free -h 2>/dev/null | awk '"'"'/^Mem:/ {print "Total: " $2 " Used: " $3 " Free: " $4}'"'"')"
+                '"'"' 2>/dev/null)
+                
+                if [ -n "$system_info" ]; then
+                    print_detail "$system_info"
+                    # Show last login only if system info was successful
+                    last_login=$(run_ssh_command "$host" "last -1 2>/dev/null | head -n 1")
+                    [ -n "$last_login" ] && print_detail "Last login: $last_login"
+                fi
+            else
+                echo -e "$WARNING_ICON Authentication required"
+                ssh_banner=$(ssh -o ConnectTimeout=$connect_timeout -o PreferredAuthentications=none "$host" 2>&1)
+                auth_methods=$(echo "$ssh_banner" | grep -i "authentication methods" | cut -d":" -f2-)
+                [ -n "$auth_methods" ] && echo -e "$INFO_ICON Available methods:$auth_methods"
+                
+                # Show clean banner message if available
+                banner=$(echo "$ssh_banner" | grep -v -E "Permission denied|Please try again|authentication methods|Connection closed|Connection timed out" | head -n 10)
+                [ -n "$banner" ] && print_detail "\n$banner"
+            fi
+
+            # Show relevant SSH config
+            print_header "SSH CONFIG"
+            echo "$ssh_config" | grep -i -E "^(hostname|port|user|identityfile|proxycommand|localforward|remoteforward)" | \
             sed -E '"'"'
                 s/^hostname/HostName/
                 s/^port/Port/
                 s/^user/User/
                 s/^identityfile/IdentityFile/
-                s/^controlmaster/ControlMaster/
-                s/^forwardagent/ForwardAgent/
+                s/^proxycommand/ProxyCommand/
                 s/^localforward/LocalForward/
                 s/^remoteforward/RemoteForward/
-                s/^proxycommand/ProxyCommand/
-                s/^serveraliveinterval/ServerAliveInterval/
-                s/^serveralivecountmax/ServerAliveCountMax/
-                s/^tcpkeepalive/TCPKeepAlive/
-                s/^compression/Compression/
-                s/^controlpath/ControlPath/
-                s/^controlpersist/ControlPersist/
-                '"'"' | 
-            column -t
-
-            # Check SSH key status
-            if [ -n "$key_file" ]; then
-                print_header "KEY STATUS"
-                if [ -f "${key_file/#\~/$HOME}" ]; then
-                    echo -e "$SUCCESS_ICON Key exists: $key_file"
-                    key_perms=$(stat -f "%Lp" "${key_file/#\~/$HOME}" 2>/dev/null)
-                    if [ "$key_perms" = "600" ]; then
-                        echo -e "$SUCCESS_ICON Key permissions correct (600)"
-                    else
-                        echo -e "$ERROR_ICON Key permissions incorrect: $key_perms (should be 600)"
-                    fi
-                    
-                    if ssh-keygen -l -f "${key_file/#\~/$HOME}" >/dev/null 2>&1; then
-                        echo -e "$SUCCESS_ICON SSH key is valid"
-                        key_info=$(ssh-keygen -l -f "${key_file/#\~/$HOME}" 2>/dev/null)
-                        echo -e "$DETAIL_COLOR$key_info\033[0m"
-                    else
-                        echo -e "$ERROR_ICON Invalid SSH key format"
-                    fi
-                else
-                    echo -e "$ERROR_ICON Key not found: $key_file"
-                fi
-            fi
-
-            print_header "CONNECTIVITY TEST"
-            if nc -z -w $connect_timeout $real_hostname $port >/dev/null 2>&1; then
-                echo -e "$SUCCESS_ICON Port $port is open on $real_hostname"
-                
-                if [[ $real_hostname == "github.com" ]]; then
-                    print_header "GITHUB SSH TEST"
-                    ssh_output=$(ssh -T git@github.com -o ConnectTimeout=$connect_timeout 2>&1)
-                    if [[ $ssh_output == *"successfully authenticated"* ]]; then
-                        echo -e "$SUCCESS_ICON GitHub SSH authentication successful"
-                        echo -e "$DETAIL_COLOR$ssh_output\033[0m"
-                    else
-                        echo -e "$ERROR_ICON GitHub SSH authentication failed"
-                        echo -e "$DETAIL_COLOR$ssh_output\033[0m"
-                    fi
-                else
-                    ssh_banner=$(ssh -o ConnectTimeout=$connect_timeout -o PreferredAuthentications=none "$host" 2>&1)
-                    
-                    print_header "AUTH STATUS"
-                    if ssh -o BatchMode=yes -o ConnectTimeout=$connect_timeout "$host" exit 2>/dev/null; then
-                        echo -e "$SUCCESS_ICON SSH authentication successful"
-                        
-                        # Get system information
-                        system_info=$(run_ssh_command "$host" '"'"'
-                            echo "System: $(uname -sr 2>/dev/null || echo Unknown)"
-                            echo "Hostname: $(hostname -f 2>/dev/null || echo Unknown)"
-                            echo "Uptime: $(uptime 2>/dev/null || echo Unknown)"
-                            echo "Load: $(cat /proc/loadavg 2>/dev/null || echo Unknown)"
-                            echo "Memory: $(free -h 2>/dev/null | grep "Mem:" | awk '"'"'"'"'"'"'"'"'{ print "Total: " $2 " Used: " $3 " Free: " $4 }'"'"'"'"'"'"'"'"' || echo Unknown)"
-                        '"'"' 2>/dev/null)
-                        
-                        if [ -n "$system_info" ]; then
-                            echo -e "$DETAIL_COLOR$system_info\033[0m"
-                        fi
-                        
-                        # Get last login
-                        last_login=$(run_ssh_command "$host" "last -1 2>/dev/null | head -n 1" 2>/dev/null)
-                        if [ -n "$last_login" ]; then
-                            echo -e "$DETAIL_COLOR\nLast login: $last_login\033[0m"
-                        fi
-                    else
-                        echo -e "$WARNING_ICON Authentication required"
-                        
-                        auth_methods=$(echo "$ssh_banner" | grep -i "authentication methods" | cut -d":" -f2-)
-                        if [ -n "$auth_methods" ]; then
-                            echo -e "$INFO_ICON Available methods:$auth_methods"
-                        fi
-                    fi
-
-                    print_header "LOGIN NOTICE"
-                    banner=$(echo "$ssh_banner" | grep -v -E "Permission denied|Please try again|authentication methods|Connection closed|Connection timed out" | head -n 10)
-                    if [ -n "$banner" ]; then
-                        echo -e "$DETAIL_COLOR$banner\033[0m"
-                    else
-                        echo "No login notice available"
-                    fi
-                fi
-            else
-                echo -e "$ERROR_ICON Cannot reach $real_hostname:$port"
-            fi
-
-            print_header "DESCRIPTION"
-            desc=$(echo {} | awk "{print \$4}")
-            echo "${desc:-No description available}"
+            '"'"' | column -t
         ' \
         --preview-window=right:50% \
         -- "$@" < <(list_ssh_hosts)
@@ -331,54 +318,117 @@ _fzf_complete_telnet() {
         --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
         --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
         --prompt='Telnet Remote > ' \
-        --preview 'host=$(echo {1});
-            real_host=$(echo {2});
-            port=23;
+        --preview '
+            # Constants
+            SUCCESS_ICON=$'\''\033[0;32m✓\033[0m'\''
+            WARNING_ICON=$'\''\033[0;33m!\033[0m'\''
+            ERROR_ICON=$'\''\033[0;31m✗\033[0m'\''
+            INFO_ICON=$'\''\033[0;34mℹ\033[0m'\''
+            HEADER_COLOR=$'\''\033[1;34m'\''
+            DETAIL_COLOR=$'\''\033[0;90m'\''
 
-            echo -e "\033[1;34m=== HOST INFO ===\033[0m"
-            printf "%-12s %s\n" "Host:" "$host"
-            printf "%-12s %s\n" "Hostname:" "$real_host"
-            printf "%-12s %s\n" "Port:" "$port"
-            printf "%-12s %s\n" "Protocol:" "TELNET"
+            print_header() {
+                echo -e "\n${HEADER_COLOR}=== $1 ===\033[0m"
+            }
 
-            echo -e "\n\033[1;34m=== CONNECTIVITY TEST ===\033[0m"
+            print_detail() {
+                echo -e "${DETAIL_COLOR}$1\033[0m"
+            }
+
+            host=$(echo {1})
+            real_host=$(echo {2})
+            port=23
+
+            # Basic host info
+            print_header "HOST INFO"
+            {
+                echo "Host: $host"
+                echo "Hostname: $real_host"
+                echo "Port: $port"
+                echo "Protocol: TELNET"
+            } | column -t
+
+            # Connectivity test
+            print_header "CONNECTIVITY TEST"
             if nc -z -w 2 $real_host $port >/dev/null 2>&1; then
-                echo -e "\033[0;32m✓\033[0m Port $port is open on $real_host"
+                echo -e "$SUCCESS_ICON Port $port is open on $real_host"
                 
+                # Enhanced telnet probing with more details
                 telnet_output=$(perl -e '\''
                     eval {
                         local $SIG{ALRM} = sub { die "timeout\n" };
-                        alarm 3;
-                        $output = `echo "quit" | telnet $ARGV[0] $ARGV[1] 2>&1`;
+                        alarm 5;  # Increased timeout for more reliable results
+                        $output = `echo "help\nquit" | telnet $ARGV[0] $ARGV[1] 2>&1`;
                         alarm 0;
                         print $output;
                     };
                     if ($@ eq "timeout\n") {
                         exit 1;
                     }
-                '\'' "$real_host" "$port" | grep -v "^Trying" | head -n 3)
+                '\'' "$real_host" "$port" | grep -v "^Trying")
                 telnet_status=$?
                 
                 if [ $telnet_status -eq 0 ] && [[ $telnet_output == *"Connected to"* ]]; then
-                    echo -e "\033[0;32m✓\033[0m Telnet connection successful"
-                    echo -e "\033[0;90m$telnet_output\033[0m"
+                    echo -e "$SUCCESS_ICON Telnet connection successful"
+                    print_detail "Connection Details:"
+                    echo "$telnet_output" | head -n 5 | while read line; do
+                        print_detail "  $line"
+                    done
                 else
-                    echo -e "\033[0;31m✗\033[0m Telnet connection failed"
-                    echo -e "\033[0;90m$telnet_output\033[0m"
+                    echo -e "$ERROR_ICON Telnet connection failed"
+                    print_detail "$telnet_output"
                 fi
             else
-                echo -e "\033[0;31m✗\033[0m Cannot reach $real_host:$port"
+                echo -e "$ERROR_ICON Cannot reach $real_host:$port"
             fi
             
-            echo -e "\n\033[1;34m=== DNS RESOLUTION ===\033[0m"
-            if ip=$(dig +short $real_host); then
-                if [ -n "$ip" ]; then
-                    echo -e "\033[0;32m✓\033[0m Resolves to: $ip"
+            # Enhanced DNS information
+            print_header "DNS RESOLUTION"
+            if dig_output=$(dig +short $real_host); then
+                if [ -n "$dig_output" ]; then
+                    echo -e "$SUCCESS_ICON DNS Resolution successful"
+                    echo "$dig_output" | while read ip; do
+                        print_detail "IP: $ip"
+                        # Try reverse DNS lookup
+                        reverse=$(dig +short -x $ip)
+                        [ -n "$reverse" ] && print_detail "PTR: $reverse"
+                    done
                 else
-                    echo -e "\033[0;31m✗\033[0m Could not resolve hostname"
+                    echo -e "$ERROR_ICON Could not resolve hostname"
                 fi
             else
-                echo -e "\033[0;31m✗\033[0m DNS lookup failed"
+                echo -e "$ERROR_ICON DNS lookup failed"
+            fi
+
+            # Service Banner (if available)
+            print_header "SERVICE INFORMATION"
+            banner_output=$(perl -e '\''
+                eval {
+                    local $SIG{ALRM} = sub { die "timeout\n" };
+                    alarm 3;
+                    $output = `nc -w 3 $ARGV[0] $ARGV[1] 2>&1`;
+                    alarm 0;
+                    print $output;
+                };
+                if ($@ eq "timeout\n") {
+                    exit 1;
+                }
+            '\'' "$real_host" "$port" | head -n 3)
+            
+            if [ -n "$banner_output" ]; then
+                echo -e "$INFO_ICON Service banner detected:"
+                print_detail "$banner_output"
+            else
+                echo -e "$WARNING_ICON No service banner available"
+            fi
+
+            # Response Time Test
+            print_header "RESPONSE TIME"
+            ping_result=$(ping -c 1 $real_host 2>/dev/null | grep "time=" | cut -d "=" -f 4)
+            if [ -n "$ping_result" ]; then
+                echo -e "$SUCCESS_ICON Response time: $ping_result"
+            else
+                echo -e "$WARNING_ICON Could not measure response time"
             fi
             ' \
         --preview-window=right:50% \
