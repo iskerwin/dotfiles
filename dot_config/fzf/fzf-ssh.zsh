@@ -75,7 +75,7 @@ __fzf_list_hosts() {
 # Enhanced SSH completion with custom bindings and header
 _fzf_complete_ssh() {
     _fzf_complete --ansi --border --cycle \
-        --height 90% \
+        --height 100% \
         --reverse \
         --header-lines=2 \
         --header='
@@ -85,11 +85,12 @@ _fzf_complete_ssh() {
         --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
         --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
         --prompt="SSH Remote > " \
-        --preview 'host=$(echo {} | awk "{print \$1}"); 
-            echo -e "\033[1;34m=== SSH Config ===\033[0m";
+        --preview '
+            host=$(echo {} | awk "{print \$1}")
+            echo -e "\033[1;34m=== SSH Config ===\033[0m"
             ssh -G $host 2>/dev/null | 
             grep -i -E "^(hostname|port|user|identityfile|controlmaster|forwardagent|localforward|remoteforward|proxycommand|serveraliveinterval|serveralivecountmax|tcpkeepalive|compressioncontrolpath|controlpersist) " |
-            sed -E '\''
+            sed -E '"'"'
                 s/^hostname/HostName/
                 s/^port/Port/
                 s/^user/User/
@@ -105,8 +106,8 @@ _fzf_complete_ssh() {
                 s/^compression/Compression/
                 s/^controlpath/ControlPath/
                 s/^controlpersist/ControlPersist/
-                '\'' | 
-            column -t;
+                '"'"' | 
+            column -t
 
             # Get SSH connection details
             ssh_config=$(ssh -G $host 2>/dev/null)
@@ -116,51 +117,83 @@ _fzf_complete_ssh() {
             port=$(echo "$ssh_config" | grep "^port " | head -n1 | cut -d" " -f2)
             port=${port:-22}  # Default to port 22 if not specified
 
-            # Handle special cases like github.com
-            if [[ $host == *"github.com"* ]]; then
-                test_host="git@github.com"
-            else
-                test_host="$host"
+            echo -e "\n\033[1;34m=== CONNECTION INFO ===\033[0m"
+            echo -e "Host:\t\t$real_hostname"
+            echo -e "Port:\t\t${port:-22}"
+            echo -e "User:\t\t${user:-$(whoami)}"
+            if [ -n "$key_file" ]; then
+                echo -e "Key File:\t$key_file"
             fi
 
-            echo -e "\n\033[1;34m=== KEY STATUS ===\033[0m"
-            if [ -f "${key_file/#\~/$HOME}" ]; then
-                echo -e "\033[0;32m✓\033[0m Key exists: $key_file"
-                key_perms=$(stat -f "%Lp" "${key_file/#\~/$HOME}" 2>/dev/null)
-                if [ "$key_perms" = "600" ]; then
-                    echo -e "\033[0;32m✓\033[0m Key permissions correct (600)"
+            # Check SSH key if specified
+            if [ -n "$key_file" ]; then
+                echo -e "\n\033[1;34m=== KEY STATUS ===\033[0m"
+                if [ -f "${key_file/#\~/$HOME}" ]; then
+                    echo -e "\033[0;32m✓\033[0m Key exists: $key_file"
+                    key_perms=$(stat -f "%Lp" "${key_file/#\~/$HOME}" 2>/dev/null)
+                    if [ "$key_perms" = "600" ]; then
+                        echo -e "\033[0;32m✓\033[0m Key permissions correct (600)"
+                    else
+                        echo -e "\033[0;31m✗\033[0m Key permissions incorrect: $key_perms (should be 600)"
+                    fi
+                    
+                    # Verify key format
+                    if ssh-keygen -l -f "${key_file/#\~/$HOME}" >/dev/null 2>&1; then
+                        echo -e "\033[0;32m✓\033[0m SSH key is valid"
+                        key_info=$(ssh-keygen -l -f "${key_file/#\~/$HOME}" 2>/dev/null)
+                        echo -e "\033[0;90m$key_info\033[0m"
+                    else
+                        echo -e "\033[0;31m✗\033[0m Invalid SSH key format"
+                    fi
                 else
-                    echo -e "\033[0;31m✗\033[0m Key permissions incorrect: $key_perms (should be 600)"
+                    echo -e "\033[0;31m✗\033[0m Key not found: $key_file"
                 fi
-            else
-                echo -e "\033[0;31m✗\033[0m Key not found: $key_file"
             fi
 
             echo -e "\n\033[1;34m=== CONNECTIVITY TEST ===\033[0m"
             if nc -z -w 2 $real_hostname $port >/dev/null 2>&1; then
                 echo -e "\033[0;32m✓\033[0m Port $port is open on $real_hostname"
                 
-                # Try SSH connection with perl-based timeout
-                ssh_output=$(perl -e '\''
-                    eval {
-                        local $SIG{ALRM} = sub { die "timeout\n" };
-                        alarm 3; # Set an alarm signal for 3 seconds
-                        $output = `ssh -T -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=no $ARGV[0] 2>&1`;
-                        alarm 0;
-                        print $output;
-                    };
-                    if ($@ eq "timeout\n") {
-                        exit 1;
-                    }
-                '\'' "$test_host")
-                ssh_status=$?
-                
-                if [ $ssh_status -eq 0 ] || [[ $ssh_output == *"successfully authenticated"* ]]; then
-                    echo -e "\033[0;32m✓\033[0m SSH authentication successful"
-                    echo -e "\033[0;90m$ssh_output\033[0m"
+                if [[ $real_hostname == "github.com" ]]; then
+                    echo -e "\n\033[1;34m=== GITHUB SSH TEST ===\033[0m"
+                    ssh_output=$(ssh -T git@github.com -o ConnectTimeout=3 2>&1)
+                    if [[ $ssh_output == *"successfully authenticated"* ]]; then
+                        echo -e "\033[0;32m✓\033[0m GitHub SSH authentication successful"
+                    else
+                        echo -e "\033[0;31m✗\033[0m GitHub SSH authentication failed"
+                        echo -e "\033[0;90m$ssh_output\033[0m"
+                    fi
                 else
-                    echo -e "\033[0;31m✗\033[0m SSH authentication failed"
-                    echo -e "\033[0;90m$ssh_output\033[0m"
+                    # Get SSH banner and auth methods in one connection attempt
+                    ssh_response=$(ssh -o PreferredAuthentications=none -o ConnectTimeout=3 "$host" 2>&1)
+                    
+                    # Extract and display auth methods
+                    echo -e "\n\033[1;34m=== AUTH METHODS ===\033[0m"
+                    auth_methods=$(echo "$ssh_response" | grep -i "authentication methods" | cut -d":" -f2-)
+                    if [ -n "$auth_methods" ]; then
+                        echo -e "Available methods:$auth_methods"
+                    else
+                        echo -e "\033[0;33m!\033[0m Unable to detect authentication methods"
+                    fi
+                    
+                    # Try to detect if the server accepts password authentication
+                    if ssh -o ConnectTimeout=3 -o BatchMode=yes "$host" true >/dev/null 2>&1; then
+                        echo -e "\033[0;32m✓\033[0m Publickey authentication available"
+                    elif [[ $auth_methods == *"password"* ]]; then
+                        echo -e "\033[0;33m!\033[0m Password authentication required"
+                    else
+                        echo -e "\033[0;33m!\033[0m Authentication method unclear, try manual connection"
+                    fi
+
+                    # Extract and display banner/login notice
+                    echo -e "\n\033[1;34m=== LOGIN NOTICE ===\033[0m"
+                    # Filter out the "Permission denied" and "Please try again" messages
+                    banner=$(echo "$ssh_response" | grep -v "Permission denied" | grep -v "Please try again" | grep -v "authentication methods" | head -n 10)
+                    if [ -n "$banner" ]; then
+                        echo -e "\033[0;90m$banner\033[0m"
+                    else
+                        echo "No login notice available"
+                    fi
                 fi
             else
                 echo -e "\033[0;31m✗\033[0m Cannot reach $real_hostname:$port"
@@ -169,7 +202,7 @@ _fzf_complete_ssh() {
             echo -e "\n\033[1;34m=== DESCRIPTION ===\033[0m"
             desc=$(echo {} | awk "{print \$4}")
             echo "${desc:-No description available}"
-            ' \
+        ' \
         --preview-window=right:50% \
         -- "$@" < <(__fzf_list_hosts)
 }
