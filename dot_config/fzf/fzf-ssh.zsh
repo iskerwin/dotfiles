@@ -1,14 +1,4 @@
 # ZSH Plugin for SSH with FZF integration
-# Global configurations with improved fzf preview
-# export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
-#     --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
-#     --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
-#     --header='
-# ╭──────────── Controls ──────────╮
-# │ CTRL-E: edit   •  CTRL-Y: copy │
-# ╰────────────────────────────────╯'
-# "
-
 # Base directory configurations with zsh style parameter expansion
 : "${SSH_DIR:=$HOME/.ssh}"
 : "${SSH_CONFIG_FILE:=$SSH_DIR/config}"
@@ -82,12 +72,18 @@ __fzf_list_hosts() {
     }' "$SSH_CONFIG_FILE" 2>/dev/null | column -t -s "|"
 }
 
-# Enhanced SSH completion
+# Enhanced SSH completion with custom bindings and header
 _fzf_complete_ssh() {
     _fzf_complete --ansi --border --cycle \
         --height 80% \
         --reverse \
         --header-lines=2 \
+        --header='
+╭──────────── Controls ──────────╮
+│ CTRL-E: edit   •  CTRL-Y: copy │
+╰────────────────────────────────╯' \
+        --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
+        --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
         --prompt="SSH Remote > " \
         --preview 'host=$(echo {} | awk "{print \$1}"); 
             echo -e "\033[1;34m=== SSH Config ===\033[0m";
@@ -119,20 +115,26 @@ _fzf_complete_ssh() {
         -- "$@" < <(__fzf_list_hosts)
 }
 
-_fzf_complete_ssh_post() {
-    awk '{print $1}'
-}
-
-# Enhanced FZF completion for TELNET
+# Enhanced TELNET completion with custom bindings and header
 _fzf_complete_telnet() {
     _fzf_complete --ansi --border --cycle \
         --height 80% \
         --reverse \
         --header-lines=2 \
+        --header='
+╭──────────── Controls ──────────╮
+│ CTRL-E: edit   •  CTRL-Y: copy │
+╰────────────────────────────────╯' \
+        --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
+        --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
         --prompt='Telnet Remote > ' \
         --preview 'echo "Port: 23\nProtocol: TELNET\nHost: {1}\nHostName: {2}"' \
         --preview-window=right:50% \
         -- "$@" < <(__fzf_list_hosts)
+}
+
+_fzf_complete_ssh_post() {
+    awk '{print $1}'
 }
 
 _fzf_complete_telnet_post() {
