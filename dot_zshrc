@@ -1,52 +1,101 @@
 #########################
 # Zap installer         #
 #########################
-# Created by Zap installer
+# Initialize Zap plugin manager - A minimal zsh plugin manager
 [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ] && source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
-plug "zap-zsh/supercharge"
-plug "zsh-users/zsh-autosuggestions"
-plug "zsh-users/zsh-syntax-highlighting"
-plug "romkatv/powerlevel10k"
-plug "Aloxaf/fzf-tab"               # Fuzzy tab completion
+
+#########################
+# Performance           #
+#########################
+# Enable Powerlevel10k instant prompt for faster startup
+# Must be at the top of ~/.zshrc before any other prompt initialization code
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+#########################
+# Plugins               #
+#########################
+# Core plugins for enhanced functionality
+plug "zap-zsh/supercharge"               # Load sensible zsh defaults
+plug "zsh-users/zsh-autosuggestions"     # Fish-like autosuggestions
+plug "zsh-users/zsh-syntax-highlighting" # Syntax highlighting for commands
+plug "romkatv/powerlevel10k"             # Highly customizable and fast prompt
+plug "Aloxaf/fzf-tab"                    # Replace zsh's default completion with fzf
 
 #########################
 # History Settings      #
 #########################
-HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
-setopt HIST_IGNORE_ALL_DUPS    # Don't record duplicates
-setopt HIST_SAVE_NO_DUPS
-setopt HIST_REDUCE_BLANKS
-setopt HIST_VERIFY
-setopt SHARE_HISTORY           # Share history between sessions
+HISTFILE=~/.zsh_history            # History file location
+HISTSIZE=1000000                   # Maximum events in internal history
+SAVEHIST=1000000                   # Maximum events in history file
+setopt HIST_IGNORE_ALL_DUPS        # Remove older duplicate entries from history
+setopt HIST_SAVE_NO_DUPS           # Don't save duplicate entries to history file
+setopt HIST_REDUCE_BLANKS          # Remove superfluous blanks from history
+setopt HIST_VERIFY                 # Show command with history expansion before running it
+setopt SHARE_HISTORY               # Share history between all sessions
+setopt HIST_IGNORE_SPACE           # Don't record commands that start with space
+setopt EXTENDED_HISTORY            # Record timestamp of command in history
 
 #########################
 # Directory Settings    #
 #########################
-setopt AUTO_CD                 # Change directory without cd
-setopt AUTO_PUSHD              # Push directory to stack
-setopt PUSHD_IGNORE_DUPS
-setopt PUSHD_SILENT
+setopt AUTO_CD                    # If a command isn't valid but is a directory, cd to it
+setopt AUTO_PUSHD                 # Make cd push the old directory onto the directory stack
+setopt PUSHD_IGNORE_DUPS          # Don't push multiple copies of the same directory
+setopt PUSHD_SILENT               # Don't print the directory stack after pushd or popd
+setopt PUSHD_TO_HOME              # Have pushd with no arguments act like 'pushd $HOME'
+
+#########################
+# Completion Settings   #
+#########################
+# Initialize the completion system
+autoload -Uz compinit
+compinit -d ~/.cache/zcompdump    # Store completion dump files in cache directory
 
 #########################
 # Config Files          #
 #########################
-# Load additional configuration files if they exist
-[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh          # Fuzzy finder custom
-[ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh    # Aliases
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh                            # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+# Source additional configuration files if they exist
+[ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh     # Custom aliases
+[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                 # Powerlevel10k configuration
+[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh           # FZF configuration
 
 #########################
 # Environment Variables #
 #########################
-# PATH configurations
-export PATH=/opt/homebrew/bin:$PATH
-export PATH=$HOME/.local/bin:$PATH
-export PATH=$HOME/bin:$PATH
+# PATH configurations - Order matters, last entry takes precedence
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"  # Homebrew executables
+export PATH="$HOME/.local/bin:$PATH"                      # Local user binaries
+export PATH="$HOME/bin:$PATH"                             # Personal scripts
 
-# Language settings
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
+# XDG Base Directory Specification
+export XDG_CONFIG_HOME="$HOME/.config"          # User-specific configuration files
+export XDG_CACHE_HOME="$HOME/.cache"            # User-specific cache files
+export XDG_DATA_HOME="$HOME/.local/share"       # User-specific data files
 
+# Language and locale settings
+export LANG=en_US.UTF-8                         # Default language
+export LC_ALL=en_US.UTF-8                       # Override all locale settings
+
+# Initialize zoxide - A smarter cd command
 eval "$(zoxide init zsh)"
+
+# Initialize homebrew command-not-found handler
+# This will suggest package names when a command is not found
+if [ -f /opt/homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh ]; then
+    source /opt/homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh
+fi
+
+# Initialize Homebrew environment
+# This sets up all necessary environment variables for Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+
+# Add to your .zshrc for persistent agent across sessions
+if [ -f "$HOME/.ssh/agent.env" ]; then
+    . "$HOME/.ssh/agent.env"
+    if ! kill -0 $SSH_AGENT_PID &>/dev/null; then
+        ssm auto-load  # Restart agent and reload keys
+    fi
+fi

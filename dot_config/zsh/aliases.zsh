@@ -85,6 +85,7 @@ alias lsdev='ls /dev/cu.*'                          # List serial devices
 
 alias ssh='ct screen ssh'                         # SSH with screen support
 alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
+alias sshals='ps aux | grep ssh-agent'             # List SSH-agent process
 
 ##############################
 # Screen Management

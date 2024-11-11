@@ -586,7 +586,4 @@ ssh_menu() {
 }
 
 # Aliases for quick access
-alias ssm='ssh_menu'
-alias ssha='add_ssh_host'
-alias sshl='list_ssh_hosts'
-alias sshd='delete_ssh_host'
+alias sshm='ssh_menu'
