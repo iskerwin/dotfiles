@@ -13,7 +13,7 @@ PID_FILE="/tmp/ssh-agent-pid"
 
 # 4. 基础工具函数
 print_separator() {
-    echo "\033[0;36m═══════════════════════════════════════════\033[0m"
+    printf "${COLOR_HEADER}%s${COLOR_RESET}\n" "=================================================="
 }
 
 print_section() {
@@ -173,7 +173,7 @@ list_loaded_keys() {
             echo "${COLOR_INFO}[$comment]${COLOR_RESET}"
             echo "  ${COLOR_DIM}Bits:${COLOR_RESET} $bits"
             echo "  ${COLOR_DIM}Hash:${COLOR_RESET} $hash"
-            echo "${COLOR_DIM}────────────────────${COLOR_RESET}"
+            printf "${COLOR_DIM}%s${COLOR_RESET}\n" "──────────────────────────────────────────────────"
         done
     else
         echo "${COLOR_WARNING}No keys currently loaded in SSH agent${COLOR_RESET}"
@@ -330,42 +330,37 @@ trap 'rm -rf "$PREVIEW_DIR"' EXIT
 
 # 1. 首先创建一个基础库文件 preview_base.sh
 cat > "$PREVIEW_DIR/preview_base.sh" << 'EOF'
-#!/usr/bin/env zsh
-
-# 颜色定义
-declare -A COLORS=(
-    [HEADER]=$'\033[1;34m'    # Bold Blue
-    [SUCCESS]=$'\033[1;32m'   # Bold Green
-    [WARNING]=$'\033[1;33m'   # Bold Yellow
-    [ERROR]=$'\033[1;31m'     # Bold Red
-    [INFO]=$'\033[1;36m'      # Bold Cyan
-    [RESET]=$'\033[0m'        # Reset
-    [DIM]=$'\033[2m'          # Dim
-    [BOLD]=$'\033[1m'         # Bold
-)
+COLOR_HEADER=$'\033[1;34m'    # Bold Blue
+COLOR_SUCCESS=$'\033[1;32m'   # Bold Green
+COLOR_WARNING=$'\033[1;33m'   # Bold Yellow
+COLOR_ERROR=$'\033[1;31m'     # Bold Red
+COLOR_INFO=$'\033[1;36m'      # Bold Cyan
+COLOR_RESET=$'\033[0m'        # Reset
+COLOR_DIM=$'\033[2m'          # Dim
+COLOR_BOLD=$'\033[1m'         # Bold
 
 # 通用工具函数
 print_separator() {
-    echo "\033[0;36m═══════════════════════════════════════════\033[0m"
+    printf "${COLOR_HEADER}%s${COLOR_RESET}\n" "=================================================="
 }
 
 print_section() {
-    echo "${COLORS[HEADER]}$1${COLORS[RESET]}"
+    echo "${COLOR_HEADER}$1${COLOR_RESET}"
     print_separator
 }
 
 format_key_info() {
     local bits=$1 hash=$2 comment=$3
-    echo "${COLORS[INFO]}[$comment]${COLORS[RESET]}"
-    echo "  ${COLORS[DIM]}Bits:${COLORS[RESET]} $bits"
-    echo "  ${COLORS[DIM]}Hash:${COLORS[RESET]} $hash"
-    echo "${COLORS[DIM]}────────────────────${COLORS[RESET]}"
+    echo "${COLOR_INFO}[$comment]${COLOR_RESET}"
+    echo "  ${COLOR_DIM}Bits:${COLOR_RESET} $bits"
+    echo "  ${COLOR_DIM}Hash:${COLOR_RESET} $hash"
+    printf "${COLOR_DIM}%s${COLOR_RESET}\n" "──────────────────────────────────────────────────"
 }
 
 # SSH 相关工具函数
 check_ssh_agent() {
     if [[ ! -S "$SSH_AUTH_SOCK" ]]; then
-        echo "${COLORS[ERROR]}SSH Agent is not running${COLORS[RESET]}"
+        echo "${COLOR_ERROR}SSH Agent is not running${COLOR_RESET}"
         return 1
     fi
     return 0
@@ -378,15 +373,15 @@ format_loaded_keys() {
             format_key_info "$bits" "$hash" "$comment"
         done
     else
-        echo "${COLORS[WARNING]}None${COLORS[RESET]}"
+        echo "${COLOR_WARNING}None${COLOR_RESET}"
     fi
 }
 
 get_agent_status() {
     if check_ssh_agent; then
-        echo "${COLORS[SUCCESS]}● Running${COLORS[RESET]}"
-        echo "${COLORS[INFO]}PID:${COLORS[RESET]}    $SSH_AGENT_PID"
-        echo "${COLORS[INFO]}Socket:${COLORS[RESET]} $SSH_AUTH_SOCK"
+        echo "${COLOR_SUCCESS}Running${COLOR_RESET}"
+        echo "${COLOR_INFO}PID:${COLOR_RESET}    $SSH_AGENT_PID"
+        echo "${COLOR_INFO}Socket:${COLOR_RESET} $SSH_AUTH_SOCK"
         echo
         print_section "🔑 Loaded Keys"
         format_loaded_keys
@@ -418,41 +413,41 @@ key=$1
 
 if [[ ! -f "$key" ]]; then
     print_section "❌ Error"
-    echo "${COLORS[ERROR]}Invalid SSH key file${COLORS[RESET]}"
+    echo "${COLOR_ERROR}Invalid SSH key file${COLOR_RESET}"
     exit 1
 fi
 
 print_section "🔑 Key Information"
 if ! key_info=$(ssh-keygen -l -f "$key" 2>/dev/null); then
-    echo "${COLORS[ERROR]}Unable to read key information${COLORS[RESET]}"
+    echo "${COLOR_ERROR}Unable to read key information${COLOR_RESET}"
     exit 1
 fi
 
 bits=$(echo "$key_info" | awk '{print $1}')
 fingerprint=$(echo "$key_info" | awk '{print $2}')
-echo "${COLORS[INFO]}Bits:${COLORS[RESET]}        $bits"
-echo "${COLORS[INFO]}Fingerprint:${COLORS[RESET]} $fingerprint"
+echo "${COLOR_INFO}Bits:${COLOR_RESET}        $bits"
+echo "${COLOR_INFO}Fingerprint:${COLOR_RESET} $fingerprint"
 echo
 
 if [[ -f "${key}.pub" ]]; then
     print_section "📄 Public Key"
-    echo "${COLORS[SUCCESS]}$(cat "${key}.pub")${COLORS[RESET]}"
+    echo "${COLOR_SUCCESS}$(cat "${key}.pub")${COLOR_RESET}"
     echo
     print_section "📋 File Details"
-    pub_perms=$(ls -l "${key}.pub")
-    echo "${COLORS[INFO]}Public Key:${COLORS[RESET]}  $pub_perms"
+    pub_perms=$(ls "${key}.pub")
+    echo "${COLOR_INFO}Public Key:${COLOR_RESET}  $pub_perms"
 else
     print_section "⚠️  Warning"
-    echo "${COLORS[WARNING]}No public key file found${COLORS[RESET]}"
+    echo "${COLOR_WARNING}No public key file found${COLOR_RESET}"
 fi
 
-priv_perms=$(ls -l "$key")
-echo "${COLORS[INFO]}Private Key:${COLORS[RESET]} $priv_perms"
+priv_perms=$(ls "$key")
+echo "${COLOR_INFO}Private Key:${COLOR_RESET} $priv_perms"
 echo
 
 created=$(stat -f "%Sm" "$key")
 print_section "📅 Timestamp"
-echo "${COLORS[INFO]}Created:${COLORS[RESET]}     $created"
+echo "${COLOR_INFO}Created:${COLOR_RESET}     $created"
 EOF
 chmod +x "$PREVIEW_DIR/key_details.sh"
 
@@ -465,7 +460,7 @@ source "$(dirname $0)/preview_base.sh"
 key_info="$@"
 
 print_section "🔑 Key Details"
-echo "${COLORS[INFO]}$key_info${COLORS[RESET]}"
+echo "${COLOR_INFO}$key_info${COLOR_RESET}"
 echo
 
 fingerprint=$(echo "$key_info" | awk '{print $2}')
@@ -476,8 +471,8 @@ while read -r key; do
     if [[ -f "$key" ]] && ssh-keygen -l -f "$key" &>/dev/null; then
         key_fp=$(ssh-keygen -l -f "$key" | awk '{print $2}')
         if [[ "$fingerprint" == "$key_fp" ]]; then
-            echo "${COLORS[SUCCESS]}Path:${COLORS[RESET]} $key"
-            echo "${COLORS[INFO]}Permissions:${COLORS[RESET]} $(ls -l "$key")"
+            echo "${COLOR_SUCCESS}Path:${COLOR_RESET} $key"
+            echo "${COLOR_INFO}Permissions:${COLOR_RESET} $(ls -l "$key")"
             found=true
             break
         fi
@@ -485,7 +480,7 @@ while read -r key; do
 done < <(find_ssh_keys)
 
 if [[ $found == false ]]; then
-    echo "${COLORS[WARNING]}No matching local key file found${COLORS[RESET]}"
+    echo "${COLOR_WARNING}No matching local key file found${COLOR_RESET}"
 fi
 EOF
 chmod +x "$PREVIEW_DIR/loaded_key_details.sh"
@@ -503,7 +498,7 @@ SSH_AGENT_PID=$3
 case $item in
     "Start SSH Agent")
         print_section "🚀 Start SSH Agent"
-        echo "${COLORS[DIM]}Start a new SSH agent or connect to an existing one${COLORS[RESET]}"
+        echo "${COLOR_DIM}Start a new SSH agent or connect to an existing one${COLOR_RESET}"
         echo
         print_section "🟢 Current Status"
         get_agent_status
@@ -511,7 +506,7 @@ case $item in
         
     "Stop SSH Agent")
         print_section "🛑 Stop SSH Agent"
-        echo "${COLORS[DIM]}Stop the running SSH agent and remove all loaded keys${COLORS[RESET]}"
+        echo "${COLOR_DIM}Stop the running SSH agent and remove all loaded keys${COLOR_RESET}"
         echo
         print_section "🟢 Current Status"
         get_agent_status
@@ -519,11 +514,11 @@ case $item in
         
     "Load Key")
         print_section "📥 Load SSH Key"
-        echo "${COLORS[DIM]}Add a new SSH key to the agent${COLORS[RESET]}"
+        echo "${COLOR_DIM}Add a new SSH key to the agent${COLOR_RESET}"
         echo
         print_section "🉑 Available Keys"
         while read -r key; do
-            echo "${COLORS[SUCCESS]}$key${COLORS[RESET]}"
+            echo "$key"
         done < <(find_ssh_keys)
         echo
         print_section "✅ Currently Loaded"
@@ -532,7 +527,7 @@ case $item in
         
     "Unload Key")
         print_section "📤 Unload SSH Key"
-        echo "${COLORS[DIM]}Remove a loaded SSH key from the agent${COLORS[RESET]}"
+        echo "${COLOR_DIM}Remove a loaded SSH key from the agent${COLOR_RESET}"
         echo
         print_section "🔑 Currently Loaded Keys"
         format_loaded_keys
@@ -540,7 +535,7 @@ case $item in
         
     "List Loaded Keys")
         print_section "📋 Loaded Keys List"
-        echo "${COLORS[DIM]}View all keys currently loaded in the agent${COLORS[RESET]}"
+        echo "${COLOR_DIM}View all keys currently loaded in the agent${COLOR_RESET}"
         echo
         print_section "🔍 Agent Details"
         get_agent_status
@@ -548,7 +543,7 @@ case $item in
         
     "Exit")
         print_section "👋 Exit Program"
-        echo "${COLORS[DIM]}Exit the SSH key management tool${COLORS[RESET]}"
+        echo "${COLOR_DIM}Exit the SSH key management tool${COLOR_RESET}"
         echo
         print_section "🟢 Current Status"
         get_agent_status
