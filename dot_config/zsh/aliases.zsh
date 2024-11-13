@@ -84,8 +84,8 @@ alias lsdev='ls /dev/cu.*'                          # List serial devices
 ##############################
 
 alias ssh='ct screen ssh'                         # SSH with screen support
-alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
-alias sshals='ps aux | grep ssh-agent'             # List SSH-agent process
+# alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
+# alias sshals='ps aux | grep ssh-agent'             # List SSH-agent process
 
 ##############################
 # Screen Management
@@ -112,14 +112,6 @@ srun() {
 # Package Management
 alias backup='brew bundle dump --describe --force --file="~/.config/brew/Brewfile"'  # Backup brew packages
 alias restore-brewfile='brew bundle --file="~/.config/brew/Brewfile"' #Restore brew packages
-
-# Alias management
-alias af='source ~/.config/zsh/alias-fzf.zsh'
-
-# Search and Grep
-alias grep='grep --color=auto'                    # Colorized grep
-alias egrep='egrep --color=auto'                  # Extended grep
-alias fgrep='fgrep --color=auto'                  # Fixed grep
 
 ##############################
 # Miscellaneous

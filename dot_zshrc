@@ -90,12 +90,3 @@ fi
 # Initialize Homebrew environment
 # This sets up all necessary environment variables for Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
-
-
-# Add to your .zshrc for persistent agent across sessions
-if [ -f "$HOME/.ssh/agent.env" ]; then
-    . "$HOME/.ssh/agent.env"
-    if ! kill -0 $SSH_AGENT_PID &>/dev/null; then
-        ssm auto-load  # Restart agent and reload keys
-    fi
-fi

@@ -308,7 +308,7 @@ _fzf_complete_ssh() {
 
 _fzf_complete_telnet() {
     _fzf_complete --ansi --border --cycle \
-        --height 90% \
+        ---height 80% \
         --reverse \
         --header-lines=2 \
         --header='
