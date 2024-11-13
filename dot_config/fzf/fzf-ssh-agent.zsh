@@ -1,57 +1,17 @@
 #!/usr/bin/env zsh
 
-# Check for required dependencies
+# 1. 依赖检查
 if ! command -v fzf >/dev/null 2>&1; then
     echo "Error: fzf is required but not installed. Please install fzf first."
     return 1
 fi
 
-# Initialize variables
+# 2. 基础变量定义
 SSH_KEY_DIR="$HOME/.ssh"
 SOCK_FILE="/tmp/ssh-agent-sock"
 PID_FILE="/tmp/ssh-agent-pid"
 
-# Color definitions
-COLOR_HEADER=$'\033[1;34m'    # Bold Blue
-COLOR_SUCCESS=$'\033[1;32m'   # Bold Green
-COLOR_WARNING=$'\033[1;33m'   # Bold Yellow
-COLOR_ERROR=$'\033[1;31m'     # Bold Red
-COLOR_INFO=$'\033[1;36m'      # Bold Cyan
-COLOR_RESET=$'\033[0m'        # Reset
-COLOR_DIM=$'\033[2m'          # Dim
-COLOR_BOLD=$'\033[1m'         # Bold
-
-# Separator function
-print_separator() {
-    echo "\033[0;36m═══════════════════════════════════════════\033[0m"
-}
-
-# Section header function
-print_section() {
-    echo "${COLOR_HEADER}$1${COLOR_RESET}"
-    print_separator
-}
-
-# Create a temporary directory for preview scripts
-PREVIEW_DIR=$(mktemp -d)
-trap 'rm -rf "$PREVIEW_DIR"' EXIT
-
-# Previous functions remain the same until the preview scripts...
-
-# Create key details preview script with enhanced formatting
-cat > "$PREVIEW_DIR/key_details.sh" << 'EOF'
-#!/usr/bin/env zsh
-
-# Color definitions
-COLOR_HEADER=$'\033[1;34m'    # Bold Blue
-COLOR_SUCCESS=$'\033[1;32m'   # Bold Green
-COLOR_WARNING=$'\033[1;33m'   # Bold Yellow
-COLOR_ERROR=$'\033[1;31m'     # Bold Red
-COLOR_INFO=$'\033[1;36m'      # Bold Cyan
-COLOR_RESET=$'\033[0m'        # Reset
-COLOR_DIM=$'\033[2m'          # Dim
-COLOR_BOLD=$'\033[1m'         # Bold
-
+# 4. 基础工具函数
 print_separator() {
     echo "\033[0;36m═══════════════════════════════════════════\033[0m"
 }
@@ -61,260 +21,6 @@ print_section() {
     print_separator
 }
 
-key=$1
-
-if [[ -f "$key" ]]; then
-    print_section "🔑 Key Information"
-    key_info=$(ssh-keygen -l -f "$key" 2>/dev/null)
-    bits=$(echo "$key_info" | awk '{print $1}')
-    fingerprint=$(echo "$key_info" | awk '{print $2}')
-    echo "${COLOR_INFO}Bits:${COLOR_RESET}        $bits"
-    echo "${COLOR_INFO}Fingerprint:${COLOR_RESET} $fingerprint"
-    echo
-
-    if [[ -f "${key}.pub" ]]; then
-        print_section "📄 Public Key"
-        echo "${COLOR_SUCCESS}$(cat "${key}.pub")${COLOR_RESET}"
-        echo
-        print_section "📋 File Details"
-        pub_perms=$(ls "${key}.pub")
-        echo "${COLOR_INFO}Public Key:${COLOR_RESET}  $pub_perms"
-    else
-        print_section "⚠️  Warning"
-        echo "${COLOR_WARNING}No public key file found${COLOR_RESET}"
-    fi # Fixed: Changed 'end' to 'fi'
-
-    priv_perms=$(ls "$key")
-    echo "${COLOR_INFO}Private Key:${COLOR_RESET} $priv_perms"
-    echo
-    
-    created=$(stat -f "%Sm" "$key")
-    print_section "📅 Timestamp"
-    echo "${COLOR_INFO}Created:${COLOR_RESET}     $created"
-else
-    print_section "❌ Error"
-    echo "${COLOR_ERROR}Invalid SSH key file${COLOR_RESET}"
-fi
-EOF
-chmod +x "$PREVIEW_DIR/key_details.sh"
-
-cat > "$PREVIEW_DIR/loaded_key_details.sh" << 'EOF'
-#!/usr/bin/env zsh
-
-# Color definitions
-COLOR_HEADER=$'\033[1;34m'    # Bold Blue
-COLOR_SUCCESS=$'\033[1;32m'   # Bold Green
-COLOR_WARNING=$'\033[1;33m'   # Bold Yellow
-COLOR_ERROR=$'\033[1;31m'     # Bold Red
-COLOR_INFO=$'\033[1;36m'      # Bold Cyan
-COLOR_RESET=$'\033[0m'        # Reset
-COLOR_DIM=$'\033[2m'          # Dim
-COLOR_BOLD=$'\033[1m'         # Bold
-
-print_separator() {
-    echo "\033[0;36m═══════════════════════════════════════════\033[0m"
-}
-
-print_section() {
-    echo "${COLOR_HEADER}$1${COLOR_RESET}"
-    print_separator
-}
-
-key_info="$@"
-print_section "🔑 Key Details"
-echo "${COLOR_INFO}$key_info${COLOR_RESET}"
-echo
-
-fingerprint=$(echo "$key_info" | awk '{print $2}')
-print_section "📂 Local Key File"
-
-found=false
-find "$HOME/.ssh" -type f -not -name "*.pub" \
-    -not -name "known_hosts*" \
-    -not -name "config" \
-    -not -name "agent-env" \
-    -not -name ".DS_Store" \
-    -not -name "authorized_keys" | while read key; do
-    if ssh-keygen -l -f "$key" &>/dev/null; then
-        key_fp=$(ssh-keygen -l -f "$key" 2>/dev/null | awk '{print $2}')
-        if [[ "$fingerprint" == "$key_fp" ]]; then
-            echo "${COLOR_SUCCESS}Path:${COLOR_RESET} $key"
-            echo "${COLOR_INFO}Permissions:${COLOR_RESET} $(ls -l "$key")"
-            found=true
-            break
-        fi
-    fi
-done
-
-if [[ $found == false ]]; then
-    echo "${COLOR_WARNING}No matching local key file found${COLOR_RESET}"
-fi
-EOF
-chmod +x "$PREVIEW_DIR/loaded_key_details.sh"
-
-cat > "$PREVIEW_DIR/menu_preview.sh" << 'EOF'
-#!/usr/bin/env zsh
-
-# Color definitions for consistent styling
-COLOR_HEADER=$'\033[1;34m'    # Bold Blue
-COLOR_SUCCESS=$'\033[1;32m'   # Bold Green
-COLOR_WARNING=$'\033[1;33m'   # Bold Yellow
-COLOR_ERROR=$'\033[1;31m'     # Bold Red
-COLOR_INFO=$'\033[1;36m'      # Bold Cyan
-COLOR_RESET=$'\033[0m'        # Reset
-COLOR_DIM=$'\033[2m'          # Dim
-COLOR_BOLD=$'\033[1m'         # Bold
-
-# 打印分隔线
-print_separator() {
-    echo "\033[0;36m═══════════════════════════════════════════\033[0m"
-}
-
-# 打印带有标题的区块
-print_section() {
-    echo "${COLOR_HEADER}$1${COLOR_RESET}"
-    print_separator
-}
-
-# 格式化显示已加载的密钥
-format_loaded_keys() {
-    local loaded_keys=$(ssh-add -l 2>/dev/null)
-    if [[ $? -eq 0 ]]; then
-        echo "$loaded_keys" | while read -r bits hash comment; do
-            echo "${COLOR_INFO}[$comment]${COLOR_RESET}"
-            echo "  ${COLOR_DIM}Bits:${COLOR_RESET} $bits"
-            echo "  ${COLOR_DIM}Hash:${COLOR_RESET} $hash"
-            echo "${COLOR_DIM}────────────────────${COLOR_RESET}"
-        done
-    else
-        echo "${COLOR_WARNING}None${COLOR_RESET}"
-    fi
-}
-
-# 列出可用的 SSH 密钥
-list_available_keys() {
-    find "$HOME/.ssh" -type f -not -name "*.pub" \
-        -not -name "known_hosts*" \
-        -not -name "config" \
-        -not -name "agent-env" \
-        -not -name ".DS_Store" \
-        -not -name "authorized_keys" | while read file; do
-        if ssh-keygen -l -f "$file" &>/dev/null; then
-            echo "${COLOR_SUCCESS}$file${COLOR_RESET}"
-        fi
-    done
-}
-
-# 获取 SSH Agent 状态
-get_status() {
-    if [[ -S "$SSH_AUTH_SOCK" ]]; then
-        echo "${COLOR_SUCCESS}Running${COLOR_RESET}"
-        echo "${COLOR_INFO}PID:${COLOR_RESET}    $SSH_AGENT_PID"
-        echo "${COLOR_INFO}Socket:${COLOR_RESET} $SSH_AUTH_SOCK"
-        echo
-        print_section "🔑 Loaded Keys"
-        format_loaded_keys
-    else
-        echo "${COLOR_ERROR}✗ Not running${COLOR_RESET}"
-        echo "${COLOR_DIM}SSH Agent is not started${COLOR_RESET}"
-    fi
-}
-
-# 菜单项处理
-item=$1
-SSH_AUTH_SOCK=$2
-SSH_AGENT_PID=$3
-
-# 菜单选项处理
-case $item in
-    "Start SSH Agent")
-        # 启动 SSH Agent，显示启动前的状态
-        print_section "🚀 Start SSH Agent"
-        echo "${COLOR_DIM}Start a new SSH agent or connect to an existing one${COLOR_RESET}"
-        echo
-        print_section "🟢 Current Status"
-        get_status
-        ;;
-        
-    "Stop SSH Agent")
-        # 停止 SSH Agent，显示停止前的状态
-        print_section "🛑 Stop SSH Agent"
-        echo "${COLOR_DIM}Stop the running SSH agent and remove all loaded keys${COLOR_RESET}"
-        echo
-        print_section "🟢 Current Status"
-        get_status
-        ;;
-        
-    "Load Key")
-        # 加载新的 SSH 密钥
-        print_section "📥 Load SSH Key"
-        echo "${COLOR_DIM}Add a new SSH key to the agent${COLOR_RESET}"
-        echo
-        print_section "🉑 Available Keys"
-        list_available_keys
-        echo
-        print_section "✅ Currently Loaded"
-        format_loaded_keys
-        ;;
-        
-    "Unload Key")
-        # 卸载已加载的 SSH 密钥
-        print_section "📤 Unload SSH Key"
-        echo "${COLOR_DIM}Remove a loaded SSH key from the agent${COLOR_RESET}"
-        echo
-        print_section "🔑 Currently Loaded Keys"
-        format_loaded_keys
-        ;;
-        
-    "List Loaded Keys")
-        # 显示已加载的密钥列表和代理状态
-        print_section "📋 Loaded Keys List"
-        echo "${COLOR_DIM}View all keys currently loaded in the agent${COLOR_RESET}"
-        echo
-        print_section "🔍 Agent Details"
-        get_status
-        ;;
-        
-    "Exit")
-        # 退出程序，显示退出前的状态
-        print_section "👋 Exit Program"
-        echo "${COLOR_DIM}Exit the SSH key management tool${COLOR_RESET}"
-        echo
-        print_section "🟢 Current Status"
-        get_status
-        ;;
-esac
-EOF
-chmod +x "$PREVIEW_DIR/menu_preview.sh"
-
-
-list_loaded_keys() {
-    print_section "Currently Loaded SSH Keys"
-    
-    local loaded_keys=$(ssh-add -l 2>/dev/null)
-    if [[ $? -eq 0 ]]; then
-        echo "$loaded_keys" | while read -r bits hash comment; do
-            echo "${COLOR_INFO}[$comment]${COLOR_RESET}"
-            echo "  ${COLOR_DIM}Bits:${COLOR_RESET} $bits"
-            echo "  ${COLOR_DIM}Hash:${COLOR_RESET} $hash"
-            echo "${COLOR_DIM}────────────────────${COLOR_RESET}"
-        done
-    else
-        echo "${COLOR_WARNING}No keys currently loaded in SSH agent${COLOR_RESET}"
-    fi
-    
-    echo
-    print_section "Agent Status"
-    if [[ -S "$SSH_AUTH_SOCK" ]]; then
-        echo "${COLOR_SUCCESS}Agent is running${COLOR_RESET}"
-        echo "${COLOR_INFO}PID:${COLOR_RESET}    $SSH_AGENT_PID"
-        echo "${COLOR_INFO}Socket:${COLOR_RESET} $(print_socket_path "$SSH_AUTH_SOCK")"
-    else
-        echo "${COLOR_ERROR}SSH Agent is not running${COLOR_RESET}"
-    fi
-}
-
-# 添加一个新函数来处理 socket 路径的显示
 print_socket_path() {
     local socket_path=$1
     local socket_dir=$(dirname "$socket_path")
@@ -322,53 +28,77 @@ print_socket_path() {
     echo "${COLOR_DIM}$socket_dir/${COLOR_RESET}${COLOR_SUCCESS}$socket_name${COLOR_RESET}"
 }
 
-# Update the ssh_menu function to use new FZF options
-ssh_menu() {
-    local options=(
-        "Start SSH Agent"
-        "Stop SSH Agent"
-        "Load Key"
-        "Unload Key"
-        "List Loaded Keys"
-        "Exit"
-    )
-    
-    local selected=$(printf "%s\n" "${options[@]}" | \
-        fzf --prompt="SSH Agent Management > " \
-        --preview="$PREVIEW_DIR/menu_preview.sh {} $SSH_AUTH_SOCK $SSH_AGENT_PID" \
-        --preview-window=right:60%:wrap \
-        --color='hl:12,hl+:15,pointer:4,marker:4' \
-        --border=rounded \
-        --margin=1 \
-        --padding=1 \
-        --header="SSH Agent Management Tool" \
-        --header-first)
-    
-    case $selected in
-        "Start SSH Agent")
-            start_ssh_agent
-            ;;
-        "Stop SSH Agent")
-            stop_ssh_agent
-            ;;
-        "Load Key")
-            load_key
-            ;;
-        "Unload Key")
-            unload_key
-            ;;
-        "List Loaded Keys")
-            list_loaded_keys
-            ;;
-        "Exit")
-            return 0
-            ;;
-    esac
+# 5. SSH 密钥操作基础函数
+list_keys() {
+    find "$SSH_KEY_DIR" -type f -not -name "*.pub" \
+        -not -name "known_hosts*" \
+        -not -name "config" \
+        -not -name "agent-env" \
+        -not -name ".DS_Store" \
+        -not -name "authorized_keys" | while read file; do
+        if ssh-keygen -l -f "$file" &>/dev/null; then
+            echo "$file"
+        fi
+    done
 }
 
-# Update the load_key and unload_key functions to use new FZF options
+get_agent_status() {
+    local status=""
+    if [[ -S "$SSH_AUTH_SOCK" ]]; then
+        status="${COLOR_SUCCESS}● Running${COLOR_RESET}\n"
+        status+="${COLOR_INFO}PID:${COLOR_RESET}    $SSH_AGENT_PID\n"
+        status+="${COLOR_INFO}Socket:${COLOR_RESET} $SSH_AUTH_SOCK\n\n"
+        print_section "Loaded Keys"
+        local loaded_keys=$(ssh-add -l 2>/dev/null)
+        if [[ $? -eq 0 ]]; then
+            status+=$(echo "$loaded_keys" | while read -r line; do
+                echo "${COLOR_SUCCESS}$line${COLOR_RESET}"
+            done)
+        else
+            status+="${COLOR_WARNING}No keys loaded${COLOR_RESET}"
+        fi
+    else
+        status="${COLOR_ERROR}✗ Not running${COLOR_RESET}\n"
+        status+="${COLOR_DIM}SSH Agent is not started${COLOR_RESET}"
+    fi
+    echo $status
+}
+
+# 6. SSH Agent 核心操作函数
+start_ssh_agent() {
+    if [[ -S "$SSH_AUTH_SOCK" ]]; then
+        echo "${COLOR_WARNING}SSH agent is already running${COLOR_RESET}"
+        return 0
+    fi
+
+    eval $(ssh-agent -s)
+    echo $SSH_AUTH_SOCK > $SOCK_FILE
+    echo $SSH_AGENT_PID > $PID_FILE
+    echo "${COLOR_SUCCESS}Started new SSH agent${COLOR_RESET}"
+}
+
+stop_ssh_agent() {
+    if [[ -f $PID_FILE ]]; then
+        pid=$(cat $PID_FILE)
+        if kill -0 $pid 2>/dev/null; then
+            kill $pid
+            rm -f $SOCK_FILE $PID_FILE
+            echo "${COLOR_SUCCESS}Stopped SSH agent${COLOR_RESET}"
+        fi
+    fi
+    unset SSH_AUTH_SOCK
+    unset SSH_AGENT_PID
+}
+
+# 7. SSH 密钥管理核心函数
 load_key() {
-    local selected_key=$(list_keys | fzf --prompt="Select SSH key to load: " \
+    local key_list=$(list_keys)
+    if [[ -z "$key_list" ]]; then
+        echo "${COLOR_ERROR}No valid SSH keys found in $SSH_KEY_DIR${COLOR_RESET}"
+        return 1
+    fi
+
+    local selected_key=$(echo "$key_list" | fzf --prompt="Select SSH key to load: " \
         --preview="$PREVIEW_DIR/key_details.sh {}" \
         --preview-window=right:60%:wrap \
         --color='hl:12,hl+:15,pointer:4,marker:4' \
@@ -378,8 +108,8 @@ load_key() {
         --header="Load SSH Key" \
         --header-first)
     
-    if [[ -n $selected_key ]]; then
-        ssh-add $selected_key
+    if [[ -n "$selected_key" ]]; then
+        ssh-add "$selected_key"
         echo "${COLOR_SUCCESS}Loaded key: ${COLOR_RESET}$selected_key"
     fi
 }
@@ -424,7 +154,7 @@ unload_key() {
             ssh-add -d "$key_file"
             echo "${COLOR_SUCCESS}Unloaded key: ${COLOR_RESET}$key_file"
         else
-            sshssh-add -d <<< ""
+            ssh-add -d <<< ""
             if [[ $? -eq 0 ]]; then
                 echo "${COLOR_SUCCESS}Unloaded key with fingerprint: ${COLOR_RESET}$fingerprint"
             else
@@ -434,95 +164,77 @@ unload_key() {
     fi
 }
 
-# Update status display function
-get_agent_status() {
-    local status=""
-    if [[ -S "$SSH_AUTH_SOCK" ]]; then
-        status="${COLOR_SUCCESS}● Running${COLOR_RESET}\n"
-        status+="${COLOR_INFO}PID:${COLOR_RESET}    $SSH_AGENT_PID\n"
-        status+="${COLOR_INFO}Socket:${COLOR_RESET} $SSH_AUTH_SOCK\n\n"
-        print_section "Loaded Keys"
-        local loaded_keys=$(ssh-add -l 2>/dev/null)
-        if [[ $? -eq 0 ]]; then
-            status+=$(echo "$loaded_keys" | while read -r line; do
-                echo "${COLOR_SUCCESS}$line${COLOR_RESET}"
-            done)
-        else
-            status+="${COLOR_WARNING}No keys loaded${COLOR_RESET}"
-        fi
+list_loaded_keys() {
+    print_section "Currently Loaded SSH Keys"
+    
+    local loaded_keys=$(ssh-add -l 2>/dev/null)
+    if [[ $? -eq 0 ]]; then
+        echo "$loaded_keys" | while read -r bits hash comment; do
+            echo "${COLOR_INFO}[$comment]${COLOR_RESET}"
+            echo "  ${COLOR_DIM}Bits:${COLOR_RESET} $bits"
+            echo "  ${COLOR_DIM}Hash:${COLOR_RESET} $hash"
+            echo "${COLOR_DIM}────────────────────${COLOR_RESET}"
+        done
     else
-        status="${COLOR_ERROR}✗ Not running${COLOR_RESET}\n"
-        status+="${COLOR_DIM}SSH Agent is not started${COLOR_RESET}"
+        echo "${COLOR_WARNING}No keys currently loaded in SSH agent${COLOR_RESET}"
     fi
-    echo $status
-}
-
-# Update message functions
-start_ssh_agent() {
+    
+    echo
+    print_section "Agent Status"
     if [[ -S "$SSH_AUTH_SOCK" ]]; then
-        echo "${COLOR_WARNING}SSH agent is already running${COLOR_RESET}"
-        return 0
+        echo "${COLOR_SUCCESS}Agent is running${COLOR_RESET}"
+        echo "${COLOR_INFO}PID:${COLOR_RESET}    $SSH_AGENT_PID"
+        echo "${COLOR_INFO}Socket:${COLOR_RESET} $(print_socket_path "$SSH_AUTH_SOCK")"
+    else
+        echo "${COLOR_ERROR}SSH Agent is not running${COLOR_RESET}"
     fi
-
-    eval $(ssh-agent -s)
-    echo $SSH_AUTH_SOCK > $SOCK_FILE
-    echo $SSH_AGENT_PID > $PID_FILE
-    echo "${COLOR_SUCCESS}Started new SSH agent${COLOR_RESET}"
 }
 
-stop_ssh_agent() {
-    if [[ -f $PID_FILE ]]; then
-        pid=$(cat $PID_FILE)
-        if kill -0 $pid 2>/dev/null; then
-            kill $pid
-            rm -f $SOCK_FILE $PID_FILE
-            echo "${COLOR_SUCCESS}Stopped SSH agent${COLOR_RESET}"
-        fi
-    fi
-    unset SSH_AUTH_SOCK
-    unset SSH_AGENT_PID
-}
-
-# Function to list available SSH keys
-list_keys() {
-    find "$SSH_KEY_DIR" -type f -not -name "*.pub" \
-        -not -name "known_hosts*" \
-        -not -name "config" \
-        -not -name "agent-env" \
-        -not -name ".DS_Store" \
-        -not -name "authorized_keys" | while read file; do
-        if ssh-keygen -l -f "$file" &>/dev/null; then
-            echo "$file"
-        fi
-    done
-}
-
-# Update the load_key function for clarity
-load_key() {
-    # First check if we have any valid keys
-    local key_list=$(list_keys)
-    if [[ -z "$key_list" ]]; then
-        echo "${COLOR_ERROR}No valid SSH keys found in $SSH_KEY_DIR${COLOR_RESET}"
-        return 1
-    fi
-
-    local selected_key=$(echo "$key_list" | fzf --prompt="Select SSH key to load: " \
-        --preview="$PREVIEW_DIR/key_details.sh {}" \
+# 8. 交互式菜单函数
+ssh_menu() {
+    local options=(
+        "Start SSH Agent"
+        "Stop SSH Agent"
+        "Load Key"
+        "Unload Key"
+        "List Loaded Keys"
+        "Exit"
+    )
+    
+    local selected=$(printf "%s\n" "${options[@]}" | \
+        fzf --prompt="SSH Agent Management > " \
+        --preview="$PREVIEW_DIR/menu_preview.sh {} $SSH_AUTH_SOCK $SSH_AGENT_PID" \
         --preview-window=right:60%:wrap \
         --color='hl:12,hl+:15,pointer:4,marker:4' \
         --border=rounded \
         --margin=1 \
         --padding=1 \
-        --header="Load SSH Key" \
+        --header="SSH Agent Management Tool" \
         --header-first)
     
-    if [[ -n "$selected_key" ]]; then
-        ssh-add "$selected_key"
-        echo "${COLOR_SUCCESS}Loaded key: ${COLOR_RESET}$selected_key"
-    fi
+    case $selected in
+        "Start SSH Agent")
+            start_ssh_agent
+            ;;
+        "Stop SSH Agent")
+            stop_ssh_agent
+            ;;
+        "Load Key")
+            load_key
+            ;;
+        "Unload Key")
+            unload_key
+            ;;
+        "List Loaded Keys")
+            list_loaded_keys
+            ;;
+        "Exit")
+            return 0
+            ;;
+    esac
 }
 
-# Add help function with nice formatting
+# 9. 辅助功能函数
 show_help() {
     print_section "SSH Management Tool Help"
     echo "${COLOR_INFO}Usage:${COLOR_RESET} ssh-management [command]"
@@ -541,7 +253,7 @@ show_help() {
     echo "Run without arguments to enter interactive menu mode"
 }
 
-# Update main command function
+# 10. 主命令函数
 ssh-management() {
     case $1 in
         start)
@@ -576,7 +288,7 @@ ssh-management() {
     esac
 }
 
-# Update auto-start functionality with status messages
+# 11. 自动启动函数
 auto_start() {
     if [[ -f $SOCK_FILE ]]; then
         export SSH_AUTH_SOCK=$(cat $SOCK_FILE)
@@ -592,13 +304,10 @@ auto_start() {
     fi
 }
 
-# Initialize
+# 12. 初始化和命令补全
 auto_start
-
-# Create alias
 alias ssha='ssh-management'
 
-# Add completion for the new help command
 _ssh_management() {
     local commands=(
         'start:Start SSH agent'
@@ -614,3 +323,236 @@ _ssh_management() {
 }
 
 compdef _ssh_management ssh-management
+
+# 13. 创建临时预览脚本目录
+PREVIEW_DIR=$(mktemp -d)
+trap 'rm -rf "$PREVIEW_DIR"' EXIT
+
+# 1. 首先创建一个基础库文件 preview_base.sh
+cat > "$PREVIEW_DIR/preview_base.sh" << 'EOF'
+#!/usr/bin/env zsh
+
+# 颜色定义
+declare -A COLORS=(
+    [HEADER]=$'\033[1;34m'    # Bold Blue
+    [SUCCESS]=$'\033[1;32m'   # Bold Green
+    [WARNING]=$'\033[1;33m'   # Bold Yellow
+    [ERROR]=$'\033[1;31m'     # Bold Red
+    [INFO]=$'\033[1;36m'      # Bold Cyan
+    [RESET]=$'\033[0m'        # Reset
+    [DIM]=$'\033[2m'          # Dim
+    [BOLD]=$'\033[1m'         # Bold
+)
+
+# 通用工具函数
+print_separator() {
+    echo "\033[0;36m═══════════════════════════════════════════\033[0m"
+}
+
+print_section() {
+    echo "${COLORS[HEADER]}$1${COLORS[RESET]}"
+    print_separator
+}
+
+format_key_info() {
+    local bits=$1 hash=$2 comment=$3
+    echo "${COLORS[INFO]}[$comment]${COLORS[RESET]}"
+    echo "  ${COLORS[DIM]}Bits:${COLORS[RESET]} $bits"
+    echo "  ${COLORS[DIM]}Hash:${COLORS[RESET]} $hash"
+    echo "${COLORS[DIM]}────────────────────${COLORS[RESET]}"
+}
+
+# SSH 相关工具函数
+check_ssh_agent() {
+    if [[ ! -S "$SSH_AUTH_SOCK" ]]; then
+        echo "${COLORS[ERROR]}SSH Agent is not running${COLORS[RESET]}"
+        return 1
+    fi
+    return 0
+}
+
+format_loaded_keys() {
+    local loaded_keys=$(ssh-add -l 2>/dev/null)
+    if [[ $? -eq 0 ]]; then
+        echo "$loaded_keys" | while read -r bits hash comment; do
+            format_key_info "$bits" "$hash" "$comment"
+        done
+    else
+        echo "${COLORS[WARNING]}None${COLORS[RESET]}"
+    fi
+}
+
+get_agent_status() {
+    if check_ssh_agent; then
+        echo "${COLORS[SUCCESS]}● Running${COLORS[RESET]}"
+        echo "${COLORS[INFO]}PID:${COLORS[RESET]}    $SSH_AGENT_PID"
+        echo "${COLORS[INFO]}Socket:${COLORS[RESET]} $SSH_AUTH_SOCK"
+        echo
+        print_section "🔑 Loaded Keys"
+        format_loaded_keys
+    fi
+}
+
+find_ssh_keys() {
+    find "$HOME/.ssh" -type f -not -name "*.pub" \
+        -not -name "known_hosts*" \
+        -not -name "config" \
+        -not -name "agent-env" \
+        -not -name ".DS_Store" \
+        -not -name "authorized_keys" | while read file; do
+        if ssh-keygen -l -f "$file" &>/dev/null; then
+            echo "$file"
+        fi
+    done
+}
+EOF
+chmod +x "$PREVIEW_DIR/preview_base.sh"
+
+# 2. 优化后的密钥详情预览脚本
+cat > "$PREVIEW_DIR/key_details.sh" << 'EOF'
+#!/usr/bin/env zsh
+
+source "$(dirname $0)/preview_base.sh"
+
+key=$1
+
+if [[ ! -f "$key" ]]; then
+    print_section "❌ Error"
+    echo "${COLORS[ERROR]}Invalid SSH key file${COLORS[RESET]}"
+    exit 1
+fi
+
+print_section "🔑 Key Information"
+if ! key_info=$(ssh-keygen -l -f "$key" 2>/dev/null); then
+    echo "${COLORS[ERROR]}Unable to read key information${COLORS[RESET]}"
+    exit 1
+fi
+
+bits=$(echo "$key_info" | awk '{print $1}')
+fingerprint=$(echo "$key_info" | awk '{print $2}')
+echo "${COLORS[INFO]}Bits:${COLORS[RESET]}        $bits"
+echo "${COLORS[INFO]}Fingerprint:${COLORS[RESET]} $fingerprint"
+echo
+
+if [[ -f "${key}.pub" ]]; then
+    print_section "📄 Public Key"
+    echo "${COLORS[SUCCESS]}$(cat "${key}.pub")${COLORS[RESET]}"
+    echo
+    print_section "📋 File Details"
+    pub_perms=$(ls -l "${key}.pub")
+    echo "${COLORS[INFO]}Public Key:${COLORS[RESET]}  $pub_perms"
+else
+    print_section "⚠️  Warning"
+    echo "${COLORS[WARNING]}No public key file found${COLORS[RESET]}"
+fi
+
+priv_perms=$(ls -l "$key")
+echo "${COLORS[INFO]}Private Key:${COLORS[RESET]} $priv_perms"
+echo
+
+created=$(stat -f "%Sm" "$key")
+print_section "📅 Timestamp"
+echo "${COLORS[INFO]}Created:${COLORS[RESET]}     $created"
+EOF
+chmod +x "$PREVIEW_DIR/key_details.sh"
+
+# 3. 优化后的已加载密钥详情预览脚本
+cat > "$PREVIEW_DIR/loaded_key_details.sh" << 'EOF'
+#!/usr/bin/env zsh
+
+source "$(dirname $0)/preview_base.sh"
+
+key_info="$@"
+
+print_section "🔑 Key Details"
+echo "${COLORS[INFO]}$key_info${COLORS[RESET]}"
+echo
+
+fingerprint=$(echo "$key_info" | awk '{print $2}')
+print_section "📂 Local Key File"
+
+found=false
+while read -r key; do
+    if [[ -f "$key" ]] && ssh-keygen -l -f "$key" &>/dev/null; then
+        key_fp=$(ssh-keygen -l -f "$key" | awk '{print $2}')
+        if [[ "$fingerprint" == "$key_fp" ]]; then
+            echo "${COLORS[SUCCESS]}Path:${COLORS[RESET]} $key"
+            echo "${COLORS[INFO]}Permissions:${COLORS[RESET]} $(ls -l "$key")"
+            found=true
+            break
+        fi
+    fi
+done < <(find_ssh_keys)
+
+if [[ $found == false ]]; then
+    echo "${COLORS[WARNING]}No matching local key file found${COLORS[RESET]}"
+fi
+EOF
+chmod +x "$PREVIEW_DIR/loaded_key_details.sh"
+
+# 4. 优化后的菜单预览脚本
+cat > "$PREVIEW_DIR/menu_preview.sh" << 'EOF'
+#!/usr/bin/env zsh
+
+source "$(dirname $0)/preview_base.sh"
+
+item=$1
+SSH_AUTH_SOCK=$2
+SSH_AGENT_PID=$3
+
+case $item in
+    "Start SSH Agent")
+        print_section "🚀 Start SSH Agent"
+        echo "${COLORS[DIM]}Start a new SSH agent or connect to an existing one${COLORS[RESET]}"
+        echo
+        print_section "🟢 Current Status"
+        get_agent_status
+        ;;
+        
+    "Stop SSH Agent")
+        print_section "🛑 Stop SSH Agent"
+        echo "${COLORS[DIM]}Stop the running SSH agent and remove all loaded keys${COLORS[RESET]}"
+        echo
+        print_section "🟢 Current Status"
+        get_agent_status
+        ;;
+        
+    "Load Key")
+        print_section "📥 Load SSH Key"
+        echo "${COLORS[DIM]}Add a new SSH key to the agent${COLORS[RESET]}"
+        echo
+        print_section "🉑 Available Keys"
+        while read -r key; do
+            echo "${COLORS[SUCCESS]}$key${COLORS[RESET]}"
+        done < <(find_ssh_keys)
+        echo
+        print_section "✅ Currently Loaded"
+        format_loaded_keys
+        ;;
+        
+    "Unload Key")
+        print_section "📤 Unload SSH Key"
+        echo "${COLORS[DIM]}Remove a loaded SSH key from the agent${COLORS[RESET]}"
+        echo
+        print_section "🔑 Currently Loaded Keys"
+        format_loaded_keys
+        ;;
+        
+    "List Loaded Keys")
+        print_section "📋 Loaded Keys List"
+        echo "${COLORS[DIM]}View all keys currently loaded in the agent${COLORS[RESET]}"
+        echo
+        print_section "🔍 Agent Details"
+        get_agent_status
+        ;;
+        
+    "Exit")
+        print_section "👋 Exit Program"
+        echo "${COLORS[DIM]}Exit the SSH key management tool${COLORS[RESET]}"
+        echo
+        print_section "🟢 Current Status"
+        get_agent_status
+        ;;
+esac
+EOF
+chmod +x "$PREVIEW_DIR/menu_preview.sh"
