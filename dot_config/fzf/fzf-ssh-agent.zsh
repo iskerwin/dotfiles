@@ -98,7 +98,6 @@ fi
 EOF
 chmod +x "$PREVIEW_DIR/key_details.sh"
 
-# Create loaded key details preview script with enhanced formatting
 cat > "$PREVIEW_DIR/loaded_key_details.sh" << 'EOF'
 #!/usr/bin/env zsh
 
@@ -153,7 +152,6 @@ fi
 EOF
 chmod +x "$PREVIEW_DIR/loaded_key_details.sh"
 
-# Create menu preview script with enhanced formatting
 cat > "$PREVIEW_DIR/menu_preview.sh" << 'EOF'
 #!/usr/bin/env zsh
 
@@ -288,6 +286,41 @@ case $item in
 esac
 EOF
 chmod +x "$PREVIEW_DIR/menu_preview.sh"
+
+
+list_loaded_keys() {
+    print_section "Currently Loaded SSH Keys"
+    
+    local loaded_keys=$(ssh-add -l 2>/dev/null)
+    if [[ $? -eq 0 ]]; then
+        echo "$loaded_keys" | while read -r bits hash comment; do
+            echo "${COLOR_INFO}[$comment]${COLOR_RESET}"
+            echo "  ${COLOR_DIM}Bits:${COLOR_RESET} $bits"
+            echo "  ${COLOR_DIM}Hash:${COLOR_RESET} $hash"
+            echo "${COLOR_DIM}────────────────────${COLOR_RESET}"
+        done
+    else
+        echo "${COLOR_WARNING}No keys currently loaded in SSH agent${COLOR_RESET}"
+    fi
+    
+    echo
+    print_section "Agent Status"
+    if [[ -S "$SSH_AUTH_SOCK" ]]; then
+        echo "${COLOR_SUCCESS}Agent is running${COLOR_RESET}"
+        echo "${COLOR_INFO}PID:${COLOR_RESET}    $SSH_AGENT_PID"
+        echo "${COLOR_INFO}Socket:${COLOR_RESET} $(print_socket_path "$SSH_AUTH_SOCK")"
+    else
+        echo "${COLOR_ERROR}SSH Agent is not running${COLOR_RESET}"
+    fi
+}
+
+# 添加一个新函数来处理 socket 路径的显示
+print_socket_path() {
+    local socket_path=$1
+    local socket_dir=$(dirname "$socket_path")
+    local socket_name=$(basename "$socket_path")
+    echo "${COLOR_DIM}$socket_dir/${COLOR_RESET}${COLOR_SUCCESS}$socket_name${COLOR_RESET}"
+}
 
 # Update the ssh_menu function to use new FZF options
 ssh_menu() {
