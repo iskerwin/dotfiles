@@ -56,10 +56,11 @@ compinit -d ~/.cache/zcompdump    # Store completion dump files in cache directo
 #########################
 # Config Files          #
 #########################
+
 # Source additional configuration files if they exist
-[ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh     # Custom aliases
-[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                 # Powerlevel10k configuration
-[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh           # FZF configuration
+[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                     # Powerlevel10k configuration
+[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh               # FZF configuration
+[ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh         # Custom aliases
 
 #########################
 # Environment Variables #

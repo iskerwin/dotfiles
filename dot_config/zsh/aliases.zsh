@@ -83,9 +83,11 @@ alias lsdev='ls /dev/cu.*'                          # List serial devices
 # SSH Management
 ##############################
 
-alias ssh='ct screen ssh'                         # SSH with screen support
-# alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
-# alias sshals='ps aux | grep ssh-agent'             # List SSH-agent process
+alias ssh='ct screen ssh'                          # SSH with screen support
+alias sshls='grep "^Host " ~/.ssh/config'          # List SSH hosts
+alias sshals='ps aux | grep ssh-agent'             # List SSH-agent process
+alias sshal='ssh-add --apple-use-keychain'         # Load key with keychain
+alias sshag='eval "$(ssh-agent -s)"'            # Start SSH-agent
 
 ##############################
 # Screen Management
@@ -189,3 +191,5 @@ alias chdt="chezmoi data"       # Show template data
 
 alias f="fzf"
 alias c='clear'
+
+alias af='source ~/.config/fzf/fzf-aliases.zsh'

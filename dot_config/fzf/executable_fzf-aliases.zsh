@@ -102,5 +102,3 @@ function alias_finder() {
 
 # Execute the main function
 alias_finder
-
-alias als='~/.config/fzf/fzf-aliases.zsh'
