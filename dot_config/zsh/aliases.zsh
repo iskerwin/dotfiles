@@ -87,12 +87,12 @@ alias ssh='ct screen ssh'                          # SSH with screen support
 alias sshls='grep "^Host " ~/.ssh/config'          # List SSH hosts
 alias sshals='ps aux | grep ssh-agent'             # List SSH-agent process
 alias sshal='ssh-add --apple-use-keychain'         # Load key with keychain
-alias sshag='eval "$(ssh-agent -s)"'            # Start SSH-agent
+alias sshag='eval "$(ssh-agent -s)"'               # Start SSH-agent
 
 ##############################
 # Screen Management
 ##############################
-
+alias screen='ct screen'
 alias sn='screen -S'                              # Create/attach screen session
 alias sl='screen -ls'                             # List screen sessions
 alias sr='screen -r'                              # Reattach to screen
@@ -101,6 +101,7 @@ alias sk='killall screen'                         # Kill all screens
 alias sd='screen -d'                              # Detach screen
 alias snw='screen -X screen'                      # New window in current session
 alias snd='screen -dm'                            # Create detached session
+alias console='screen -fn /dev/cu.BTConsole 9600' # 
 
 # Run command in new screen window
 srun() {

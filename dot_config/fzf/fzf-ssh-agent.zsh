@@ -562,7 +562,7 @@ esac'
 #-----------------------------------------------------------------------------
 
 # Main menu interface using fzf
-ssh_menu() {
+ssha_menu() {
     local options=(
         "Start SSH Agent"
         "Stop SSH Agent"
@@ -632,14 +632,14 @@ auto_start() {
 #-----------------------------------------------------------------------------
 
 # Main command interface function
-ssh-management() {
+ssha-management() {
     case $1 in
         start) start_ssh_agent ;;
         stop) stop_ssh_agent ;;
         load) load_key ;;
         unload) unload_key ;;
         list) list_loaded_keys ;;
-        menu) ssh_menu ;;
+        menu) ssha_menu ;;
         help)
             print_section "SSH Management Tool Help"
             echo "${COLOR_INFO}Usage:${COLOR_RESET} ssh-management [command]"
@@ -659,7 +659,7 @@ ssh-management() {
                 echo "Run ${COLOR_INFO}ssh-management help${COLOR_RESET} for usage information"
                 return 1
             fi
-            ssh_menu
+            ssha_menu
             ;;
     esac
 }
@@ -668,7 +668,7 @@ ssh-management() {
 create_preview_scripts
 
 # ZSH command completion configuration
-_ssh_management() {
+_ssha_management() {
     local commands=(
         'start:Start SSH agent'
         'stop:Stop SSH agent'
@@ -684,9 +684,9 @@ _ssh_management() {
 compdef _ssh_management ssh-management
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    ssh-management "$@"
+    ssha-management "$@"
 else
     create_preview_scripts
     auto_start
-    alias ssha='ssh-management'
+    alias ssha='ssha-management'
 fi
