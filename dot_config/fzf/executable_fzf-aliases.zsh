@@ -89,8 +89,8 @@ function alias_finder() {
         --preview-window "${PREVIEW_WINDOW_SIZE}:hidden" \
         --bind "ctrl-e:execute(echo -n {3..} | tr -d '\n' > $HOME/.fzf-alias-tmp)+abort" \
         --bind "enter:execute(echo {1} | tr -d '\n' > $HOME/.fzf-alias-tmp)+abort" \
-        --color 'fg:250,fg+:252,bg+:235,hl:110,hl+:110' \
-        --color 'info:110,prompt:109,spinner:110,pointer:167,marker:215'
+        # --color 'fg:250,fg+:252,bg+:235,hl:110,hl+:110' \
+        # --color 'info:110,prompt:109,spinner:110,pointer:167,marker:215'
 
     # If selected, read the temporary file and output to the command line
     if [ -f "$HOME/.fzf-alias-tmp" ]; then
