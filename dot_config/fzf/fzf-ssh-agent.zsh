@@ -684,7 +684,7 @@ _ssha_management() {
     _describe 'command' commands
 }
 
-compdef _ssh_management ssh-management
+compdef _ssha_management ssha-management
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     ssha-management "$@"
