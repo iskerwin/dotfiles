@@ -371,9 +371,9 @@ if [[ $? -eq 0 ]]; then
     
     echo "${COLOR_INFO}Type:${COLOR_RESET}        $type"
     echo "${COLOR_INFO}Bits:${COLOR_RESET}        $bits"
-    echo "${COLOR_INFO}Fingerprint:${COLOR_RESET} $fingerprint"
-    echo "${COLOR_INFO}Comment:${COLOR_RESET}     $comment"
     echo "${COLOR_INFO}Created:${COLOR_RESET}     $created"
+    echo "${COLOR_INFO}Comment:${COLOR_RESET}     $comment"
+    echo "${COLOR_INFO}Fingerprint:${COLOR_RESET} $fingerprint"
     echo "${COLOR_INFO}Permissions:${COLOR_RESET} $(check_permissions "$key")"
 fi
 
@@ -404,8 +404,8 @@ type=$(echo "$key_info" | awk '"'"'{$1=$2=$3=""; print substr($0,4)}'"'"')
 
 echo "${COLOR_INFO}Type:${COLOR_RESET}        $type"
 echo "${COLOR_INFO}Bits:${COLOR_RESET}        $bits"
-echo "${COLOR_INFO}Fingerprint:${COLOR_RESET} $fingerprint"
 echo "${COLOR_INFO}Comment:${COLOR_RESET}     $comment"
+echo "${COLOR_INFO}Fingerprint:${COLOR_RESET} $fingerprint"
 
 echo
 print_section "📂 Local Key File"
@@ -441,10 +441,13 @@ print_agent_status() {
     print_section "🔄 SSH Agent Status"
     if [[ -S "$ssh_sock" ]]; then
         echo "${COLOR_SUCCESS}✓ Agent is running${COLOR_RESET}"
-        echo "${COLOR_INFO}PID:${COLOR_RESET}    $ssh_pid"
-        echo "${COLOR_INFO}Uptime:${COLOR_RESET} $(ps -o etime= -p "$ssh_pid" 2>/dev/null || echo "N/A")"
-        echo "${COLOR_INFO}Socket:${COLOR_RESET} $ssh_sock"
-        
+        echo "${COLOR_INFO}Process:${COLOR_RESET}"
+        echo "${COLOR_DIM}PID:${COLOR_RESET}    $ssh_pid"
+        echo "${COLOR_DIM}Uptime:${COLOR_RESET} $(ps -o etime= -p "$ssh_pid" 2>/dev/null || echo "N/A")"
+        socket_start=${ssh_sock%/_*}
+        socket_ssh_part=${ssh_sock##*/T/}
+        echo "${COLOR_DIM}Socket:${COLOR_RESET} ${socket_start}/.../${socket_ssh_part}"
+
         echo
         echo "${COLOR_INFO}Environment:${COLOR_RESET}"
         echo "${COLOR_DIM}SSH_AUTH_SOCK:${COLOR_RESET} ${COLOR_SUCCESS}Set${COLOR_RESET}"

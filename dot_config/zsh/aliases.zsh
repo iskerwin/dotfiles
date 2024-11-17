@@ -86,8 +86,8 @@ alias lsdev='ls /dev/cu.*'                          # List serial devices
 alias ssh='ct screen ssh'                          # SSH with screen support
 alias sshls='grep "^Host " ~/.ssh/config'          # List SSH hosts
 alias sshals='ps aux | grep ssh-agent'             # List SSH-agent process
-alias sshal='ssh-add --apple-use-keychain'         # Load key with keychain
-alias sshag='eval "$(ssh-agent -s)"'               # Start SSH-agent
+alias sshalk='ssh-add --apple-load-keychain'        # Load key with keychain
+alias sshags='eval "$(ssh-agent -s)"'               # Start SSH-agent
 
 ##############################
 # Screen Management
