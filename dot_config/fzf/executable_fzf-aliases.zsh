@@ -37,22 +37,22 @@ function alias_finder() {
         order[9] = "misc"
         
         # Enhanced headers with decorative borders
-        headers["navigation"] = "╔════════════════════════════════════ 󰇐 File Navigation ════════════════════════════════════╗"
-        headers["file-ops"]   = "╔════════════════════════════════════  File Operations ═════════════════════════════════════╗"
-        headers["git"]        = "╔════════════════════════════════════ 󰊢 Git Operations ═════════════════════════════════════╗"
-        headers["system"]     = "╔═══════════════════════════════════ 󰜫 System Operations ═══════════════════════════════════╗"
-        headers["ssh"]        = "╔════════════════════════════════════ 󰣀 SSH Management ═════════════════════════════════════╗"
-        headers["screen"]     = "╔═══════════════════════════════════  Screen Management ════════════════════════════════════╗"
-        headers["dev"]        = "╔═══════════════════════════════════ 󰅨 Development Tools ═══════════════════════════════════╗"
-        headers["chezmoi"]    = "╔════════════════════════════════════════ 󰋊 Chezmoi ════════════════════════════════════════╗"
-        headers["misc"]       = "╔═══════════════════════════════════ 󰘓 Miscellaneous ═══════════════════════════════════════╗"
+        headers["navigation"] = "╔═════════════════════════════════════════ 󰇐 File Navigation ═════════════════════════════════════════╗"
+        headers["file-ops"]   = "╔═════════════════════════════════════════  File Operations ══════════════════════════════════════════╗"
+        headers["git"]        = "╔═════════════════════════════════════════ 󰊢 Git Operations ══════════════════════════════════════════╗"
+        headers["system"]     = "╔════════════════════════════════════════ 󰜫 System Operations ════════════════════════════════════════╗"
+        headers["ssh"]        = "╔═════════════════════════════════════════ 󰣀 SSH Management ══════════════════════════════════════════╗"
+        headers["screen"]     = "╔════════════════════════════════════════  Screen Management ═════════════════════════════════════════╗"
+        headers["dev"]        = "╔════════════════════════════════════════ 󰅨 Development Tools ════════════════════════════════════════╗"
+        headers["chezmoi"]    = "╔═════════════════════════════════════════════ 󰋊 Chezmoi ═════════════════════════════════════════════╗"
+        headers["misc"]       = "╔════════════════════════════════════════ 󰘓 Miscellaneous ════════════════════════════════════════════╗"
     }
     
     function classify_command(cmd) {
         if (cmd ~ /^(cd |ls|ll|tree|eza)/) return "navigation"
         if (cmd ~ /^(rm|clean)/) return "file-ops"
-        if (cmd ~ /^git/) return "git"
-        if (cmd ~ /(brew |ip|ifconfig|speed|weather)/) return "system"
+        if (cmd ~ /^(git|g |ga|add|pull|push|stat|diff|fetch|clone|commit|gb|gco|grb|gm)/) return "git"
+        if (cmd ~ /(brew |ip|ifconfig|speed|weather|update|upgrade|cleanup|install|uninstall|doctor)/) return "system"
         if (cmd ~ /(ssh|.ssh)/) return "ssh"
         if (cmd ~ /screen/) return "screen"
         if (cmd ~ /(grep|backup|restore)/) return "dev"
@@ -60,14 +60,33 @@ function alias_finder() {
         return "misc"
     }
     
+    function clean_quotes(str) {
+        # Remove only the outermost quotes if they match
+        if ((substr(str, 1, 1) == "\"" && substr(str, length(str), 1) == "\"") ||
+            (substr(str, 1, 1) == "\047" && substr(str, length(str), 1) == "\047")) {
+            return substr(str, 2, length(str) - 2)
+        }
+        return str
+    }
+    
     !/^#/ {
-        name=$1
+        # Get the alias name
+        name = $1
         sub(/^alias /, "", name)
-        command=$2
-        gsub(/^[ '\''"]+|['\''"]+$/, "", command)
+        
+        # Get the command by joining all fields after the first =
+        command = ""
+        for(i=2; i<=NF; i++) {
+            if(i>2) command = command "="
+            command = command $i
+        }
+        
+        # Only remove leading/trailing whitespace and outermost quotes
+        gsub(/^[ \t]+|[ \t]+$/, "", command)
+        command = clean_quotes(command)
         
         type = classify_command(command)
-        entries[type] = entries[type] sprintf("%s%-28s%s ➜%s  %s\n", \
+        entries[type] = entries[type] sprintf("%s%-20s%s ➜%s  %s\n", \
             name_style, name, \
             arrow_style, \
             cmd_style, command)
@@ -79,7 +98,7 @@ function alias_finder() {
         for (i = 1; i <= length(order); i++) {
             type = order[i]
             if (types[type]) {
-                printf "%s%s%s\n%s%s╚═══════════════════════════════════════════════════════════════════════════════════════════╝%s\n", \
+                printf "%s%s%s\n%s%s╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝%s\n", \
                     separator_style, \
                     headers[type], \
                     cmd_style, \

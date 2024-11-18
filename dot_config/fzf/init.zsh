@@ -10,45 +10,73 @@ fi
 source <(fzf --zsh)
 
 # ===== Basic command configuration =====
-# Define the directories and files you want to exclude
-export FZF_IGNORE_DIRS=(
-    .m2
-    .npm
-    .git
-    .idea
-    .cache
-    .vscode
-    .gradle
-    .DS_Store
-    dist
-    build
-    target
-    vendor
-    Public
-    Library
-    Library/Logs
-    Applications
-    node_modules
-    __pycache__
-)
-
-# Build exclude parameters for fd command
-FZF_FD_OPTS=()
-for dir in "${FZF_IGNORE_DIRS[@]}"; do
-    FZF_FD_OPTS+=(--exclude "$dir")
-done
+# Create .rgignore file if it doesn't exist
+RGIGNORE="$HOME/.rgignore"
+if [[ ! -f "$RGIGNORE" ]]; then
+    cat > "$RGIGNORE" << EOL
+.m2/
+.npm/
+.git/
+.idea/
+.cache/
+.vscode/
+.gradle/
+.DS_Store/
+dist/
+build/
+target/
+vendor/
+Public/
+Library/
+Library/Logs/
+Applications/
+node_modules/
+__pycache__/
+EOL
+fi
 
 # Set basic commands
 if command -v fd > /dev/null; then
-    export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --max-depth 8 ${FZF_FD_OPTS[@]}"
-    export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --max-depth 8 ${FZF_FD_OPTS[@]}"
+    export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --max-depth 8 \
+        --exclude .m2 \
+        --exclude .npm \
+        --exclude .git \
+        --exclude .idea \
+        --exclude .cache \
+        --exclude .vscode \
+        --exclude .gradle \
+        --exclude .DS_Store \
+        --exclude dist \
+        --exclude build \
+        --exclude target \
+        --exclude vendor \
+        --exclude Public \
+        --exclude Library \
+        --exclude Applications \
+        --exclude node_modules \
+        --exclude __pycache__"
+    
+    export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --max-depth 8 \
+        --exclude .m2 \
+        --exclude .npm \
+        --exclude .git \
+        --exclude .idea \
+        --exclude .cache \
+        --exclude .vscode \
+        --exclude .gradle \
+        --exclude .DS_Store \
+        --exclude dist \
+        --exclude build \
+        --exclude target \
+        --exclude vendor \
+        --exclude Public \
+        --exclude Library \
+        --exclude Applications \
+        --exclude node_modules \
+        --exclude __pycache__"
 else
-    # Build exclude parameters for rg command
-    RG_OPTS=()
-    for dir in "${FZF_IGNORE_DIRS[@]}"; do
-        RG_OPTS+=(--glob "!$dir/*")
-    done
-    export FZF_DEFAULT_COMMAND="rg --files --hidden --follow ${RG_OPTS[@]}"
+    # Use ripgrep with .rgignore file
+    export FZF_DEFAULT_COMMAND="rg --files --hidden --follow"
 fi
 
 # Set completion trigger
@@ -98,9 +126,9 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
 ╰─────────────────────────────────────╯'
 "
 
-[ -f ~/.config/fzf/fzf-tab-colors.zsh ] && source ~/.config/fzf/fzf-tab-colors.zsh    # Dracula color scheme for fzf-tab
 [ -f ~/.config/fzf/fzf-ssh.zsh ] && source ~/.config/fzf/fzf-ssh.zsh                  # Better completion for ssh in Zsh with FZF
 [ -f ~/.config/fzf/fzf-ssh-agent.zsh ] && source ~/.config/fzf/fzf-ssh-agent.zsh      # SSH-agent configuration
+[ -f ~/.config/fzf/fzf-tab-colors.zsh ] && source ~/.config/fzf/fzf-tab-colors.zsh    # Dracula color scheme for fzf-tab
 
 # Cleaning function
 fzfcleanup() {
