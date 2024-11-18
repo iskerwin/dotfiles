@@ -35,7 +35,7 @@ COMMON_FUNCTIONS='
 
 # Print a horizontal separator line
 print_separator() {
-    printf "${COLOR_HEADER}%s${COLOR_RESET}\n" "============================================================"
+    printf "${COLOR_HEADER}%s${COLOR_RESET}\n" "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 }
 
 # Print a section header with separator
