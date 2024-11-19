@@ -84,7 +84,7 @@ _fzf_complete_ssh() {
 │ CTRL-E: edit   •  CTRL-Y: copy host │
 ╰─────────────────────────────────────╯' \
         --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
-        --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
+        --bind='ctrl-e:execute(${EDITOR:-nvim} ~/.ssh/config)' \
         --prompt="SSH Remote > " \
         --preview '
             # Constants
@@ -228,16 +228,16 @@ _fzf_complete_telnet() {
 │ CTRL-E: edit   •  CTRL-Y: copy │
 ╰────────────────────────────────╯' \
         --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
-        --bind='ctrl-e:execute(${EDITOR:-vim} ~/.ssh/config)' \
+        --bind='ctrl-e:execute(${EDITOR:-nvim} ~/.ssh/config)' \
         --prompt="Telnet Remote > " \
         --preview '
             # Constants
-            SUCCESS_ICON=$'\''\033[0;32m✓\033[0m'\''
-            WARNING_ICON=$'\''\033[0;33m!\033[0m'\''
-            ERROR_ICON=$'\''\033[0;31m✗\033[0m'\''
-            INFO_ICON=$'\''\033[0;34mℹ\033[0m'\''
-            HEADER_COLOR=$'\''\033[1;34m'\''
-            DETAIL_COLOR=$'\''\033[0;90m'\''
+            SUCCESS_ICON=$'"'"'\033[0;32m✓\033[0m'"'"'
+            WARNING_ICON=$'"'"'\033[0;33m!\033[0m'"'"'
+            ERROR_ICON=$'"'"'\033[0;31m✗\033[0m'"'"'
+            INFO_ICON=$'"'"'\033[0;34mℹ\033[0m'"'"'
+            HEADER_COLOR=$'"'"'\033[1;34m'"'"'
+            DETAIL_COLOR=$'"'"'\033[0;90m'"'"'
 
             print_header() {
                 echo -e "\n${HEADER_COLOR}━━━━━━━━━━ $1 ━━━━━━━━━━\033[0m"

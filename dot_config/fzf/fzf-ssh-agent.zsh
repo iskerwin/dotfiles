@@ -578,11 +578,11 @@ ssha_menu() {
     local selected=$(printf "%s\n" "${options[@]}" | fzf --prompt="SSH Agent Management > " \
         --preview="$PREVIEW_DIR/menu_preview.sh {} \"$SSH_AUTH_SOCK\" \"$SSH_AGENT_PID\"" \
         --preview-window=right:60%:wrap \
-        --color='hl:12,hl+:15,pointer:4,marker:4' \
         --border=rounded \
         --margin=1 \
         --padding=1 \
         --header="SSH Agent Management Tool" \
+        --ansi --border --cycle \
         --header-first)
     
     case $selected in
