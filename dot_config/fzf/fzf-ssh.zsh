@@ -92,19 +92,21 @@ _fzf_complete_ssh() {
             WARNING_ICON=$'"'"'\033[0;33m!\033[0m'"'"'
             ERROR_ICON=$'"'"'\033[0;31m✗\033[0m'"'"'
             INFO_ICON=$'"'"'\033[0;34mℹ\033[0m'"'"'
-            HEADER_COLOR=$'"'"'\033[1;34m'"'"'
-            DETAIL_COLOR=$'"'"'\033[0;90m'"'"'
-            
+            COLOR_HEADER=$'"'"'\033[1;34m'"'"'
+            COLOR_DETAIL=$'"'"'\033[0;90m'"'"'
+            COLOR_RESET=$'"'"'\033[0m'"'"'
+
             ssh_timeout=3
             connect_timeout=2
 
             # Helper functions
             print_header() {
-                echo -e "\n${HEADER_COLOR}━━━━━━━━━━ $1 ━━━━━━━━━━\033[0m"
+                echo -e "\n${COLOR_HEADER}$1${COLOR_RESET}"
+                echo -e "${COLOR_HEADER}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLOR_RESET}"
             }
 
             print_detail() {
-                echo -e "${DETAIL_COLOR}$1\033[0m"
+                echo -e "${COLOR_DETAIL}$1${COLOR_RESET}"
             }
 
             run_ssh_command() {
@@ -120,7 +122,7 @@ _fzf_complete_ssh() {
             key_file=$(echo "$ssh_config" | grep "^identityfile " | head -n1 | cut -d" " -f2)
             
             # Start with host summary
-            print_header " HOST SUMMARY "
+            print_header "🖥️  HOST SUMMARY"
             {
                 echo "Host: $host"
                 echo "HostName: $real_hostname"
@@ -132,7 +134,7 @@ _fzf_complete_ssh() {
             [ -n "$desc" ] && print_detail "$desc"
 
             # Check connectivity first
-            print_header " CONNECTIVITY "
+            print_header "🌐 CONNECTIVITY"
             if ! nc -z -G 2 $real_hostname $port >/dev/null 2>&1; then
                 echo -e "$ERROR_ICON Cannot reach $real_hostname:$port"
                 exit 0
@@ -141,22 +143,36 @@ _fzf_complete_ssh() {
 
             # Check key status if exists
             if [ -n "$key_file" ]; then
-                print_header "  KEY STATUS  "
+                print_header "🔑 KEY STATUS"
                 expanded_key="${key_file/#\~/$HOME}"
                 
                 if [ ! -f "$expanded_key" ]; then
                     echo -e "$ERROR_ICON Key not found: $key_file"
                 else
                     echo -e "$SUCCESS_ICON Key exists: $key_file"
+                    
+                    # Check permissions
                     key_perms=$(stat -f "%Lp" "$expanded_key" 2>/dev/null)
                     [ "$key_perms" = "600" ] && \
-                        echo -e "$SUCCESS_ICON Permissions OK (600)" || \
+                        echo -e "$SUCCESS_ICON Permissions: OK (600)" || \
                         echo -e "$ERROR_ICON Invalid permissions: $key_perms (should be 600)"
                     
+                    # Check key format and display detailed information
                     if ssh-keygen -l -f "$expanded_key" >/dev/null 2>&1; then
-                        key_info=$(ssh-keygen -l -f "$expanded_key" 2>/dev/null)
                         echo -e "$SUCCESS_ICON Valid key format"
-                        print_detail "$key_info"
+                        
+                        # Get key details
+                        key_info=$(ssh-keygen -l -f "$expanded_key" 2>/dev/null)
+                        bits=$(echo "$key_info" | awk '"'"'{print $1}'"'"')
+                        hash=$(echo "$key_info" | awk '"'"'{print $2}'"'"')
+                        comment=$(echo "$key_info" | awk '"'"'{$1=$2=""; sub(/^[ \t]+/, ""); print}'"'"' | sed '"'"'s/ (.*)//'"'"')
+                        type=$(echo "$key_info" | grep -o '"'"'([^)]*)'"'"')
+                        
+                        # Display structured information
+                        echo -e "${COLOR_DETAIL}  [$comment]"
+                        echo -e "  Type: $type"
+                        echo -e "  Bits: $bits"
+                        echo -e "  Hash: $hash${COLOR_RESET}"
                     else
                         echo -e "$ERROR_ICON Invalid key format"
                     fi
@@ -164,7 +180,7 @@ _fzf_complete_ssh() {
             fi
 
             # Authentication check
-            print_header "AUTHENTICATION"
+            print_header "🔐 AUTHENTICATION"
             if [[ $real_hostname == "github.com" ]]; then
                 ssh_output=$(ssh -T git@github.com -o ConnectTimeout=$connect_timeout 2>&1)
                 if [[ $ssh_output == *"successfully authenticated"* ]]; then
@@ -176,20 +192,6 @@ _fzf_complete_ssh() {
                 fi
             elif ssh -o BatchMode=yes -o ConnectTimeout=$connect_timeout "$host" exit 2>/dev/null; then
                 echo -e "$SUCCESS_ICON Authentication successful"
-                
-                # Get system info more efficiently
-                system_info=$(run_ssh_command "$host" '"'"'
-                    echo "OS: $(uname -sr 2>/dev/null)"
-                    echo "Load: $(uptime | sed '"'"'s/.*load average: //'"'"')"
-                    echo "Memory: $(free -h 2>/dev/null | awk '"'"'/^Mem:/ {print "Total: " $2 " Used: " $3 " Free: " $4}'"'"')"
-                '"'"' 2>/dev/null)
-                
-                if [ -n "$system_info" ]; then
-                    print_detail "$system_info"
-                    # Show last login only if system info was successful
-                    last_login=$(run_ssh_command "$host" "last -1 2>/dev/null | head -n 1")
-                    [ -n "$last_login" ] && print_detail "Last login: $last_login"
-                fi
             else
                 echo -e "$WARNING_ICON Authentication required"
                 ssh_banner=$(ssh -o ConnectTimeout=$connect_timeout -o PreferredAuthentications=none "$host" 2>&1)
@@ -200,129 +202,12 @@ _fzf_complete_ssh() {
                 banner=$(echo "$ssh_banner" | grep -v -E "Permission denied|Please try again|authentication methods|Connection closed|Connection timed out" | head -n 10)
                 [ -n "$banner" ] && print_detail "\n$banner"
             fi
-
-            # Show relevant SSH config
-            print_header "  SSH CONFIG  "
-            echo "$ssh_config" | grep -i -E "^(hostname|port|user|identityfile|proxycommand|localforward|remoteforward)" | \
-            sed -E '"'"'
-                s/^hostname/HostName/
-                s/^port/Port/
-                s/^user/User/
-                s/^identityfile/IdentityFile/
-                s/^proxycommand/ProxyCommand/
-                s/^localforward/LocalForward/
-                s/^remoteforward/RemoteForward/
-            '"'"' | column -t
+            column -t
         ' \
-        --preview-window=right:50% \
-        -- "$@" < <(list_ssh_hosts)
-}
-
-_fzf_complete_telnet() {
-    _fzf_complete --ansi --border --cycle \
-        --height "80%" \
-        --reverse \
-        --header-lines=2 \
-        --header='
-╭──────────── Controls ──────────╮
-│ CTRL-E: edit   •  CTRL-Y: copy │
-╰────────────────────────────────╯' \
-        --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
-        --bind='ctrl-e:execute(${EDITOR:-nvim} ~/.ssh/config)' \
-        --prompt="Telnet Remote > " \
-        --preview '
-            # Constants
-            SUCCESS_ICON=$'"'"'\033[0;32m✓\033[0m'"'"'
-            WARNING_ICON=$'"'"'\033[0;33m!\033[0m'"'"'
-            ERROR_ICON=$'"'"'\033[0;31m✗\033[0m'"'"'
-            INFO_ICON=$'"'"'\033[0;34mℹ\033[0m'"'"'
-            HEADER_COLOR=$'"'"'\033[1;34m'"'"'
-            DETAIL_COLOR=$'"'"'\033[0;90m'"'"'
-
-            print_header() {
-                echo -e "\n${HEADER_COLOR}━━━━━━━━━━ $1 ━━━━━━━━━━\033[0m"
-            }
-
-            print_detail() {
-                echo -e "${DETAIL_COLOR}$1\033[0m"
-            }
-
-            host=$(echo {} | awk "{print \$1}")
-            real_host=$(echo {} | awk "{print \$2}")
-            port=23
-
-            # Basic host info
-            print_header "    HOST INFO    "
-            {
-                echo "Host: $host"
-                echo "Hostname: $real_host"
-                echo "Port: $port"
-                echo "Protocol: TELNET"
-            } | column -t
-
-            # Connectivity test
-            print_header "CONNECTIVITY TEST"
-            
-            # 使用 nc 快速测试端口
-            if nc -z -G 2 $real_host $port 2>/dev/null; then
-                echo -e "$SUCCESS_ICON Port $port is open on $real_host"
-                
-                # 使用 perl 进行有超时控制的 telnet 测试
-                telnet_output=$(perl -e '\''
-                    use Time::HiRes qw(alarm sleep);
-                    my $timeout = 3;
-                    eval {
-                        local $SIG{ALRM} = sub { die "timeout\n" };
-                        alarm $timeout;
-                        open(my $telnet, "echo quit | telnet $ARGV[0] $ARGV[1] 2>&1 |") or die "Failed to execute telnet: $!";
-                        while (<$telnet>) {
-                            next if /^Trying/;
-                            print $_;
-                        }
-                        close($telnet);
-                        alarm 0;
-                    };
-                    if ($@) {
-                        if ($@ eq "timeout\n") {
-                            print "Connection timed out after ${timeout}s\n";
-                            exit 2;
-                        }
-                    }
-                '\'' "$real_host" "$port")
-                
-                if [[ $? -eq 2 ]]; then
-                    echo -e "$WARNING_ICON Telnet connection timed out"
-                elif [[ $telnet_output == *"Connected to"* ]]; then
-                    echo -e "$SUCCESS_ICON Telnet connection successful"
-                    print_detail "Connection Details:"
-                    echo "$telnet_output" | head -n 5 | while read line; do
-                        print_detail "  $line"
-                    done
-                else
-                    echo -e "$WARNING_ICON Connection attempt failed"
-                    print_detail "$(echo "$telnet_output" | head -n 3)"
-                fi
-            else
-                echo -e "$ERROR_ICON Cannot reach $real_host:$port"
-            fi
-
-            # Response Time Test
-            print_header "  RESPONSE TIME  "
-            ping_result=$(ping -c 1 -t 2 $real_host 2>/dev/null | grep "time=" | cut -d "=" -f 4)
-            if [ -n "$ping_result" ]; then
-                echo -e "$SUCCESS_ICON Response time: $ping_result"
-            else
-                echo -e "$WARNING_ICON Could not measure response time"
-            fi
-        ' \
-        --preview-window=right:50% \
+        --preview-window=right:60% \
         -- "$@" < <(list_ssh_hosts)
 }
 
 _fzf_complete_ssh_post() {
-    awk '{print $1}'
-}
-
-_fzf_complete_telnet_post() {
     awk '{print $1}'
 }

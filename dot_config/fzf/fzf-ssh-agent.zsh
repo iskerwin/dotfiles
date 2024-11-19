@@ -35,7 +35,7 @@ COMMON_FUNCTIONS='
 
 # Print a horizontal separator line
 print_separator() {
-    printf "${COLOR_HEADER}%s${COLOR_RESET}\n" "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    printf "${COLOR_HEADER}%s${COLOR_RESET}\n" "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 }
 
 # Print a section header with separator
@@ -62,7 +62,7 @@ format_key_info() {
     [[ -n "$type" ]] && echo "${COLOR_DIM}Type:${COLOR_RESET} $type"
     echo "${COLOR_DIM}Bits:${COLOR_RESET} $bits"
     echo "${COLOR_DIM}Hash:${COLOR_RESET} $hash"
-    echo "${COLOR_DIM}────────────────────────────────────────────────────────────${COLOR_RESET}"
+    echo "${COLOR_DIM}──────────────────────────────${COLOR_RESET}"
 }
 
 # Format file sizes with appropriate units
@@ -509,7 +509,7 @@ print_available_keys() {
                 echo "${COLOR_DIM}Path:${COLOR_RESET} $key"
                 echo "${COLOR_DIM}Size:${COLOR_RESET} $(format_size $(stat -f %z "$key"))"
                 [[ -n "$comment" ]] && echo "${COLOR_DIM}Comment:${COLOR_RESET} $comment"
-                echo "${COLOR_DIM}────────────────────────────────────────────────────────────${COLOR_RESET}"
+                echo "${COLOR_DIM}──────────────────────────────${COLOR_RESET}"
             fi
         fi
     done < <(find ~/.ssh -type f -not -name "*.pub" -not -name "known_hosts*" -not -name "config" -not -name ".DS_Store")
