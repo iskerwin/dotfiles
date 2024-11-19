@@ -56,6 +56,7 @@ alias gb='git branch'                                   # List branches
 alias gco='git checkout'                                # Checkout branch/commit
 alias grb='git rebase'                                  # Rebase
 alias gm='git merge'                                    # Merge
+alias lg='lazygit'                                      # lazygit
 
 ##############################
 # System Operations
@@ -153,7 +154,7 @@ alias chea='chezmoi edit --apply'  # Edit and apply changes immediately
 
 # View and apply changes
 alias chd='chezmoi diff'           # Show pending changes
-alias chay='chezmoi apply -v'      # Apply pending changes to target
+alias chav='chezmoi apply -v'      # Apply pending changes to target
 alias chf='chezmoi apply --force'  # Force apply changes
 
 # Update and upgrade
