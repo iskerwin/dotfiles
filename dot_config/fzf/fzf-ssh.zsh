@@ -113,18 +113,18 @@ _fzf_complete_ssh() {
             }
 
             # Get host and basic info
-            host=$(echo {} | awk "{print \$1}")
-            ssh_config=$(ssh -G $host 2>/dev/null)
-            real_hostname=$(echo "$ssh_config" | grep "^hostname " | head -n1 | cut -d" " -f2)
+            name=$(echo {} | awk "{print \$1}")
+            ssh_config=$(ssh -G $name 2>/dev/null)
+            host=$(echo "$ssh_config" | grep "^hostname " | head -n1 | cut -d" " -f2)
+            user=$(echo "$ssh_config" | grep "^user " | head -n1 | cut -d" " -f2)
             port=$(echo "$ssh_config" | grep "^port " | head -n1 | cut -d" " -f2)
             port=${port:-22}
-            key_file=$(echo "$ssh_config" | grep "^identityfile " | head -n1 | cut -d" " -f2)
-            user=$(echo "$ssh_config" | grep "^user " | head -n1 | cut -d" " -f2)
+            key=$(echo "$ssh_config" | grep "^identityfile " | head -n1 | cut -d" " -f2)
 
             # Get description from SSH config
             config_file="$HOME/.ssh/config"
             if [ -f "$config_file" ]; then
-                desc=$(awk -v host="$host" '"'"'
+                desc=$(awk -v host="$name" '"'"'
                     $1 == "Host" { 
                         in_block = 0
                         if ($2 == host || host ~ "^"$2"$") {
@@ -144,32 +144,32 @@ _fzf_complete_ssh() {
             # Start with host summary
             print_header "🔖 HOST SUMMARY"
             {
+                [ -n "$name" ] && echo "Name: $name"
                 [ -n "$host" ] && echo "Host: $host"
-                [ -n "$real_hostname" ] && echo "HostName: $real_hostname"
                 [ -n "$user" ] && echo "User: $user"
                 [ -n "$port" ] && echo "Port: $port"
-                [ -n "$key_file" ] && echo "Key: $key_file"
+                [ -n "$key" ] && echo "Key: $key"
             } | column -t
             
             print_detail "${desc:-No description}"
 
             # Check connectivity first
             print_header "🌐 CONNECTIVITY"
-            if ! nc -z -G 2 $real_hostname $port >/dev/null 2>&1; then
-                echo -e "$ERROR_ICON Cannot reach $real_hostname:$port"
+            if ! nc -z -G 2 $host $port >/dev/null 2>&1; then
+                echo -e "$ERROR_ICON Cannot reach $host:$port"
                 exit 0
             fi
-            echo -e "$SUCCESS_ICON Connected to $real_hostname:$port"
+            echo -e "$SUCCESS_ICON Connected to $host:$port"
 
             # Check key status if exists
-            if [ -n "$key_file" ]; then
+            if [ -n "$key" ]; then
                 print_header "🔑 KEY STATUS"
-                expanded_key="${key_file/#\~/$HOME}"
+                expanded_key="${key/#\~/$HOME}"
                 
                 if [ ! -f "$expanded_key" ]; then
-                    echo -e "$ERROR_ICON No identity file specified or found: $key_file"
+                    echo -e "$ERROR_ICON No identity file specified or found: $key"
                 else
-                    echo -e "$SUCCESS_ICON Key exists:  $key_file"
+                    echo -e "$SUCCESS_ICON Key exists:  $key"
                     
                     # Check permissions
                     key_perms=$(stat -f "%Lp" "$expanded_key" 2>/dev/null)
@@ -201,7 +201,7 @@ _fzf_complete_ssh() {
 
             # Authentication check
             print_header "🔐 AUTHENTICATION"
-            if [[ $real_hostname == "github.com" ]]; then
+            if [[ $host == "github.com" ]]; then
                 ssh_output=$(ssh -T git@github.com -o ConnectTimeout=$connect_timeout 2>&1)
                 if [[ $ssh_output == *"successfully authenticated"* ]]; then
                     echo -e "$SUCCESS_ICON GitHub authentication successful"
@@ -210,11 +210,11 @@ _fzf_complete_ssh() {
                     echo -e "$ERROR_ICON GitHub authentication failed"
                     print_detail "$ssh_output"
                 fi
-            elif ssh -o BatchMode=yes -o ConnectTimeout=$connect_timeout "$host" exit 2>/dev/null; then
+            elif ssh -o BatchMode=yes -o ConnectTimeout=$connect_timeout "$name" exit 2>/dev/null; then
                 echo -e "$SUCCESS_ICON Authentication successful"
             else
                 echo -e "$WARNING_ICON Authentication required"
-                ssh_banner=$(ssh -o ConnectTimeout=$connect_timeout -o PreferredAuthentications=none "$host" 2>&1)
+                ssh_banner=$(ssh -o ConnectTimeout=$connect_timeout -o PreferredAuthentications=none "$name" 2>&1)
                 auth_methods=$(echo "$ssh_banner" | grep -i "authentication methods" | cut -d":" -f2-)
                 [ -n "$auth_methods" ] && echo -e "$INFO_ICON Available methods:$auth_methods"
                 
