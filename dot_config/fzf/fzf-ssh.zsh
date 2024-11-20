@@ -20,8 +20,8 @@ list_ssh_hosts() {
         IGNORECASE = 1
         RS=""
         FS="\n"
-        print "Alias|Hostname|Port|Description"
-        print "─────|────────|────|───────────"
+        print "Alias|Hostname|Port"
+        print "─────|────────|────"
     }
     {
         user = hostname = alias = port = key = desc = ""
@@ -58,11 +58,10 @@ list_ssh_hosts() {
         }
         
         if (alias && hostname) {
-            printf "%s|%s|%s|%s\n", 
+            printf "%s|%s|%s\n", 
                     alias, 
                     hostname, 
-                    (port ? port : "22"),
-                    (desc ? desc : "No description")
+                    (port ? port : "22")
         }
     }' "$SSH_CONFIG_FILE" 2>/dev/null | column -t -s "|"
 }
@@ -120,18 +119,39 @@ _fzf_complete_ssh() {
             port=$(echo "$ssh_config" | grep "^port " | head -n1 | cut -d" " -f2)
             port=${port:-22}
             key_file=$(echo "$ssh_config" | grep "^identityfile " | head -n1 | cut -d" " -f2)
+            user=$(echo "$ssh_config" | grep "^user " | head -n1 | cut -d" " -f2)
+
+            # Get description from SSH config
+            config_file="$HOME/.ssh/config"
+            if [ -f "$config_file" ]; then
+                desc=$(awk -v host="$host" '"'"'
+                    $1 == "Host" { 
+                        in_block = 0
+                        if ($2 == host || host ~ "^"$2"$") {
+                            in_block = 1
+                        }
+                    }
+                    in_block && /^[[:space:]]*#_Desc[[:space:]]/ {
+                        sub(/^[[:space:]]*#_Desc[[:space:]]*/, "")
+                        desc = $0
+                        gsub(/^[[:space:]]+|[[:space:]]+$/, "", desc)
+                        print desc
+                        exit
+                    }
+                '"'"' "$config_file")
+            fi
             
             # Start with host summary
-            print_header "🖥️  HOST SUMMARY"
+            print_header "🔖 HOST SUMMARY"
             {
-                echo "Host: $host"
-                echo "HostName: $real_hostname"
-                echo "Port: $port"
+                [ -n "$host" ] && echo "Host: $host"
+                [ -n "$real_hostname" ] && echo "HostName: $real_hostname"
+                [ -n "$user" ] && echo "User: $user"
+                [ -n "$port" ] && echo "Port: $port"
                 [ -n "$key_file" ] && echo "Key: $key_file"
             } | column -t
             
-            desc=$(echo {} | awk "{print \$4}")
-            [ -n "$desc" ] && print_detail "$desc"
+            print_detail "${desc:-No description}"
 
             # Check connectivity first
             print_header "🌐 CONNECTIVITY"
@@ -147,9 +167,9 @@ _fzf_complete_ssh() {
                 expanded_key="${key_file/#\~/$HOME}"
                 
                 if [ ! -f "$expanded_key" ]; then
-                    echo -e "$ERROR_ICON Key not found: $key_file"
+                    echo -e "$ERROR_ICON No identity file specified or found: $key_file"
                 else
-                    echo -e "$SUCCESS_ICON Key exists: $key_file"
+                    echo -e "$SUCCESS_ICON Key exists:  $key_file"
                     
                     # Check permissions
                     key_perms=$(stat -f "%Lp" "$expanded_key" 2>/dev/null)
