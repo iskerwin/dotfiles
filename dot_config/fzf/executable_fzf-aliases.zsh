@@ -1,13 +1,13 @@
 #!/usr/bin/env zsh
 
 # ━━━━━━━━━━━━━━━━━━━━━━ Style Configuration ━━━━━━━━━━━━━━━━━━━━━━
-# Enhanced color palette using modern terminal colors
-HEADER_STYLE=$(echo -e "\033[1;38;5;75m")  # Bright Blue
-NAME_STYLE=$(echo -e "\033[38;5;43m")      # Turquoise
-ARROW_STYLE=$(echo -e "\033[38;5;242m")    # Soft Gray
-CMD_STYLE=$(echo -e "\033[0m")             # Reset
-TYPE_STYLE=$(echo -e "\033[3;38;5;246m")   # Italic Medium Gray
-SEPARATOR_STYLE=$(echo -e "\033[38;5;240m") # Dark Gray
+# Dracula color palette
+HEADER_STYLE=$(echo -e "\033[1;38;5;141m")  # Purple
+NAME_STYLE=$(echo -e "\033[38;5;84m")       # Green
+ARROW_STYLE=$(echo -e "\033[38;5;212m")     # Pink
+CMD_STYLE=$(echo -e "\033[0m")              # Reset
+TYPE_STYLE=$(echo -e "\033[3;38;5;189m")    # Light Purple
+SEPARATOR_STYLE=$(echo -e "\033[38;5;61m")  # Dark Purple
 
 # ━━━━━━━━━━━━━━━━━━━━━━ Main Function ━━━━━━━━━━━━━━━━━━━━━━
 function alias_finder() {
@@ -118,8 +118,8 @@ function alias_finder() {
         --preview-window "${PREVIEW_WINDOW_SIZE}:hidden" \
         --bind "ctrl-e:execute(echo -n {3..} | tr -d '\n' > $HOME/.fzf-alias-tmp)+abort" \
         --bind "enter:execute(echo {1} | tr -d '\n' > $HOME/.fzf-alias-tmp)+abort" \
-        --color='bg+:-1,fg+:255,hl:108,hl+:108,border:240' \
-        --color='header:75,info:108,prompt:75,pointer:168,marker:168'
+        --color='bg+:#44475a,fg+:#f8f8f2,hl:#50fa7b,hl+:#50fa7b,border:#6272a4' \
+        --color='header:#bd93f9,info:#50fa7b,prompt:#bd93f9,pointer:#ff79c6,marker:#ff79c6'
 
     # Process selection
     if [ -f "$HOME/.fzf-alias-tmp" ]; then
