@@ -1,5 +1,5 @@
 ##############################
-# File Navigation
+# File Navigation            #
 ##############################
 
 # Directory Navigation
@@ -26,10 +26,6 @@ alias l.='ls -d .*'                             # List only dotfiles
 alias l='ll -a --git-ignore'                    # Long format, all files
 alias tree='eza --tree --level=2 --group-directories-first --icons'
 
-##############################
-# File Operations
-##############################
-
 # Safe Remove Operations
 if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
     alias rm='safe-rm'
@@ -37,14 +33,7 @@ fi
 alias clean-ds='fd -H -I -t f ".DS_Store" --exec rm -f {}'  # Remove .DS_Store files
 
 ##############################
-# Git Operations
-##############################
-
-alias g='git'
-alias lg='lazygit'   # lazygit
-
-##############################
-# System Operations
+# System Operations          #
 ##############################
 
 # Homebrew Package Management
@@ -62,11 +51,17 @@ alias ip='ifconfig en0 | grep inet'                 # Show local IP
 alias myip_in='curl http://ipecho.net/plain; echo'  # Internal IP
 alias myip_out='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'  # External IP
 alias speed='networkQuality'                        # Network speed test
+alias netports="networksetup -listallhardwareports" # List all network hardware ports
+alias portcheck="nc -zv"                            # Quick port check
+alias digcheck="dig +nocmd +noall +answer"          # Detailed DNS query
+alias testinternet="curl -I"
 alias weather='curl wttr.in/Guangzhou'              # Show weather
 alias lsdev='ls /dev/cu.*'                          # List serial devices
+alias proxy='export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890'
+alias unproxy='unset https_proxy http_proxy all_proxy'
 
 ##############################
-# SSH Management
+# SSH Management             #
 ##############################
 
 alias ssh='ct screen ssh'                           # SSH with screen support
@@ -76,7 +71,7 @@ alias sshalk='ssh-add --apple-load-keychain'        # Load key with keychain
 alias sshags='eval "$(ssh-agent -s)"'               # Start SSH-agent
 
 ##############################
-# Screen Management
+# Screen Management          #
 ##############################
 alias screen='ct screen'
 alias sn='screen -S'                              # Create/attach screen session
@@ -95,60 +90,51 @@ srun() {
 }
 
 ##############################
-# Development Tools
+# Miscellaneous              #
 ##############################
 
-# Package Management
-alias backup='brew bundle dump --describe --force --file="~/.config/brew/Brewfile"'  # Backup brew packages
-alias restore-brewfile='brew bundle --file="~/.config/brew/Brewfile"'                #Restore brew packages
-
-##############################
-# Miscellaneous
-##############################
-
+alias f='fzf'
+alias c='clear'
+alias g='git'
+alias lg='lazygit'                                # lazygit
 alias rz='source ~/.zshrc'                        # Reload zsh config
+alias af='source ~/.config/fzf/fzf-aliases.zsh'   # Aliases tool
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
+alias backup='brew bundle dump --describe --force --file="~/.config/brew/Brewfile"'  # Backup brew packages
+alias restore-brewfile='brew bundle --file="~/.config/brew/Brewfile"'                # Restore brew packages
 
 ##############################
-# chezmoi
+# chezmoi                    #
 ##############################
-
-#
-# Basic commands
-#
 
 # Basic operations
-alias ch='chezmoi'                 # Base command shortcut
-alias chcd='chezmoi cd'            # Navigate to chezmoi source directory
-alias chst='chezmoi status'        # Show status of managed files
-alias chdoc='chezmoi doctor'       # Check chezmoi installation and configuration
-
-#
-# Source file management
-#
+alias ch='chezmoi'                      # Base command shortcut
+alias chcd='chezmoi cd'                 # Navigate to chezmoi source directory
+alias chst='chezmoi status'             # Show status of managed files
+alias chdoc='chezmoi doctor'            # Check chezmoi installation and configuration
 
 # Adding and editing files
-alias cha='chezmoi add -v'         # Add a new file to chezmoi
-alias chr='chezmoi re-add -v'      # Update source state from target
-alias che='chezmoi edit'           # Edit a managed file
-alias chea='chezmoi edit --apply'  # Edit and apply changes immediately
-
-#
-# Diff and sync commands
-#
+alias cha='chezmoi add -v'              # Add a new file to chezmoi
+alias chr='chezmoi re-add -v'           # Update source state from target
+alias che='chezmoi edit'                # Edit a managed file
+alias chea='chezmoi edit --apply'       # Edit and apply changes immediately
 
 # View and apply changes
-alias chd='chezmoi diff -v'        # Show pending changes
-alias chp='chezmoi apply -v'       # Apply pending changes to target
-alias chf='chezmoi apply --force'  # Force apply changes
+alias chd='chezmoi diff -v'             # Show pending changes
+alias chp='chezmoi apply -v'            # Apply pending changes to target
+alias chf='chezmoi apply --force'       # Force apply changes
 
 # Update and upgrade
-alias chup='chezmoi update'        # Update from source repo
-alias chug='chezmoi upgrade'       # Upgrade chezmoi to latest version
+alias chup='chezmoi update'             # Update from source repo
+alias chug='chezmoi upgrade'            # Upgrade chezmoi to latest version
 
-#
-# Git integration
-#
+# Show managed paths
+alias chls='chezmoi managed'            # List managed files
+alias chm='chezmoi merge'               # Merge changes from source to target
+
+# Debug and information    
+alias chv='chezmoi verify'              # Verify chezmoi configuration
+alias chdt='chezmoi data'               # Show template data
 
 # Check if git is available
 if (( $+commands[git] )); then
@@ -156,30 +142,10 @@ if (( $+commands[git] )); then
     source <(alias | awk -F "='" -f "${0:h}/alias.awk")
     
     # Git operations
-    alias chg='chezmoi git --'           # Execute git commands in chezmoi repo
-    alias chgp='chezmoi git -- push'     # Push changes to remote
-    alias chgl='chezmoi git -- pull'     # Pull changes from remote
-    alias chgs='chezmoi git -- status'   # Git status in chezmoi repo
-    alias chga='chezmoi git -- add'      # Stage changes in chezmoi repo
-    alias chgc='chezmoi git -- commit'   # Commit changes in chezmoi repo
+    alias chg='chezmoi git --'          # Execute git commands in chezmoi repo
+    alias chgp='chezmoi git -- push'    # Push changes to remote
+    alias chgl='chezmoi git -- pull'    # Pull changes from remote
+    alias chgs='chezmoi git -- status'  # Git status in chezmoi repo
+    alias chga='chezmoi git -- add'     # Stage changes in chezmoi repo
+    alias chgc='chezmoi git -- commit'  # Commit changes in chezmoi repo
 fi
-
-#
-# Additional helpful commands
-#
-
-# Show managed paths
-alias chls='chezmoi managed'    # List managed files
-alias chm='chezmoi merge'       # Merge changes from source to target
-
-# Debug and information
-alias chv='chezmoi verify'      # Verify chezmoi configuration
-alias chdt='chezmoi data'       # Show template data
-
-alias f='fzf'
-alias c='clear'
-
-alias af='source ~/.config/fzf/fzf-aliases.zsh'
-
-alias proxy='export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890'
-alias unproxy='unset https_proxy http_proxy all_proxy'
