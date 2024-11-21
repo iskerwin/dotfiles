@@ -41,22 +41,7 @@ alias clean-ds='fd -H -I -t f ".DS_Store" --exec rm -f {}'  # Remove .DS_Store f
 ##############################
 
 alias g='git'
-alias ga='git add'
-alias add='git add .'                                   # Add all changes
-alias log='git log --oneline --graph --decorate --all'  # Pretty git log
-alias pull='git pull origin'                            # Pull from origin
-alias push='git push origin'                            # Push to origin
-alias stat='git status'                                 # Show status
-alias diff='git diff --name-only --diff-filter=d | xargs bat --diff'  # Show changes
-alias fetch='git fetch'                                 # Fetch updates
-alias clone='git clone'                                 # Clone repository
-alias commit='git commit -m'                            # Commit with message
-alias commitam='git commit -am'                         # Add and commit modified files
-alias gb='git branch'                                   # List branches
-alias gco='git checkout'                                # Checkout branch/commit
-alias grb='git rebase'                                  # Rebase
-alias gm='git merge'                                    # Merge
-alias lg='lazygit'                                      # lazygit
+alias lg='lazygit'   # lazygit
 
 ##############################
 # System Operations
@@ -84,9 +69,9 @@ alias lsdev='ls /dev/cu.*'                          # List serial devices
 # SSH Management
 ##############################
 
-alias ssh='ct screen ssh'                          # SSH with screen support
-alias sshls='grep "^Host " ~/.ssh/config'          # List SSH hosts
-alias sshals='ps aux | grep ssh-agent'             # List SSH-agent process
+alias ssh='ct screen ssh'                           # SSH with screen support
+alias sshls='grep "^Host " ~/.ssh/config'           # List SSH hosts
+alias sshals='ps aux | grep ssh-agent'              # List SSH-agent process
 alias sshalk='ssh-add --apple-load-keychain'        # Load key with keychain
 alias sshags='eval "$(ssh-agent -s)"'               # Start SSH-agent
 
@@ -115,7 +100,7 @@ srun() {
 
 # Package Management
 alias backup='brew bundle dump --describe --force --file="~/.config/brew/Brewfile"'  # Backup brew packages
-alias restore-brewfile='brew bundle --file="~/.config/brew/Brewfile"' #Restore brew packages
+alias restore-brewfile='brew bundle --file="~/.config/brew/Brewfile"'                #Restore brew packages
 
 ##############################
 # Miscellaneous
@@ -143,8 +128,8 @@ alias chdoc='chezmoi doctor'       # Check chezmoi installation and configuratio
 #
 
 # Adding and editing files
-alias cha='chezmoi add'            # Add a new file to chezmoi
-alias chr='chezmoi re-add'         # Update source state from target
+alias cha='chezmoi add -v'         # Add a new file to chezmoi
+alias chr='chezmoi re-add -v'      # Update source state from target
 alias che='chezmoi edit'           # Edit a managed file
 alias chea='chezmoi edit --apply'  # Edit and apply changes immediately
 
@@ -153,8 +138,8 @@ alias chea='chezmoi edit --apply'  # Edit and apply changes immediately
 #
 
 # View and apply changes
-alias chd='chezmoi diff'           # Show pending changes
-alias chav='chezmoi apply -v'      # Apply pending changes to target
+alias chd='chezmoi diff -v'        # Show pending changes
+alias chp='chezmoi apply -v'       # Apply pending changes to target
 alias chf='chezmoi apply --force'  # Force apply changes
 
 # Update and upgrade
@@ -185,7 +170,7 @@ fi
 
 # Show managed paths
 alias chls='chezmoi managed'    # List managed files
-alias chmrg='chezmoi merge'     # Merge changes from source to target
+alias chm='chezmoi merge'       # Merge changes from source to target
 
 # Debug and information
 alias chv='chezmoi verify'      # Verify chezmoi configuration
