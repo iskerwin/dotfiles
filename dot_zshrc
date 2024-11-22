@@ -47,13 +47,6 @@ setopt PUSHD_SILENT               # Don't print the directory stack after pushd 
 setopt PUSHD_TO_HOME              # Have pushd with no arguments act like 'pushd $HOME'
 
 #########################
-# Completion Settings   #
-#########################
-# Initialize the completion system
-autoload -Uz compinit
-compinit -d ~/.cache/zcompdump    # Store completion dump files in cache directory
-
-#########################
 # Config Files          #
 #########################
 
@@ -91,3 +84,10 @@ fi
 # Initialize Homebrew environment
 # This sets up all necessary environment variables for Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
+
+#########################
+# Completion Settings   #
+#########################
+# Initialize the completion system
+autoload -Uz compinit
+compinit -d ~/.cache/zcompdump    # Store completion dump files in cache directory
