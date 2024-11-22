@@ -46,7 +46,7 @@ function alias_finder() {
     
     function classify_command(cmd) {
         if (cmd ~ /^(z|cd |ls|ll|la|tree|eza)/) return "navigation"
-        if (cmd ~ /^(ifconfig|curl|echo|nc|dig|export|unset|network)/) return "system"
+        if (cmd ~ /^(ifconfig|curl|echo|nc|dig|export|unset|network|nexttrace|unproxy|proxy|function)/) return "system"
         if (cmd ~ /(ssh|.ssh)/) return "ssh"
         if (cmd ~ /(brew |update)/) return "brew"
         if (cmd ~ /screen/) return "screen"

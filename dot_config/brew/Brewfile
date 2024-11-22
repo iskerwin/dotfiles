@@ -5,12 +5,14 @@ tap "homebrew/bundle"
 tap "homebrew/services"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
-# Breadth-first version of find
-brew "bfs"
+# Interface bandwidth monitor
+brew "bmon"
 # Core application library for C
 brew "glib"
 # Manage your dotfiles across multiple diverse machines, securely
 brew "chezmoi"
+# Disk Usage/Free Utility - a better 'df' alternative
+brew "duf"
 # Program that can automate interactive applications
 brew "expect"
 # Modern, maintained replacement for ls
@@ -19,8 +21,12 @@ brew "eza"
 brew "fd"
 # Command-line fuzzy finder written in Go
 brew "fzf"
-# Render markdown on the CLI
-brew "glow"
+# OpenType text shaping engine
+brew "harfbuzz"
+# OCR (Optical Character Recognition) engine
+brew "tesseract"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
 # ISO/IEC 23008-12:2017 HEIF file format decoder and encoder
@@ -33,10 +39,14 @@ brew "imagemagick"
 brew "iperf3"
 # Ranger-like terminal file manager written in Rust
 brew "joshuto"
+# Simple terminal UI for git commands
+brew "lazygit"
 # Show markdown documents on text terminals
 brew "mdcat"
 # Menu-driven communications program
 brew "minicom"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
 # Open source visual route tracking CLI tool
 brew "nexttrace"
 # Interpreted, interactive, object-oriented programming language
@@ -59,6 +69,8 @@ brew "ugrep"
 brew "zoxide"
 # Chromium based browser
 cask "arc"
+# Client for the Dropbox cloud storage service
+cask "dropbox"
 # Dictionary and translator app
 cask "easydict"
 cask "font-jetbrains-mono-nerd-font"
@@ -103,7 +115,10 @@ vscode "oderwat.indent-rainbow"
 vscode "pkief.material-icon-theme"
 vscode "pomdtr.excalidraw-editor"
 vscode "purocean.drawio-preview"
+vscode "ralfzhang.filetemplate"
+vscode "rogalmic.zsh-debug"
 vscode "ryu1kn.partial-diff"
+vscode "tamasfe.even-better-toml"
 vscode "usernamehw.errorlens"
 vscode "xlthu.pangu-markdown"
 vscode "y-ysss.cisco-config-highlight"

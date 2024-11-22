@@ -48,8 +48,10 @@ alias uud='update; upgrade; cleanup; doctor'                  # Full system upda
 
 # System Information
 alias ip='ifconfig en0 | grep inet'                 # Show local IP
-alias myip_in='curl http://ipecho.net/plain; echo'  # Internal IP
-alias myip_out='curl -s http://checkip.dyndns.org/ | sed "s/[a-zA-Z<>/ :]//g"'  # External IP
+alias nt='nexttrace'                                # An open source visual routing tool that pursues light weight                          
+alias ipw='function _ipw(){ curl ip.im/$1; };_ipw'  # IP where
+alias internal='unproxy && curl ipv4.im/info'       # Internal IP
+alias external='proxy && curl ipv4.im/info'         # External IP
 alias speed='networkQuality'                        # Network speed test
 alias netports="networksetup -listallhardwareports" # List all network hardware ports
 alias portcheck="nc -zv"                            # Quick port check
