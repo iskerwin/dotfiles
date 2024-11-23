@@ -9,10 +9,15 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
-alias icloud='cd ~/Library/Mobile\ Documents/com\~apple\~CloudDocs/'
+alias icloud='cd {{ .icloud }}'
 
 # Directory Listing (using eza/exa)
-alias ls='eza --group-directories-first --icons --git --time-style=long-iso'
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --group-directories-first --icons --git --time-style=long-iso'
+else
+    alias ls='ls --color=auto'
+fi
+
 alias la='ls -a -l'                             # List all files including hidden
 alias ld='la -D'                                # List only dirs
 alias lf='la -f'                                # List only files
@@ -26,29 +31,47 @@ alias l.='ls -d .*'                             # List only dotfiles
 alias l='ll -a --git-ignore'                    # Long format, all files
 alias tree='eza --tree --level=2 --group-directories-first --icons'
 
-# Safe Remove Operations
-if (( ${+commands[safe-rm]} && ! ${+commands[safe-rmdir]} )); then
-    alias rm='safe-rm'
+# Safe Operations
+alias rm='rm -i'   # Confirm before deleting
+alias cp='cp -i'   # Confirm before copying
+alias mv='mv -i'   # Confirm before moving
+
+install_missing() {
+    local package=$1
+    if (( ${+commands[brew]} )); then
+        echo "Installing $package..."
+        brew install $package
+    else
+        echo "Error: Homebrew not found. Please install Homebrew first."
+        echo "Visit https://brew.sh for installation instructions."
+    fi
+}
+
+# Clean .DS_Store files (requires fd command)
+if (( ${+commands[fd]} )); then
+    alias clean-ds='fd -H -I -t f ".DS_Store" --exec rm -f {}'  # Clean all .DS_Store files recursively
+else
+    alias clean-ds='echo "Installing fd..." && install_missing fd'
 fi
-alias clean-ds='fd -H -I -t f ".DS_Store" --exec rm -f {}'  # Remove .DS_Store files
 
 ##############################
 # System Operations          #
 ##############################
 
 # Homebrew Package Management
-alias update='brew update'                                    # Update Homebrew
-alias upgrade='brew upgrade'                                  # Upgrade packages
-alias cleanup='brew cleanup'                                  # Clean old versions
-alias install='brew install'                                  # Install package
-alias uninstall='brew uninstall'                              # Remove package
-alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'  # Check system
-alias update-all='brew cu -a -f -v --no-brew-update -y'       # Update all casks
-alias uud='update; upgrade; cleanup; doctor'                  # Full system update
+alias update='brew update && brew upgrade && brew cleanup && brew doctor'      # Update Homebrew/Cask
+alias cleanup='brew cleanup'                                                   # Clean old versions
+alias install='brew install'                                                   # Install package
+alias uninstall='brew uninstall'                                               # Remove package
+alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'                   # Check system
+alias update-cask='brew cu -a -f -v --no-brew-update -y && brew cleanup'       # Update all casks with non-official.
+# alias update-cask='brew update && brew upgrade --cask && brew cleanup'         # Update all casks with homebrew
+alias brewbackup='brew bundle dump --describe --force --file={{ .brewfile }}'  # Backup brew packages
+alias brewrestore='brew bundle --file={{ .brewfile }}'                         # Restore brew packages
 
 # System Information
 alias ip='ifconfig en0 | grep inet'                 # Show local IP
-alias nt='nexttrace'                                # An open source visual routing tool that pursues light weight                          
+alias nt='nexttrace'                                # Visual traceroute tool                        
 alias ipw='function _ipw(){ curl ip.im/$1; };_ipw'  # IP where
 alias internal='unproxy && curl ipv4.im/info'       # Internal IP
 alias external='proxy && curl ipv4.im/info'         # External IP
@@ -84,7 +107,7 @@ alias sk='killall screen'                         # Kill all screens
 alias sd='screen -d'                              # Detach screen
 alias snw='screen -X screen'                      # New window in current session
 alias snd='screen -dm'                            # Create detached session
-alias console='screen -fn /dev/cu.BTConsole 9600' # 
+alias console='screen -fn /dev/cu.BTConsole 9600' # # Connect to Bluetooth console (9600 baud rate)
 
 # Run command in new screen window
 srun() {
@@ -102,52 +125,43 @@ alias lg='lazygit'                                # lazygit
 alias rz='source ~/.zshrc'                        # Reload zsh config
 alias af='source ~/.config/fzf/fzf-aliases.zsh'   # Aliases tool
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
-alias backup='brew bundle dump --describe --force --file="~/.config/brew/Brewfile"'  # Backup brew packages
-alias restore-brewfile='brew bundle --file="~/.config/brew/Brewfile"'                # Restore brew packages
 
 ##############################
-# chezmoi                    #
+# Chezmoi Aliases            #
 ##############################
 
-# Basic operations
-alias ch='chezmoi'                      # Base command shortcut
-alias chcd='chezmoi cd'                 # Navigate to chezmoi source directory
-alias chst='chezmoi status'             # Show status of managed files
-alias chdoc='chezmoi doctor'            # Check chezmoi installation and configuration
+# Core Commands (最常用的核心命令)
+alias cz='chezmoi'                      # Base command with shorter alias
+alias czcd='chezmoi cd'                 # Navigate to source directory
+alias czs='chezmoi status'              # Show status
+alias cza='chezmoi add -v'              # Add files
+alias cze='chezmoi edit'                # Edit files
+alias czd='chezmoi diff -v'             # Show differences
+alias czp='chezmoi apply -v'            # Apply changes
 
-# Adding and editing files
-alias cha='chezmoi add -v'              # Add a new file to chezmoi
-alias chr='chezmoi re-add -v'           # Update source state from target
-alias che='chezmoi edit'                # Edit a managed file
-alias chea='chezmoi edit --apply'       # Edit and apply changes immediately
+# Extended Operations (扩展操作)
+alias czr='chezmoi re-add -v'           # Re-add files
+alias czf='chezmoi apply --force'       # Force apply
+alias czea='chezmoi edit --apply'       # Edit and apply
+alias czup='chezmoi update -v'          # Update from source
+alias czug='chezmoi upgrade'            # Upgrade chezmoi
 
-# View and apply changes
-alias chd='chezmoi diff -v'             # Show pending changes
-alias chp='chezmoi apply -v'            # Apply pending changes to target
-alias chf='chezmoi apply --force'       # Force apply changes
+# Information & Debug (信息和调试)
+alias czls='chezmoi managed'            # List managed files
+alias czda='chezmoi data'               # Show template data
+alias czdc='chezmoi doctor'             # Check installation
+alias czv='chezmoi verify'              # Verify configuration
 
-# Update and upgrade
-alias chup='chezmoi update'             # Update from source repo
-alias chug='chezmoi upgrade'            # Upgrade chezmoi to latest version
+# Git Integration (Git 集成)
+# Using czg prefix for consistency with git operations
+alias czg='chezmoi git --'              # Git operations
+alias czga='czg add'                    # Stage changes
+alias czgc='czg commit -m'              # Commit changes
+alias czgp='czg push'                   # Push changes
+alias czgl='czg pull'                   # Pull changes
+alias czgs='czg status'                 # Git status
 
-# Show managed paths
-alias chls='chezmoi managed'            # List managed files
-alias chm='chezmoi merge'               # Merge changes from source to target
-
-# Debug and information    
-alias chv='chezmoi verify'              # Verify chezmoi configuration
-alias chdt='chezmoi data'               # Show template data
-
-# Check if git is available
-if (( $+commands[git] )); then
-    # Load git aliases from external file
-    source <(alias | awk -F "='" -f "${0:h}/alias.awk")
-    
-    # Git operations
-    alias chg='chezmoi git --'          # Execute git commands in chezmoi repo
-    alias chgp='chezmoi git -- push'    # Push changes to remote
-    alias chgl='chezmoi git -- pull'    # Pull changes from remote
-    alias chgs='chezmoi git -- status'  # Git status in chezmoi repo
-    alias chga='chezmoi git -- add'     # Stage changes in chezmoi repo
-    alias chgc='chezmoi git -- commit'  # Commit changes in chezmoi repo
-fi
+# Common Workflows
+alias czap='chezmoi add -v && chezmoi apply -v'            # Add and apply
+alias czep='chezmoi edit --apply && chezmoi apply -v'      # Edit and apply
+alias czsync='czgl && czp && czgp'                         # Full sync workflow

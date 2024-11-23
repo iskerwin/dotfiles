@@ -39,6 +39,8 @@ brew "imagemagick"
 brew "iperf3"
 # Ranger-like terminal file manager written in Rust
 brew "joshuto"
+# Lightweight and flexible command-line JSON processor
+brew "jq"
 # Simple terminal UI for git commands
 brew "lazygit"
 # Show markdown documents on text terminals
@@ -53,6 +55,8 @@ brew "nexttrace"
 brew "python@3.11"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
+# Wraps rm to prevent dangerous deletion of files
+brew "safe-rm"
 # Terminal multiplexer with VT100/ANSI terminal emulation
 brew "screen"
 # Log file highlighter
@@ -65,6 +69,8 @@ brew "tmux"
 brew "tree"
 # Ultra fast grep with query UI, fuzzy search, archive search, and more
 brew "ugrep"
+# Internet file retriever
+brew "wget"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
 # Chromium based browser
@@ -106,6 +112,7 @@ vscode "foxundermoon.shell-format"
 vscode "github.copilot"
 vscode "github.copilot-chat"
 vscode "jamiewoodio.cisco"
+vscode "jinliming2.vscode-go-template"
 vscode "kisstkondoros.vscode-gutter-preview"
 vscode "mhutchie.git-graph"
 vscode "ms-vscode-remote.remote-ssh"

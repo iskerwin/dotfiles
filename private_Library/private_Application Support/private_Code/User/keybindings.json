@@ -1,0 +1,26 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+    {
+        "key": "shift+cmd+u",
+        "command": "-workbench.action.output.toggleOutput"
+    },
+    {
+        "key": "shift+alt+x",
+        "command": "wwm.aligncode"
+    },
+    {
+        "key": "shift+alt+f",
+        "command": "-editor.action.formatDocument.none",
+        "when": "editorTextFocus && !editorHasDocumentFormattingProvider && !editorReadonly"
+    },
+    {
+        "key": "cmd+o",
+        "command": "projectManager.listGitProjects#sideBarGit"
+    },
+    {
+        "key": "ctrl+=","command": "expand_region", "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+-","command": "undo_expand_region", "when": "editorTextFocus && editorHasSelection"
+    },
+]
