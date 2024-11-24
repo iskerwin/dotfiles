@@ -85,6 +85,7 @@
   "files.associations": {
         "*.zsh.tmpl": "shellscript",
         "*.toml.tmpl": "toml",
-        "*gitconfig.tmpl":"ini"
+        "*gitconfig.tmpl": "ini",
+        "config.tmpl": "ini"
   }
 }
