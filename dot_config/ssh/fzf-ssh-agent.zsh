@@ -7,18 +7,18 @@
 # - Automated agent management
 # - Command-line and interactive modes
 
-#-----------------------------------------------------------------------------
-# 1. Base Configuration
-#-----------------------------------------------------------------------------
+#================================================#
+# Base Configuration                             #
+#================================================#
 SSH_KEY_DIR="$HOME/.ssh"              # Directory containing SSH keys
 SOCK_FILE="/tmp/ssh-agent-sock"       # Socket file location
 PID_FILE="/tmp/ssh-agent-pid"         # PID file location
 PREVIEW_DIR=$(mktemp -d)              # Temporary directory for preview scripts
 trap 'rm -rf "$PREVIEW_DIR"' EXIT     # Clean up preview directory on exit
 
-#-----------------------------------------------------------------------------
-# 2. Color Definitions and Common Utilities
-#-----------------------------------------------------------------------------
+#================================================#
+# Color Definitions and Common Utilities         #
+#================================================#
 COLOR_DEFINITIONS='
 # ANSI color codes for output formatting
 COLOR_HEADER=$'"'"'\033[1;34m'"'"'    # Bold Blue
@@ -89,9 +89,9 @@ print_socket_path() {
 }
 '
 
-#-----------------------------------------------------------------------------
-# 3. Core SSH Functions
-#-----------------------------------------------------------------------------
+#================================================#
+# Core SSH Functions                             #
+#================================================#
 
 # Find all SSH private keys in the SSH directory
 find_ssh_keys() {
@@ -120,9 +120,9 @@ format_loaded_keys() {
     fi
 }
 
-#-----------------------------------------------------------------------------
-# 4. SSH Agent Management
-#-----------------------------------------------------------------------------
+#================================================#
+# SSH Agent Management                           #
+#================================================#
 
 # Check and display current SSH agent status
 get_agent_status() {
@@ -208,9 +208,9 @@ auto_start() {
     start_ssh_agent
 }
 
-#-----------------------------------------------------------------------------
-# 5. SSH Key Management Functions
-#-----------------------------------------------------------------------------
+#================================================#
+# SSH Key Management Functions                   #
+#================================================#
 
 # Find a local key file matching a given fingerprint
 find_key_by_fingerprint() {
@@ -229,9 +229,9 @@ find_key_by_fingerprint() {
     return 1
 }
 
-#-----------------------------------------------------------------------------
-# 5. SSH Key Management Functions (continued)
-#-----------------------------------------------------------------------------
+#================================================#
+# SSH Key Management Functions                   #
+#================================================#
 
 # Interactive key loading function using fzf
 load_key() {
@@ -330,9 +330,9 @@ list_loaded_keys() {
     fi
 }
 
-#-----------------------------------------------------------------------------
-# 6. Preview Script Generation
-#-----------------------------------------------------------------------------
+#================================================#
+# Preview Script Generation                      #
+#================================================#
 
 # Generate preview script from content
 generate_preview_script() {
@@ -560,9 +560,9 @@ esac'
     generate_preview_script "$PREVIEW_DIR/menu_preview.sh" "$menu_preview_content"
 }
 
-#-----------------------------------------------------------------------------
-# 7. Interactive Menu Interface
-#-----------------------------------------------------------------------------
+#================================================#
+# Interactive Menu Interface                     #
+#================================================#
 
 # Main menu interface using fzf
 ssha_menu() {
@@ -595,9 +595,9 @@ ssha_menu() {
     esac
 }
 
-#-----------------------------------------------------------------------------
-# Auto-start and Initialization
-#-----------------------------------------------------------------------------
+#================================================#
+# Auto-start and Initialization                  #
+#================================================#
 
 # Automatically start SSH agent if needed
 auto_start() {
@@ -630,9 +630,9 @@ auto_start() {
     start_ssh_agent
 }
 
-#-----------------------------------------------------------------------------
-# Main Function and Command Completion
-#-----------------------------------------------------------------------------
+#================================================#
+# Main Function and Command Completion           #
+#================================================#
 
 # Main command interface function
 ssha-management() {

@@ -1,6 +1,9 @@
 #!/usr/bin/env zsh
 
-# ━━━━━━━━━━━━━━━━━━━━━━ Style Configuration ━━━━━━━━━━━━━━━━━━━━━━
+##################################################
+# Style Configuration                            #
+##################################################
+
 # Dracula color palette
 HEADER_STYLE=$(echo -e "\033[1;38;5;141m")  # Purple
 NAME_STYLE=$(echo -e "\033[38;5;84m")       # Green
@@ -9,8 +12,17 @@ CMD_STYLE=$(echo -e "\033[0m")              # Reset
 TYPE_STYLE=$(echo -e "\033[3;38;5;189m")    # Light Purple
 SEPARATOR_STYLE=$(echo -e "\033[38;5;61m")  # Dark Purple
 
-# ━━━━━━━━━━━━━━━━━━━━━━ Main Function ━━━━━━━━━━━━━━━━━━━━━━
+##################################################
+# Main Function                                  #
+##################################################
+
 function alias_finder() {
+    # Create a more unique temporary file with process ID
+    local tmp_file="/tmp/fzf-alias-tmp.$$"
+    
+    # Ensure cleanup on script exit
+    trap "rm -f $tmp_file" EXIT INT TERM
+    
     local header_text="${HEADER_STYLE}
     ╭─────────────────────────────────────────────────╮
     │ Controls │ ENTER: input alias • CTRL-E: command │
@@ -110,15 +122,15 @@ function alias_finder() {
         --marker ' 󰄲' \
         --header "$header_text" \
         --preview-window "${PREVIEW_WINDOW_SIZE}:hidden" \
-        --bind "ctrl-e:execute(echo -n {3..} | tr -d '\n' > $HOME/.fzf-alias-tmp)+abort" \
-        --bind "enter:execute(echo {1} | tr -d '\n' > $HOME/.fzf-alias-tmp)+abort" \
+        --bind "ctrl-e:execute(echo -n {3..} | tr -d '\n' > $tmp_file)+abort" \
+        --bind "enter:execute(echo {1} | tr -d '\n' > $tmp_file)+abort" \
         --color='bg+:#44475a,fg+:#f8f8f2,hl:#50fa7b,hl+:#50fa7b,border:#6272a4' \
         --color='header:#bd93f9,info:#50fa7b,prompt:#bd93f9,pointer:#ff79c6,marker:#ff79c6'
 
-    # Process selection
-    if [ -f "$HOME/.fzf-alias-tmp" ]; then
-        local result=$(cat "$HOME/.fzf-alias-tmp")
-        rm "$HOME/.fzf-alias-tmp"
+    # Process selection with safer file handling
+    if [ -f "$tmp_file" ]; then
+        local result=$(cat "$tmp_file")
+        rm -f "$tmp_file"
         print -z "$result"
     fi
 }

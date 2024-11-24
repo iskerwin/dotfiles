@@ -1,6 +1,9 @@
 # ~/.config/fzf/init.zsh
 
-# ===== Basic settings =====
+#================================================#
+# Basic settings                                 #
+#================================================#
+
 # Setup fzf path
 if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
     PATH="${PATH:+${PATH}:}/opt/homebrew/opt/fzf/bin"
@@ -9,9 +12,12 @@ fi
 # Load fzf
 source <(fzf --zsh)
 
-# ===== Basic command configuration =====
+#================================================#
+# Basic command configuration                    #
+#================================================#
+
 # Create .rgignore file if it doesn't exist
-RGIGNORE="$HOME/.rgignore"
+RGIGNORE="$HOME/.config/fzf/.rgignore"
 if [[ ! -f "$RGIGNORE" ]]; then
     cat > "$RGIGNORE" << EOL
 .m2/
@@ -82,7 +88,10 @@ fi
 # Set completion trigger
 export FZF_COMPLETION_TRIGGER='\'
 
-# ===== Preview configuration =====
+#================================================#
+# Preview configuration                          #
+#================================================#
+
 # Define preview commands
 show_file_or_dir_preview="if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat -n --color=always --line-range :500 {}; fi"
 
@@ -93,7 +102,10 @@ export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -200'"
 # Disable preview of CTRL-R history
 export FZF_CTRL_R_OPTS="--preview-window=hidden"
 
-# ===== Appearance configuration =====
+#================================================#
+# Appearance configuration                       #
+#================================================#
+
 export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
     --height=90%
     --layout=reverse
@@ -126,8 +138,8 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
 ╰─────────────────────────────────────╯'
 "
 
-[ -f ~/.config/fzf/fzf-ssh.zsh ] && source ~/.config/fzf/fzf-ssh.zsh                  # Better completion for ssh in Zsh with FZF
-[ -f ~/.config/fzf/fzf-ssh-agent.zsh ] && source ~/.config/fzf/fzf-ssh-agent.zsh      # SSH-agent configuration
+[ -f ~/.config/ssh/fzf-ssh.zsh ] && source ~/.config/ssh/fzf-ssh.zsh                  # Better completion for ssh in Zsh with FZF
+[ -f ~/.config/ssh/fzf-ssh-agent.zsh ] && source ~/.config/ssh/fzf-ssh-agent.zsh      # SSH-agent configuration
 [ -f ~/.config/fzf/fzf-tab-colors.zsh ] && source ~/.config/fzf/fzf-tab-colors.zsh    # Dracula color scheme for fzf-tab
 
 # Cleaning function

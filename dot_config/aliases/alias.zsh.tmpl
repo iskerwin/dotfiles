@@ -1,6 +1,6 @@
-##############################
-# File Navigation            #
-##############################
+#================================================#
+# File Navigation                                #
+#================================================#
 
 # Directory Navigation
 alias cd='z'
@@ -54,9 +54,9 @@ else
     alias clean-ds='echo "Installing fd..." && install_missing fd'
 fi
 
-##############################
-# System Operations          #
-##############################
+#================================================#
+# System Operations                              #      
+#================================================#
 
 # Homebrew Package Management
 alias update='brew update && brew upgrade && brew cleanup && brew doctor'      # Update Homebrew/Cask
@@ -85,19 +85,20 @@ alias lsdev='ls /dev/cu.*'                          # List serial devices
 alias proxy='export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890'
 alias unproxy='unset https_proxy http_proxy all_proxy'
 alias top='btop'                                    # A monitor of resources
-##############################
-# SSH Management             #
-##############################
 
-alias ssh='ct screen ssh'                           # SSH with screen support
-alias sshls='grep "^Host " ~/.ssh/config'           # List SSH hosts
-alias sshals='ps aux | grep ssh-agent'              # List SSH-agent process
-alias sshalk='ssh-add --apple-load-keychain'        # Load key with keychain
-alias sshags='eval "$(ssh-agent -s)"'               # Start SSH-agent
+#================================================#
+# SSH Management                                 #
+#================================================#
 
-##############################
-# Screen Management          #
-##############################
+alias ssh='ct screen ssh'                         # SSH with screen support
+alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
+alias sshals='ps aux | grep ssh-agent'            # List SSH-agent process
+alias sshalk='ssh-add --apple-load-keychain'      # Load key with keychain
+alias sshags='eval "$(ssh-agent -s)"'             # Start SSH-agent
+
+#================================================#
+# Screen Management                              #
+#================================================#
 alias screen='ct screen'
 alias sn='screen -S'                              # Create/attach screen session
 alias sl='screen -ls'                             # List screen sessions
@@ -114,23 +115,23 @@ srun() {
     screen -dm bash -c "$*"
 }
 
-##############################
-# Miscellaneous              #
-##############################
+#================================================#
+# Miscellaneous                                  #
+#================================================#
 
-alias f='fzf'
-alias c='clear'
-alias g='git'
+alias f='fzf'                                     # FZF
+alias g='git'                                     # Git
 alias lg='lazygit'                                # lazygit
 alias rz='source ~/.zshrc'                        # Reload zsh config
-alias af='source ~/.config/fzf/fzf-aliases.zsh'   # Aliases tool
+alias af='source ~/.config/aliases/fzf-alias.zsh' # Aliases tool
+alias clr='clear'                                 # Clear
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
 
-##############################
-# Chezmoi Aliases            #
-##############################
+#================================================#
+# Chezmoi Aliases                                #
+#================================================#
 
-# Core Commands (最常用的核心命令)
+# Core Commands
 alias cz='chezmoi'                      # Base command with shorter alias
 alias czcd='chezmoi cd'                 # Navigate to source directory
 alias czs='chezmoi status'              # Show status
@@ -139,20 +140,20 @@ alias cze='chezmoi edit'                # Edit files
 alias czd='chezmoi diff -v'             # Show differences
 alias czp='chezmoi apply -v'            # Apply changes
 
-# Extended Operations (扩展操作)
+# Extended Operations
 alias czr='chezmoi re-add -v'           # Re-add files
 alias czf='chezmoi apply --force'       # Force apply
 alias czea='chezmoi edit --apply'       # Edit and apply
 alias czup='chezmoi update -v'          # Update from source
 alias czug='chezmoi upgrade'            # Upgrade chezmoi
 
-# Information & Debug (信息和调试)
+# Information & Debug
 alias czls='chezmoi managed'            # List managed files
 alias czda='chezmoi data'               # Show template data
 alias czdc='chezmoi doctor'             # Check installation
 alias czv='chezmoi verify'              # Verify configuration
 
-# Git Integration (Git 集成)
+# Git Integration
 # Using czg prefix for consistency with git operations
 alias czg='chezmoi git --'              # Git operations
 alias czga='czg add'                    # Stage changes

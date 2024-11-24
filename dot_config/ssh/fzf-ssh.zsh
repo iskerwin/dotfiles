@@ -1,7 +1,8 @@
 # ZSH Plugin for SSH with FZF integration
-#######################################################
-# Core SSH functionality and configuration management #
-#######################################################
+
+#================================================#
+# Core SSH functionality                         #
+#================================================#
 # Base directory configurations with zsh style parameter expansion
 : "${SSH_DIR:=$HOME/.ssh}"
 : "${SSH_CONFIG_FILE:=$SSH_DIR/config}"
@@ -82,9 +83,9 @@ list_ssh_hosts() {
 # Initialize environment
 setup_ssh_environment
 
-#######################################################
-# UI and interaction functionality for SSH management #
-#######################################################
+#================================================#
+# UI and interaction functionality               #
+#================================================#
 # FZF integration for SSH completions
 _fzf_complete_ssh() {
     _fzf_complete --ansi --border --cycle \
