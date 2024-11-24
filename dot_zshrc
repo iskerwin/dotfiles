@@ -56,7 +56,7 @@ plug "romkatv/powerlevel10k"                      # Highly customizable and fast
 plug "zsh-users/zsh-autosuggestions"              # Fish-like autosuggestions
 plug "Aloxaf/fzf-tab"                             # Replace zsh's default completion with fzf
 plug "zdharma-continuum/fast-syntax-highlighting" # Syntax highlighting for commands
-plug "hlissner/zsh-autopair"               # 自动补全括号
+plug "hlissner/zsh-autopair"                      # Autocomplete parentheses
 plug "MichaelAquilina/zsh-you-should-use"         # reminds you to use existing aliases
 
 #########################
