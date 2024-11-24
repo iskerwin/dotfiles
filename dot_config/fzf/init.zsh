@@ -19,7 +19,7 @@ source <(fzf --zsh)
 # Create .rgignore file if it doesn't exist
 RGIGNORE="$HOME/.config/fzf/.rgignore"
 if [[ ! -f "$RGIGNORE" ]]; then
-    cat > "$RGIGNORE" << EOL
+    cat >"$RGIGNORE" <<EOL
 .m2/
 .npm/
 .git/
@@ -42,7 +42,7 @@ EOL
 fi
 
 # Set basic commands
-if command -v fd > /dev/null; then
+if command -v fd >/dev/null; then
     export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --max-depth 8 \
         --exclude .m2 \
         --exclude .npm \
@@ -61,7 +61,7 @@ if command -v fd > /dev/null; then
         --exclude Applications \
         --exclude node_modules \
         --exclude __pycache__"
-    
+
     export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --max-depth 8 \
         --exclude .m2 \
         --exclude .npm \
@@ -138,9 +138,9 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
 ╰─────────────────────────────────────╯'
 "
 
-[ -f ~/.config/ssh/fzf-ssh.zsh ] && source ~/.config/ssh/fzf-ssh.zsh                  # Better completion for ssh in Zsh with FZF
-[ -f ~/.config/ssh/fzf-ssh-agent.zsh ] && source ~/.config/ssh/fzf-ssh-agent.zsh      # SSH-agent configuration
-[ -f ~/.config/fzf/fzf-tab-colors.zsh ] && source ~/.config/fzf/fzf-tab-colors.zsh    # Dracula color scheme for fzf-tab
+[ -f ~/.config/ssh/fzf-ssh.zsh ] && source ~/.config/ssh/fzf-ssh.zsh               # Better completion for ssh in Zsh with FZF
+[ -f ~/.config/ssh/fzf-ssh-agent.zsh ] && source ~/.config/ssh/fzf-ssh-agent.zsh   # SSH-agent configuration
+[ -f ~/.config/fzf/fzf-tab-colors.zsh ] && source ~/.config/fzf/fzf-tab-colors.zsh # Dracula color scheme for fzf-tab
 
 # Cleaning function
 fzfcleanup() {

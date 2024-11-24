@@ -14,7 +14,7 @@ setup_ssh_environment() {
     [[ ! -d "$SSH_DIR" ]] && mkdir -p "$SSH_DIR" && chmod 700 "$SSH_DIR"
     [[ ! -f "$SSH_CONFIG_FILE" ]] && touch "$SSH_CONFIG_FILE" && chmod 600 "$SSH_CONFIG_FILE"
     [[ ! -f "$SSH_KNOWN_HOSTS" ]] && touch "$SSH_KNOWN_HOSTS" && chmod 644 "$SSH_KNOWN_HOSTS"
-    
+
     # Validate SSH config file format
     if ! ssh -G localhost >/dev/null 2>&1; then
         echo "Warning: SSH config file format error detected" >&2

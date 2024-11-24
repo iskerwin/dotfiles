@@ -10,11 +10,11 @@
 #================================================#
 # Base Configuration                             #
 #================================================#
-SSH_KEY_DIR="$HOME/.ssh"              # Directory containing SSH keys
-SOCK_FILE="/tmp/ssh-agent-sock"       # Socket file location
-PID_FILE="/tmp/ssh-agent-pid"         # PID file location
-PREVIEW_DIR=$(mktemp -d)              # Temporary directory for preview scripts
-trap 'rm -rf "$PREVIEW_DIR"' EXIT     # Clean up preview directory on exit
+SSH_KEY_DIR="$HOME/.ssh"          # Directory containing SSH keys
+SOCK_FILE="/tmp/ssh-agent-sock"   # Socket file location
+PID_FILE="/tmp/ssh-agent-pid"     # PID file location
+PREVIEW_DIR=$(mktemp -d)          # Temporary directory for preview scripts
+trap 'rm -rf "$PREVIEW_DIR"' EXIT # Clean up preview directory on exit
 
 #================================================#
 # Color Definitions and Common Utilities         #
@@ -152,8 +152,8 @@ start_ssh_agent() {
     agent_output=$(ssh-agent -s)
     if [[ $? -eq 0 ]]; then
         eval "$agent_output"
-        echo "$SSH_AUTH_SOCK" > "$SOCK_FILE"
-        echo "$SSH_AGENT_PID" > "$PID_FILE"
+        echo "$SSH_AUTH_SOCK" >"$SOCK_FILE"
+        echo "$SSH_AGENT_PID" >"$PID_FILE"
         chmod 600 "$SOCK_FILE" "$PID_FILE"
         echo "${COLOR_SUCCESS}Started new SSH agent${COLOR_RESET}"
         return 0
@@ -189,17 +189,17 @@ auto_start() {
     if [[ -f "$SOCK_FILE" && -f "$PID_FILE" ]]; then
         local stored_sock=$(cat "$SOCK_FILE")
         local stored_pid=$(cat "$PID_FILE")
-        
+
         local old_sock=$SSH_AUTH_SOCK
         local old_pid=$SSH_AGENT_PID
         export SSH_AUTH_SOCK=$stored_sock
         export SSH_AGENT_PID=$stored_pid
-        
+
         if kill -0 "$stored_pid" 2>/dev/null && ssh-add -l &>/dev/null; then
             echo "${COLOR_DIM}Reconnected to existing SSH agent${COLOR_RESET}"
             return 0
         fi
-        
+
         export SSH_AUTH_SOCK=$old_sock
         export SSH_AGENT_PID=$old_pid
     fi
@@ -216,7 +216,7 @@ auto_start() {
 find_key_by_fingerprint() {
     local target_fingerprint=$1
     local key_file=""
-    
+
     while read -r file; do
         if [[ -f "$file" ]] && ssh-keygen -l -f "$file" &>/dev/null; then
             local file_fingerprint=$(ssh-keygen -l -f "$file" | awk '{print $2}')
@@ -251,7 +251,7 @@ load_key() {
         --padding=1 \
         --header="Load SSH Key" \
         --header-first)
-    
+
     if [[ -n "$selected_key" ]]; then
         ssh-add "$selected_key"
         echo "${COLOR_SUCCESS}Loaded key: ${COLOR_RESET}$selected_key"
@@ -265,7 +265,7 @@ unload_key() {
         echo "${COLOR_ERROR}No keys loaded in SSH agent${COLOR_RESET}"
         return 1
     fi
-    
+
     # Display interactive key unloading menu
     local selected_key=$(echo "$loaded_keys" | fzf --prompt="Select SSH key to unload: " \
         --preview="$PREVIEW_DIR/loaded_key_preview.sh {}" \
@@ -276,16 +276,16 @@ unload_key() {
         --padding=1 \
         --header="Unload SSH Key" \
         --header-first)
-    
+
     if [[ -n "$selected_key" ]]; then
         local fingerprint=$(echo "$selected_key" | awk '{print $2}')
         local key_file=$(find_key_by_fingerprint "$fingerprint")
-        
+
         if [[ -n "$key_file" ]]; then
             ssh-add -d "$key_file"
             echo "${COLOR_SUCCESS}Unloaded key: ${COLOR_RESET}$key_file"
         else
-            ssh-add -d <<< ""
+            ssh-add -d <<<""
             if [[ $? -eq 0 ]]; then
                 echo "${COLOR_SUCCESS}Unloaded key with fingerprint: ${COLOR_RESET}$fingerprint"
             else
@@ -314,11 +314,11 @@ list_loaded_keys() {
         --header="Loaded SSH Keys" \
         --header-first \
         --no-select-1)
-    
+
     if [[ -n "$selected_key" ]]; then
         local fingerprint=$(echo "$selected_key" | awk '{print $2}')
         local key_file=$(find_key_by_fingerprint "$fingerprint")
-        
+
         if [[ -n "$key_file" ]]; then
             echo "${COLOR_INFO}Selected key details:${COLOR_RESET}"
             echo "File: $key_file"
@@ -338,13 +338,13 @@ list_loaded_keys() {
 generate_preview_script() {
     local script_path=$1
     local script_content=$2
-    
+
     {
         echo "#!/usr/bin/env zsh"
         echo "$COLOR_DEFINITIONS"
         echo "$COMMON_FUNCTIONS"
         echo "$script_content"
-    } > "$script_path"
+    } >"$script_path"
     chmod +x "$script_path"
 }
 
@@ -574,7 +574,7 @@ ssha_menu() {
         "List Loaded Keys"
         "Exit"
     )
-    
+
     local selected=$(printf "%s\n" "${options[@]}" | fzf --prompt="SSH Agent Management > " \
         --preview="$PREVIEW_DIR/menu_preview.sh {} \"$SSH_AUTH_SOCK\" \"$SSH_AGENT_PID\"" \
         --preview-window=right:60%:wrap \
@@ -584,14 +584,14 @@ ssha_menu() {
         --header="SSH Agent Management Tool" \
         --ansi --border --cycle \
         --header-first)
-    
+
     case $selected in
-        "Start SSH Agent") start_ssh_agent ;;
-        "Stop SSH Agent") stop_ssh_agent ;;
-        "Load Key") load_key ;;
-        "Unload Key") unload_key ;;
-        "List Loaded Keys") list_loaded_keys ;;
-        "Exit") return 0 ;;
+    "Start SSH Agent") start_ssh_agent ;;
+    "Stop SSH Agent") stop_ssh_agent ;;
+    "Load Key") load_key ;;
+    "Unload Key") unload_key ;;
+    "List Loaded Keys") list_loaded_keys ;;
+    "Exit") return 0 ;;
     esac
 }
 
@@ -611,17 +611,17 @@ auto_start() {
     if [[ -f "$SOCK_FILE" && -f "$PID_FILE" ]]; then
         local stored_sock=$(cat "$SOCK_FILE")
         local stored_pid=$(cat "$PID_FILE")
-        
+
         local old_sock=$SSH_AUTH_SOCK
         local old_pid=$SSH_AGENT_PID
         export SSH_AUTH_SOCK=$stored_sock
         export SSH_AGENT_PID=$stored_pid
-        
+
         if kill -0 "$stored_pid" 2>/dev/null && ssh-add -l &>/dev/null; then
             echo "${COLOR_DIM}Reconnected to existing SSH agent${COLOR_RESET}"
             return 0
         fi
-        
+
         export SSH_AUTH_SOCK=$old_sock
         export SSH_AGENT_PID=$old_pid
     fi
@@ -637,33 +637,33 @@ auto_start() {
 # Main command interface function
 ssha-management() {
     case $1 in
-        start) start_ssh_agent ;;
-        stop) stop_ssh_agent ;;
-        load) load_key ;;
-        unload) unload_key ;;
-        list) list_loaded_keys ;;
-        menu) ssha_menu ;;
-        help)
-            print_section "SSH Management Tool Help"
-            echo "${COLOR_INFO}Usage:${COLOR_RESET} ssh-management [command]"
-            echo
-            print_section "Available Commands"
-            echo "${COLOR_INFO}start${COLOR_RESET}    Start SSH agent"
-            echo "${COLOR_INFO}stop${COLOR_RESET}     Stop SSH agent"
-            echo "${COLOR_INFO}load${COLOR_RESET}     Load SSH key"
-            echo "${COLOR_INFO}unload${COLOR_RESET}   Unload SSH key"
-            echo "${COLOR_INFO}list${COLOR_RESET}     List loaded keys"
-            echo "${COLOR_INFO}menu${COLOR_RESET}     Show interactive menu"
-            echo "${COLOR_INFO}help${COLOR_RESET}     Show this help message"
-            ;;
-        *)
-            if [[ -n "$1" ]]; then
-                echo "${COLOR_ERROR}Unknown command: $1${COLOR_RESET}"
-                echo "Run ${COLOR_INFO}ssh-management help${COLOR_RESET} for usage information"
-                return 1
-            fi
-            ssha_menu
-            ;;
+    start) start_ssh_agent ;;
+    stop) stop_ssh_agent ;;
+    load) load_key ;;
+    unload) unload_key ;;
+    list) list_loaded_keys ;;
+    menu) ssha_menu ;;
+    help)
+        print_section "SSH Management Tool Help"
+        echo "${COLOR_INFO}Usage:${COLOR_RESET} ssh-management [command]"
+        echo
+        print_section "Available Commands"
+        echo "${COLOR_INFO}start${COLOR_RESET}    Start SSH agent"
+        echo "${COLOR_INFO}stop${COLOR_RESET}     Stop SSH agent"
+        echo "${COLOR_INFO}load${COLOR_RESET}     Load SSH key"
+        echo "${COLOR_INFO}unload${COLOR_RESET}   Unload SSH key"
+        echo "${COLOR_INFO}list${COLOR_RESET}     List loaded keys"
+        echo "${COLOR_INFO}menu${COLOR_RESET}     Show interactive menu"
+        echo "${COLOR_INFO}help${COLOR_RESET}     Show this help message"
+        ;;
+    *)
+        if [[ -n "$1" ]]; then
+            echo "${COLOR_ERROR}Unknown command: $1${COLOR_RESET}"
+            echo "Run ${COLOR_INFO}ssh-management help${COLOR_RESET} for usage information"
+            return 1
+        fi
+        ssha_menu
+        ;;
     esac
 }
 

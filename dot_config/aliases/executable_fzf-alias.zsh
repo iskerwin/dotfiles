@@ -5,12 +5,12 @@
 ##################################################
 
 # Dracula color palette
-HEADER_STYLE=$(echo -e "\033[1;38;5;141m")  # Purple
-NAME_STYLE=$(echo -e "\033[38;5;84m")       # Green
-ARROW_STYLE=$(echo -e "\033[38;5;212m")     # Pink
-CMD_STYLE=$(echo -e "\033[0m")              # Reset
-TYPE_STYLE=$(echo -e "\033[3;38;5;189m")    # Light Purple
-SEPARATOR_STYLE=$(echo -e "\033[38;5;61m")  # Dark Purple
+HEADER_STYLE=$(echo -e "\033[1;38;5;141m") # Purple
+NAME_STYLE=$(echo -e "\033[38;5;84m")      # Green
+ARROW_STYLE=$(echo -e "\033[38;5;212m")    # Pink
+CMD_STYLE=$(echo -e "\033[0m")             # Reset
+TYPE_STYLE=$(echo -e "\033[3;38;5;189m")   # Light Purple
+SEPARATOR_STYLE=$(echo -e "\033[38;5;61m") # Dark Purple
 
 ##################################################
 # Main Function                                  #
@@ -19,22 +19,22 @@ SEPARATOR_STYLE=$(echo -e "\033[38;5;61m")  # Dark Purple
 function alias_finder() {
     # Create a more unique temporary file with process ID
     local tmp_file="/tmp/fzf-alias-tmp.$$"
-    
+
     # Ensure cleanup on script exit
     trap "rm -f $tmp_file" EXIT INT TERM
-    
+
     local header_text="${HEADER_STYLE}
     ╭─────────────────────────────────────────────────╮
     │ Controls │ ENTER: input alias • CTRL-E: command │
     ╰─────────────────────────────────────────────────╯${CMD_STYLE}"
-    
+
     # Process and display aliases using awk
     alias | awk -v name_style="$NAME_STYLE" \
-                -v arrow_style="$ARROW_STYLE" \
-                -v cmd_style="$CMD_STYLE" \
-                -v type_style="$TYPE_STYLE" \
-                -v separator_style="$SEPARATOR_STYLE" \
-    '
+        -v arrow_style="$ARROW_STYLE" \
+        -v cmd_style="$CMD_STYLE" \
+        -v type_style="$TYPE_STYLE" \
+        -v separator_style="$SEPARATOR_STYLE" \
+        '
     BEGIN {
         FS="="
         # Refined category titles with consistent styling
