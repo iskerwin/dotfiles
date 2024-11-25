@@ -1,16 +1,52 @@
+# User Information
 [user]
-	name = {{ .name }}
-	email = {{ .email }}
+    name = {{ .name }}     # Your name will be used in commits
+    email = {{ .email }}   # Your email will be used in commits
+
+# Delta Configuration
+#[core]
+#    pager = delta          # Use delta as the default pager for diffs
+#
+#[interactive]
+#    diffFilter = delta --color-only    # Use delta in interactive mode
+#
+#[delta]
+#    navigate = true        # Enable navigation between diff sections using n and N
+#    dark = true           # Set dark theme (use light = true for light theme, or omit for auto)
+#
+#[merge]
+#    conflictstyle = zdiff3 # Use zdiff3 for better merge conflict resolution
+
+# Diff-so-fancy Configuration
 
 [core]
-    pager = delta
+    pager = diff-so-fancy | less --tabs=4 -RFX    # Use diff-so-fancy as pager with less options
 
 [interactive]
-    diffFilter = delta --color-only
+    diffFilter = diff-so-fancy --patch            # Use diff-so-fancy in interactive mode
 
-[delta]
-    navigate = true  # use n and N to move between diff sections
-    dark = true      # or light = true, or omit for auto-detection
+# Color Configuration (works with both delta and diff-so-fancy)
+[color]
+    ui = true                         # Enable colored output
 
-[merge]
-    conflictstyle = zdiff3
+[color "diff-highlight"]
+    oldNormal = red bold              # Style for removed lines
+    oldHighlight = red bold 52        # Style for removed words
+    newNormal = green bold            # Style for added lines
+    newHighlight = green bold 22      # Style for added words
+
+[color "diff"]
+    meta = 11                         # Style for meta information (file names)
+    frag = magenta bold               # Style for chunk headers
+    func = 146 bold                   # Style for function names
+    commit = yellow bold              # Style for commit hashes
+    old = red bold                    # Style for removed lines
+    new = green bold                  # Style for added lines
+    whitespace = red reverse          # Style for whitespace errors
+
+# Diff-so-fancy specific settings
+[diff-so-fancy]
+    markEmptyLines = false            # Don't mark empty lines with arrows
+    changeHunkIndicators = true       # Show indicators for changed hunks
+    stripLeadingSymbols = false       # Keep leading symbols in diffs
+    useUnicodeRuler = true            # Use Unicode characters for rulers
