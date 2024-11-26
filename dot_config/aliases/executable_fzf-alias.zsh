@@ -44,12 +44,12 @@ _generate_command_cache() {
         echo "${COLOR_SEPARATOR}╔════════════════════════════════════════ 󰘓 Aliases ═══════════════════════════════════════════╗${COLOR_CMD}"
         alias | awk -v name_color="$COLOR_NAME" -v arrow_color="$COLOR_ARROW" -v cmd_color="$COLOR_CMD" '
         {
-            split($0, parts, "=")
-            alias_name = parts[1]
-            sub(/^alias /, "", alias_name)
-            alias_value = parts[2]
-            gsub(/^[ \t"'\'']+|[ \t"'\'']+$/, "", alias_value)
-            printf("%s%-25s%s ➜ %s%s\n", name_color, alias_name, arrow_color, cmd_color, alias_value)
+        eq_pos = index($0, "=")
+        alias_name = substr($0, 1, eq_pos - 1)
+        sub(/^alias /, "", alias_name)
+        alias_value = substr($0, eq_pos + 1)
+        gsub(/^[ \t"'\'']+|[ \t"'\'']+$/, "", alias_value)
+        printf("%s%-25s%s ➜ %s%s\n", name_color, alias_name, arrow_color, cmd_color, alias_value)
         }'
         echo "${COLOR_SEPARATOR}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_CMD}"
 
