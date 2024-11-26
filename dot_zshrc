@@ -95,10 +95,15 @@ setopt PUSHD_TO_HOME              # Have pushd with no arguments act like 'pushd
 #================================================#
 
 # Source additional configuration files if they exist
-[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                     # Powerlevel10k configuration
-[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh               # FZF configuration
-[ -f ~/.config/aliases/alias.zsh ] && source ~/.config/aliases/alias.zsh     # Custom aliases
-[ -f ~/.config/git/fzf-git.zsh ] && source ~/.config/git/fzf-git.zsh         # Custom aliases
+[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                         # Powerlevel10k configuration
+[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh                   # FZF configuration
+[ -f ~/.config/git/fzf-git.zsh ] && source ~/.config/git/fzf-git.zsh             # Custom git log
+[ -f ~/.config/aliases/aliases.zsh ] && source ~/.config/aliases/aliases.zsh     # Custom aliases
+[ -f ~/.config/aliases/functions.zsh ] && source ~/.config/aliases/functions.zsh # Custom functions
 
 # Initialize zoxide - A smarter cd command
-eval "$(zoxide init zsh)"
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+else
+    echo "zoxide Not installed"
+fi

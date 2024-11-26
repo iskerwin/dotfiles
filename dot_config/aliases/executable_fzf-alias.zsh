@@ -1,142 +1,101 @@
 #!/usr/bin/env zsh
 
-##################################################
-# Style Configuration                            #
-##################################################
+# Color palette using ANSI 24-bit color
+COLOR_HEADER='\033[38;2;189;147;249m'     # Purple
+COLOR_NAME='\033[38;2;80;250;123m'        # Green
+COLOR_ARROW='\033[38;2;255;121;198m'      # Pink
+COLOR_CMD='\033[0m'                       # Default
+COLOR_SEPARATOR='\033[38;2;98;114;164m'   # Comment
+COLOR_FUNC='\033[38;2;241;250;140m'       # Yellow
 
-# Dracula color palette
-HEADER_STYLE=$(echo -e "\033[1;38;5;141m") # Purple
-NAME_STYLE=$(echo -e "\033[38;5;84m")      # Green
-ARROW_STYLE=$(echo -e "\033[38;5;212m")    # Pink
-CMD_STYLE=$(echo -e "\033[0m")             # Reset
-TYPE_STYLE=$(echo -e "\033[3;38;5;189m")   # Light Purple
-SEPARATOR_STYLE=$(echo -e "\033[38;5;61m") # Dark Purple
+# Configuration
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/command-finder"
+CACHE_FILE="$CONFIG_DIR/command_cache"
 
-##################################################
-# Main Function                                  #
-##################################################
+# Ensure the config directory exists
+mkdir -p "$CONFIG_DIR"
 
-function alias_finder() {
-    # Create a more unique temporary file with process ID
-    local tmp_file="/tmp/fzf-alias-tmp.$$"
+# Command descriptions
+typeset -A CMD_DESCRIPTIONS=(
+    [ip]="IP info (Usage: ip [internal | external])"
+    [srun]="Run the command in a new screen window"
+    [proxy]="Proxy settings (Usage: proxy [on|off])"
+    [czsync]="Execute the complete chezmoi sync workflow"
+    [sattach]="Smart screen session management tool"
+    [clean_ds]="Recursively clean .DS_Store (Usage: clean_ds [path])"
+    [portcheck]="Check host port (Usage: portcheck HOST [PORT])"
+    [install_missing]="Install missing packages using Homebrew"
+)
 
-    # Ensure cleanup on script exit
-    trap "rm -f $tmp_file" EXIT INT TERM
+# Check dependencies
+_check_dependencies() {
+    local deps=("fzf" "awk")
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" &> /dev/null; then
+            echo "${COLOR_ARROW}Error:${COLOR_CMD} $dep is required but not installed." >&2
+            return 1
+        fi
+    done
+}
 
-    local header_text="${HEADER_STYLE}
-    ╭─────────────────────────────────────────────────╮
-    │ Controls │ ENTER: input alias • CTRL-E: command │
-    ╰─────────────────────────────────────────────────╯${CMD_STYLE}"
+# Generate cache with colorized content
+_generate_command_cache() {
+    {
+        echo "${COLOR_SEPARATOR}╔════════════════════════════════════════ 󰘓 Aliases ═══════════════════════════════════════════╗${COLOR_CMD}"
+        alias | awk -v name_color="$COLOR_NAME" -v arrow_color="$COLOR_ARROW" -v cmd_color="$COLOR_CMD" '
+        {
+            split($0, parts, "=")
+            alias_name = parts[1]
+            sub(/^alias /, "", alias_name)
+            alias_value = parts[2]
+            gsub(/^[ \t"'\'']+|[ \t"'\'']+$/, "", alias_value)
+            printf("%s%-25s%s ➜ %s%s\n", name_color, alias_name, arrow_color, cmd_color, alias_value)
+        }'
+        echo "${COLOR_SEPARATOR}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_CMD}"
 
-    # Process and display aliases using awk
-    alias | awk -v name_style="$NAME_STYLE" \
-        -v arrow_style="$ARROW_STYLE" \
-        -v cmd_style="$CMD_STYLE" \
-        -v type_style="$TYPE_STYLE" \
-        -v separator_style="$SEPARATOR_STYLE" \
-        '
-    BEGIN {
-        FS="="
-        # Refined category titles with consistent styling
-        order[1] = "navigation"
-        order[2] = "system"
-        order[3] = "brew"
-        order[4] = "git"
-        order[5] = "ssh"
-        order[6] = "screen"
-        order[7] = "chezmoi"
-        order[8] = "misc"
-        
-        # Enhanced headers with decorative borders
-        headers["ssh"]        = "╔═════════════════════════════════════════ 󰣀 SSH Management ══════════════════════════════════════════╗"
-        headers["misc"]       = "╔═════════════════════════════════════════ 󰘓 Miscellaneous ═══════════════════════════════════════════╗"
-        headers["brew"]       = "╔═════════════════════════════════════════ 󱃖 Brew Management ═════════════════════════════════════════╗"
-        headers["git"]        = "╔══════════════════════════════════════════ 󰊢 git Management ═════════════════════════════════════════╗"
-        headers["screen"]     = "╔════════════════════════════════════════   Screen Management ═══════════════════════════════════════╗"
-        headers["system"]     = "╔════════════════════════════════════════ 󰜫 System Operations ════════════════════════════════════════╗"
-        headers["chezmoi"]    = "╔════════════════════════════════════════ 󰋊 Chezmoi Management ═══════════════════════════════════════╗"
-        headers["navigation"] = "╔═════════════════════════════════════════ 󰇐 File Navigation ═════════════════════════════════════════╗"
-    }
-    
-    function classify_command(cmd) {
-        if (cmd ~ /^(z|cd |ls|ll|la|tree|eza)/) return "navigation"
-        if (cmd ~ /^(ifconfig|curl|echo|nc|dig|export|unset|network|nexttrace|unproxy|proxy|function)/) return "system"
-        if (cmd ~ /(ssh|.ssh)/) return "ssh"
-        if (cmd ~ /(brew |update)/) return "brew"
-        if (cmd ~ /(git)/) return "git"
-        if (cmd ~ /screen/) return "screen"
-        if (cmd ~ /^(chezmoi |ch)/) return "chezmoi"
-        return "misc"
-    }
-    
-    function clean_quotes(str) {
-        # Remove only the outermost quotes if they match
-        if ((substr(str, 1, 1) == "\"" && substr(str, length(str), 1) == "\"") ||
-            (substr(str, 1, 1) == "\047" && substr(str, length(str), 1) == "\047")) {
-            return substr(str, 2, length(str) - 2)
-        }
-        return str
-    }
-    
-    !/^#/ {
-        # Get the alias name
-        name = $1
-        sub(/^alias /, "", name)
-        
-        # Get the command by joining all fields after the first =
-        command = ""
-        for(i=2; i<=NF; i++) {
-            if(i>2) command = command "="
-            command = command $i
-        }
-        
-        # Only remove leading/trailing whitespace and outermost quotes
-        gsub(/^[ \t]+|[ \t]+$/, "", command)
-        command = clean_quotes(command)
-        
-        type = classify_command(command)
-        entries[type] = entries[type] sprintf("%s%-20s%s ➜%s  %s\n", \
-            name_style, name, \
-            arrow_style, \
-            cmd_style, command)
-        types[type] = 1
-    }
-    
-    END {
-        # Output categories with bottom borders
-        for (i = 1; i <= length(order); i++) {
-            type = order[i]
-            if (types[type]) {
-                printf "%s%s%s\n%s%s╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝%s\n", \
-                    separator_style, \
-                    headers[type], \
-                    cmd_style, \
-                    entries[type], \
-                    separator_style, \
-                    cmd_style
-            }
-        }
-    }' | fzf \
+        echo "${COLOR_SEPARATOR}╔════════════════════════════════════════ 󰊕 Functions ═════════════════════════════════════════╗${COLOR_CMD}"
+        for key in "${(@k)CMD_DESCRIPTIONS}"; do
+            printf "${COLOR_FUNC}%-25s${COLOR_ARROW} ➜ ${COLOR_CMD}%s\n" "$key" "${CMD_DESCRIPTIONS[$key]}"
+        done
+        echo "${COLOR_SEPARATOR}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_CMD}"
+    } > "$CACHE_FILE"
+}
+
+# Main command finder
+command_finder() {
+    _check_dependencies || return 1
+    _generate_command_cache 
+
+    local tmp_file="$(mktemp)"
+    trap "rm -f $tmp_file" EXIT
+
+    local header_text="
+    ╭───────────────────────────────────────────────────────────╮
+    │ Controls │ ENTER: input command • CTRL-E: show definition │
+    ╰───────────────────────────────────────────────────────────╯"
+
+    cat "$CACHE_FILE" | fzf \
         --ansi \
+        --cycle \
         --reverse \
         --border double \
         --prompt ' 󰘧 ' \
         --pointer ' 󰮺' \
         --marker ' 󰄲' \
         --header "$header_text" \
+        --preview 'echo {}' \
         --preview-window "${PREVIEW_WINDOW_SIZE}:hidden" \
         --bind "ctrl-e:execute(echo -n {3..} | tr -d '\n' > $tmp_file)+abort" \
-        --bind "enter:execute(echo {1} | tr -d '\n' > $tmp_file)+abort" \
+        --bind "enter:execute(echo -n {1} > $tmp_file)+abort" \
         --color='bg+:#44475a,fg+:#f8f8f2,hl:#50fa7b,hl+:#50fa7b,border:#6272a4' \
         --color='header:#bd93f9,info:#50fa7b,prompt:#bd93f9,pointer:#ff79c6,marker:#ff79c6'
 
-    # Process selection with safer file handling
-    if [ -f "$tmp_file" ]; then
-        local result=$(cat "$tmp_file")
-        rm -f "$tmp_file"
+    if [[ -s "$tmp_file" ]]; then
+        local result
+        result=$(<"$tmp_file")
         print -z "$result"
     fi
 }
 
-# Execute the main function
-alias_finder
+# Run the command finder
+command_finder

@@ -1,0 +1,134 @@
+#!/bin/zsh
+
+#================================================#
+# File Navigation                                #
+#================================================#
+
+# Directory Navigation
+alias cd='z'
+alias home='cd ~'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias icloud='cd {{ .icloud }}'
+
+# Directory Listing (using eza/exa)
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --group-directories-first --icons --git --git-ignore'
+else
+    alias ls='ls --color=auto'
+fi
+
+alias l='ls -la'          # List all files including hidden
+alias l.='ls -ld .*'      # List only dotfiles
+alias lt='l -snew'        # Sort by modification time
+alias lz='l -ssize'       # Sort by size
+alias lx='l -sext'        # Sort by extension
+alias tree='eza --tree --level=2 --group-directories-first --icons --git-ignore'
+
+# Safe Operations
+alias rm='rm -i'   # Confirm before deleting
+alias cp='cp -i'   # Confirm before copying
+alias mv='mv -i'   # Confirm before moving
+
+#================================================#
+# System Operations                              #      
+#================================================#
+
+# Homebrew Package Management
+alias cleanup='brew cleanup'                                                       # Clean old versions
+alias install='proxy on && brew install'                                           # Install package
+alias uninstall='brew uninstall'                                                   # Remove package
+alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'                       # Check system
+alias update-cask='paroxy && brew cu -a -f -v --no-brew-update -y && brew cleanup' # Update all casks with non-official.
+alias brew-update='proxy on && brew update && brew upgrade && brew cleanup && brew doctor && proxy off'                                                                     
+alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'     # Backup brew packages
+alias brew-restore='brew bundle --file={{ .brewfile }}'                            # Restore brew packages
+
+# System Information
+alias nt='nexttrace'                                   # Visual traceroute tool                        
+alias ipw='function _ipw(){ curl ip.im/$1; };_ipw'     # IP where
+alias speed='networkQuality'                           # Network speed test
+alias netports="networksetup -listallhardwareports"    # List all network hardware ports
+alias digcheck="dig +nocmd +noall +answer"             # Detailed DNS query
+alias testinternet="curl -I"                           # testinternet
+alias weather='curl wttr.in/Guangzhou'                 # Show weather
+alias lsdev='ls /dev/cu.*'                             # List serial devices
+alias top='btop'                                       # A monitor of resources
+
+#================================================#
+# SSH Management                                 #
+#================================================#
+
+alias ssh='ct screen ssh'                         # SSH with screen support
+alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
+alias sshals='ps aux | grep ssh-agent'            # List SSH-agent process
+alias sshalk='ssh-add --apple-load-keychain'      # Load key with keychain
+alias sshags='eval "$(ssh-agent -s)"'             # Start SSH-agent
+
+#================================================#
+# Screen Management                              #
+#================================================#
+
+alias screen='ct screen'
+alias sn='screen -S'                              # Create/attach screen session
+alias sl='screen -ls'                             # List screen sessions
+alias sr='screen -r'                              # Reattach to screen
+alias sm='screen -DR main'                        # Main screen session
+alias sk='killall screen'                         # Kill all screens
+alias sd='screen -d'                              # Detach screen
+alias snw='screen -X screen'                      # New window in current session
+alias snd='screen -dm'                            # Create detached session
+alias console='screen -fn /dev/cu.BTConsole 9600' # # Connect to Bluetooth console (9600 baud rate)
+
+#================================================#
+# Miscellaneous                                  #
+#================================================#
+
+alias f='fzf'                                     # FZF
+alias g='git'                                     # Git
+alias lg='lazygit'                                # lazygit
+alias rz='source ~/.zshrc'                        # Reload zsh config
+alias af='source ~/.config/aliases/fzf-alias.zsh' # Aliases tool
+alias clr='clear'                                 # Clear
+alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
+
+#================================================#
+# Chezmoi Aliases                                #
+#================================================#
+
+# Core Commands
+alias cz='chezmoi'                 # Base command with shorter alias
+alias cza='cz add -v'              # Add files
+alias czd='cz diff -v'             # Show differences
+alias cze='cz edit'                # Edit files
+alias czp='cz apply -v'            # Apply changes
+alias czs='cz status'              # Show status
+alias czcd='cz cd'                 # Navigate to source directory
+
+# Extended Operations
+alias czf='cz apply --force'       # Force apply
+alias czr='cz re-add -v'           # Re-add files
+alias czea='cz edit --apply'       # Edit and apply
+alias czup='cz update -v'          # Update from source
+alias czug='cz upgrade'            # Upgrade chezmoi
+
+# Information & Debug
+alias czv='cz verify'              # Verify configuration
+alias czls='cz managed'            # List managed files
+alias czda='cz data'               # Show template data
+alias czdc='cz doctor'             # Check installation
+
+# Git Integration
+# Using czg prefix for consistency with git operations
+alias czg='cz git --'              # Git operations
+alias czga='czg add'               # Stage changes
+alias czgc='czg commit -m'         # Commit changes
+alias czgp='czg push'              # Push changes
+alias czgl='czg pull'              # Pull changes
+alias czgs='czg status'            # Git status
+
+# Common Workflows
+alias czap='cz add -v && cz apply -v'       # Add and apply
+alias czep='cz edit --apply && cz apply -v' # Edit and apply
