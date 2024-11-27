@@ -7,10 +7,14 @@ tap "homebrew/services"
 brew "bat"
 # Interface bandwidth monitor
 brew "bmon"
+# Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "btop"
 # Core application library for C
 brew "glib"
 # Manage your dotfiles across multiple diverse machines, securely
 brew "chezmoi"
+# Good-lookin' diffs with diff-highlight and more
+brew "diff-so-fancy"
 # Disk Usage/Free Utility - a better 'df' alternative
 brew "duf"
 # Program that can automate interactive applications
@@ -21,6 +25,8 @@ brew "eza"
 brew "fd"
 # Command-line fuzzy finder written in Go
 brew "fzf"
+# GitHub command-line tool
+brew "gh"
 # OpenType text shaping engine
 brew "harfbuzz"
 # OCR (Optical Character Recognition) engine
