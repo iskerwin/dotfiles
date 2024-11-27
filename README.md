@@ -3,7 +3,8 @@
 ├── dot_chromaterm.yml
 ├── dot_config
 │   ├── aliases
-│   │   ├── alias.zsh.tmpl
+│   │   ├── aliases.zsh.tmpl
+│   │   ├── executable_functions.zsh
 │   │   └── executable_fzf-alias.zsh
 │   ├── bat
 │   │   └── config
@@ -11,7 +12,6 @@
 │   │   └── Brewfile
 │   ├── btop
 │   │   ├── btop.conf
-│   │   ├── btop.log
 │   │   └── themes
 │   ├── chezmoi
 │   │   └── chezmoi.toml.tmpl
@@ -27,7 +27,7 @@
 │   │   ├── Default.json
 │   │   └── key.itermkeymap
 │   ├── lazygit
-│   │   └── empty_config.yml
+│   │   └── config.yml
 │   ├── script
 │   └── ssh
 │       ├── fzf-ssh-agent.zsh
