@@ -41,8 +41,8 @@ alias cleanup='brew cleanup'                                                    
 alias install='proxy on && brew install'                                           # Install package
 alias uninstall='brew uninstall'                                                   # Remove package
 alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'                       # Check system
-alias update-cask='paroxy && brew cu -a -f -v --no-brew-update -y && brew cleanup' # Update all casks with non-official.
-alias brew-update='proxy on && brew update && brew upgrade && brew cleanup && brew doctor && proxy off'                                                                     
+alias update-cask='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup' # Update all casks with non-official.
+alias brew-update='proxy on && brew doctor && brew update && brew upgrade && brew cleanup && proxy off'                                                                     
 alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'     # Backup brew packages
 alias brew-restore='brew bundle --file={{ .brewfile }}'                            # Restore brew packages
 
