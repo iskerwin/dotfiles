@@ -13,34 +13,40 @@ install_missing() {
 }
 
 clean_ds() {
-    # Check the fd command
-    if ! command -v fd &>/dev/null; then
-        echo "fd command not found. Installing..."
-        if command -v brew &>/dev/null; then
-            brew install fd
-        else
-            echo "Error: Homebrew not found. Please install Homebrew first."
-            echo "Visit https://brew.sh for installation instructions."
-            return 1
-        fi
-    fi
-
-    # Help info
+    # Help information
     if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-        echo "Usage: clean_ds [path]"
-        echo "Clean .DS_Store files recursively"
-        echo
+        echo "Usage: clean_ds [options]"
+        echo "Clean .DS_Store files safely using fd and safe-rm."
+        echo 
         echo "Options:"
-        echo "  path    Specify directory to clean (default: current directory)"
-        echo "  -h      Show this help message"
+        echo "  -h, --help    Show this help message"
+        echo "  --all         Clean .DS_Store files across the entire filesystem (requires sudo)"
         return 0
     fi
 
-    local target_dir="${1:-.}" # directory specified or default to the current directory
+    # Verify installation of fd and safe-rm tools.
+    if ! command -v fd &>/dev/null; then
+        echo "Error: 'fd' is not installed. Please install 'fd' to use this script."
+        return 1
+    fi
 
-    echo "Cleaning .DS_Store files in ${target_dir}..."
-    fd -H -I -t f ".DS_Store" "${target_dir}" --exec rm -f {}
-    echo "Clean complete!"
+    if ! command -v safe-rm &>/dev/null; then
+        echo "Error: 'safe-rm' is not installed. Please install 'safe-rm' to use this script."
+        return 1
+    fi
+
+    # Clean up the .DS_Store files in the current directory
+    echo "Using fd to clean .DS_Store files in the current directory..."
+    fd -H -I -t f ".DS_Store" . -X safe-rm
+
+    # If the --all parameter is specified, clean up the entire disk
+    if [[ "$1" == "--all" ]]; then
+        echo "Cleaning .DS_Store files across the entire filesystem. This requires sudo..."
+        sudo fd -H -I -t f ".DS_Store" / -X safe-rm
+        echo ".DS_Store file cleanup complete for the entire filesystem."
+    else
+        echo "Current directory cleanup complete."
+    fi
 }
 
 #================================================#
