@@ -4,8 +4,8 @@
 COLOR_HEADER='\033[38;2;189;147;249m'     # Purple
 COLOR_NAME='\033[38;2;80;250;123m'        # Green
 COLOR_ARROW='\033[38;2;255;121;198m'      # Pink
-COLOR_CMD='\033[0m'                       # Default
-COLOR_SEPARATOR='\033[38;2;98;114;164m'   # Comment
+COLOR_RESET='\033[0m'                     # Default
+COLOR_CMD='\033[38;2;98;114;164m'         # Comment
 COLOR_FUNC='\033[38;2;241;250;140m'       # Yellow
 
 # Configuration
@@ -17,13 +17,14 @@ mkdir -p "$CONFIG_DIR"
 
 # Command descriptions
 typeset -A CMD_DESCRIPTIONS=(
-    [ip]="IP info (Usage: ip [internal | external])"
-    [srun]="Run the command in a new screen window"
+    [ip]="IP info (Usage: ip [internal|external])"
+    [ipw]="IP where (Usage: ipw [HOST])"
+    [srun]="Run the command in a new screen window (Usage: srun [CMD])"
     [proxy]="Proxy settings (Usage: proxy [on|off])"
     [czsync]="Execute the complete chezmoi sync workflow"
     [sattach]="Smart screen session management tool"
-    [clean_ds]="Recursively clean .DS_Store (Usage: clean_ds [path])"
-    [portcheck]="Check host port (Usage: portcheck HOST [PORT])"
+    [clean_ds]="Recursively clean .DS_Store (Usage: clean_ds [PATH])"
+    [portcheck]="Check host port (Usage: portcheck [HOST] [PORT])"
     [install_missing]="Install missing packages using Homebrew"
 )
 
@@ -32,7 +33,7 @@ _check_dependencies() {
     local deps=("fzf" "awk")
     for dep in "${deps[@]}"; do
         if ! command -v "$dep" &> /dev/null; then
-            echo "${COLOR_ARROW}Error:${COLOR_CMD} $dep is required but not installed." >&2
+            echo "${COLOR_ARROW}Error:${COLOR_RESET} $dep is required but not installed." >&2
             return 1
         fi
     done
@@ -41,23 +42,23 @@ _check_dependencies() {
 # Generate cache with colorized content
 _generate_command_cache() {
     {
-        echo "${COLOR_SEPARATOR}╔════════════════════════════════════════ 󰘓 Aliases ═══════════════════════════════════════════╗${COLOR_CMD}"
-        alias | awk -v name_color="$COLOR_NAME" -v arrow_color="$COLOR_ARROW" -v cmd_color="$COLOR_CMD" '
+        echo "${COLOR_CMD}╔═════════════════════════════════════════════ 󰘓 Aliases ════════════════════════════════════════════════╗${COLOR_RESET}"
+        alias | awk -v name_color="$COLOR_NAME" -v arrow_color="$COLOR_ARROW" -v cmd_color="$COLOR_RESET" '
         {
         eq_pos = index($0, "=")
         alias_name = substr($0, 1, eq_pos - 1)
         sub(/^alias /, "", alias_name)
         alias_value = substr($0, eq_pos + 1)
         gsub(/^[ \t"'\'']+|[ \t"'\'']+$/, "", alias_value)
-        printf("%s%-25s%s ➜ %s%s\n", name_color, alias_name, arrow_color, cmd_color, alias_value)
+        printf("%s%-20s%s ➜ %s%s\n", name_color, alias_name, arrow_color, cmd_color, alias_value)
         }'
-        echo "${COLOR_SEPARATOR}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_CMD}"
+        echo "${COLOR_CMD}╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
 
-        echo "${COLOR_SEPARATOR}╔════════════════════════════════════════ 󰊕 Functions ═════════════════════════════════════════╗${COLOR_CMD}"
+        echo "${COLOR_CMD}╔═════════════════════════════════════════════ 󰊕 Functions ══════════════════════════════════════════════╗${COLOR_RESET}"
         for key in "${(@k)CMD_DESCRIPTIONS}"; do
-            printf "${COLOR_FUNC}%-25s${COLOR_ARROW} ➜ ${COLOR_CMD}%s\n" "$key" "${CMD_DESCRIPTIONS[$key]}"
+            printf "${COLOR_FUNC}%-20s${COLOR_ARROW} ➜ ${COLOR_RESET}%s\n" "$key" "${CMD_DESCRIPTIONS[$key]}"
         done
-        echo "${COLOR_SEPARATOR}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_CMD}"
+        echo "${COLOR_CMD}╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
     } > "$CACHE_FILE"
 }
 

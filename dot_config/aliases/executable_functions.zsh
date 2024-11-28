@@ -1,13 +1,14 @@
 #!/bin/zsh
 
 install_missing() {
-    local package=$1
-    if (( ${+commands[brew]} )); then
+    local package="${1:-}"
+    if command -v brew &>/dev/null; then
         echo "Installing $package..."
-        brew install $package
+        brew install "$package"
     else
         echo "Error: Homebrew not found. Please install Homebrew first."
         echo "Visit https://brew.sh for installation instructions."
+        return 1
     fi
 }
 
@@ -35,15 +36,15 @@ clean_ds() {
         return 0
     fi
 
-    local target_dir="${1:-.}"  # directory specified or default to the current directory
-    
+    local target_dir="${1:-.}" # directory specified or default to the current directory
+
     echo "Cleaning .DS_Store files in ${target_dir}..."
     fd -H -I -t f ".DS_Store" "${target_dir}" --exec rm -f {}
     echo "Clean complete!"
 }
 
 #================================================#
-# System Operations                              #      
+# System Operations                              #
 #================================================#
 
 portcheck() {
@@ -60,11 +61,20 @@ ip() {
     fi
 }
 
+ipw() {
+    local target="${1:-}"
+    if [[ -z "$target" ]]; then
+        curl -s ip.im
+    else
+        curl -s "ip.im/$target"
+    fi
+}
+
 proxy() {
     if [ "$1" = "on" ]; then
         export https_proxy=http://127.0.0.1:7890 \
-                http_proxy=http://127.0.0.1:7890 \
-                all_proxy=socks5://127.0.0.1:7890
+            http_proxy=http://127.0.0.1:7890 \
+            all_proxy=socks5://127.0.0.1:7890
         echo "Proxy enabled"
     elif [ "$1" = "off" ]; then
         unset https_proxy http_proxy all_proxy
@@ -80,7 +90,7 @@ proxy() {
 
 # Run command in new screen window
 srun() {
-    screen -dm bash -c "$*"
+    screen -dm bash -c "$@"
 }
 
 # An intelligent screen session management tool
@@ -107,7 +117,7 @@ sattach() {
 #================================================#
 
 # Full sync workflow
-czsync() {                                        
+czsync() {
     czg pull
     czp
     czg add -A
