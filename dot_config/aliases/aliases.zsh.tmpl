@@ -37,14 +37,22 @@ alias mv='mv -i'   # Confirm before moving
 #================================================#
 
 # Homebrew Package Management
-alias cleanup='brew cleanup'                                                       # Clean old versions
-alias install='proxy on && brew install'                                           # Install package
-alias uninstall='brew uninstall'                                                   # Remove package
-alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'                       # Check system
-alias update-cask='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup' # Update all casks with non-official.
+# > Clean old versions
+alias cleanup='brew cleanup'
+# > Install package
+alias install='proxy on && brew install'
+# > Remove package
+alias uninstall='brew uninstall'
+# > Check system
+alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'
+# > Update brew packages
 alias brew-update='proxy on && brew doctor && brew update && brew upgrade && brew cleanup && proxy off'                                                                     
-alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'     # Backup brew packages
-alias brew-restore='brew bundle --file={{ .brewfile }}'                            # Restore brew packages
+# > Backup brew packages
+alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'
+# > Restore brew packages
+alias brew-restore='brew bundle --file={{ .brewfile }}'
+# > Update all casks with non-official.
+alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off'
 
 # System Information
 alias nt='nexttrace'                                   # Visual traceroute tool                        

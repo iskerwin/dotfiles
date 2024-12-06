@@ -3,6 +3,7 @@ tap "buo/cask-upgrade"
 tap "danielgatis/imgcat"
 tap "homebrew/bundle"
 tap "homebrew/services"
+tap "mihomo-party-org/mihomo-party"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Interface bandwidth monitor
@@ -96,6 +97,8 @@ cask "iterm2"
 cask "jordanbaird-ice"
 # Utility to open, create and modify archive files
 cask "maczip"
+# Markdown editor
+cask "markedit"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
 # Utility to uninstall apps and remove leftover files from old/uninstalled apps
@@ -110,6 +113,8 @@ cask "reminders-menubar"
 cask "visual-studio-code"
 # Free messaging and calling application
 cask "wechat"
+# Network protocol analyzer
+cask "wireshark"
 vscode "adpyke.codesnap"
 vscode "amazonwebservices.codewhisperer-for-command-line-companion"
 vscode "christian-kohler.path-intellisense"
@@ -126,6 +131,7 @@ vscode "mhutchie.git-graph"
 vscode "ms-vscode-remote.remote-ssh"
 vscode "ms-vscode-remote.remote-ssh-edit"
 vscode "ms-vscode.remote-explorer"
+vscode "nguyenngoclong.terminal-keeper"
 vscode "oderwat.indent-rainbow"
 vscode "pkief.material-icon-theme"
 vscode "pomdtr.excalidraw-editor"
