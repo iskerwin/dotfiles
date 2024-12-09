@@ -46,7 +46,7 @@ alias uninstall='brew uninstall'
 # > Check system
 alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'
 # > Update brew packages
-alias brew-update='proxy on && brew doctor && brew update && brew upgrade && brew cleanup && proxy off'                                                                     
+alias brew-update='proxy on && brew doctor && brew update && brew upgrade && brew cleanup && proxy off'
 # > Backup brew packages
 alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'
 # > Restore brew packages
@@ -55,7 +55,7 @@ alias brew-restore='brew bundle --file={{ .brewfile }}'
 alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off'
 
 # System Information
-alias nt='nexttrace'                                   # Visual traceroute tool                        
+alias nt='nexttrace'                                   # Visual traceroute tool
 alias speed='networkQuality'                           # Network speed test
 alias netports="networksetup -listallhardwareports"    # List all network hardware ports
 alias digcheck="dig +nocmd +noall +answer"             # Detailed DNS query
