@@ -78,9 +78,9 @@ ipw() {
 
 proxy() {
     if [ "$1" = "on" ]; then
-        export https_proxy=http://127.0.0.1:7890 \
-            http_proxy=http://127.0.0.1:7890 \
-            all_proxy=socks5://127.0.0.1:7890
+        export https_proxy=http://127.0.0.1:6152 \
+            http_proxy=http://127.0.0.1:6152 \
+            all_proxy=socks5://127.0.0.1:6153
         echo "Proxy enabled"
     elif [ "$1" = "off" ]; then
         unset https_proxy http_proxy all_proxy
