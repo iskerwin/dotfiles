@@ -37,35 +37,32 @@ alias mv='mv -i'   # Confirm before moving
 #================================================#
 
 # Homebrew Package Management
-# > Clean old versions
-alias cleanup='brew cleanup'
-# > Install package
-alias install='proxy on && brew install'
-# > Remove package
-alias uninstall='brew uninstall'
-# > Check system
-alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'
-# > Update brew packages
-alias brew-update='proxy on && brew doctor && brew update && brew upgrade && brew cleanup && proxy off'
-# > Backup brew packages
-alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'
-# > Restore brew packages
-alias brew-restore='brew bundle --file={{ .brewfile }}'
-# > Update all casks with non-official.
-alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off'
+alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'    # Check system health
+alias cleanup='brew cleanup'                                    # Remove old versions
+alias install='proxy on && brew install'                        # Install packages with proxy
+alias uninstall='brew uninstall'                                # Remove packages
+# Homebrew Update Operations
+alias brew-update='proxy on && brew doctor && brew update && brew upgrade && brew cleanup && proxy off'  # Full system update
+alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off'   # Update all casks
+# Homebrew Backup & Restore
+alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'   # Export package list
+alias brew-restore='brew bundle --file={{ .brewfile }}'                          # Install from package list
 
 # System Information
-alias nt='nexttrace'                                       # Visual traceroute tool
-alias speed='networkQuality'                               # Network speed test
-alias netports="networksetup -listallhardwareports"        # List all network hardware ports
-alias digcheck="dig +nocmd +noall +answer"                 # Detailed DNS query
-alias show-route='netstat -rn'                             # Show routing table
-alias testinternet="curl -I"                               # testinternet
-alias show-interface='networksetup -listallhardwareports'  # List all network hardware ports
-alias weather='curl wttr.in/Guangzhou'                     # Show weather
+# Network Tools
+alias digcheck="dig +nocmd +noall +answer"                 # Detailed DNS lookup
+alias nt='nexttrace'                                       # Visual traceroute utility
+alias show-interface='networksetup -listallhardwareports'  # List network interfaces
+alias show-route='netstat -rn'                             # Display routing table
+alias show-ports="networksetup -listallhardwareports"      # Show hardware network ports
+alias test-internet="curl -I"                              # Check internet connectivity
+alias test-speed='networkQuality'                          # Run network speed test
+
+# System Monitoring
+alias top='btop'                                           # Enhanced system monitor
 alias lsdev='ls /dev/cu.*'                                 # List serial devices
-alias top='btop'                                           # A monitor of resources
-alias xa='xattr -cr'
+alias weather='curl wttr.in/Guangzhou'                     # Show weather forecast
+alias xa='xattr -cr'                                       # Remove extended attributes
 
 # > -清除从互联网下载的文件的隔离标志（quarantine flag）
 # > -移除文件上可能存在的安全性或来源相关的额外元数据
@@ -147,6 +144,6 @@ alias czgs='czg status'            # Git status
 # Common Workflows
 alias czap='cz add -v && cz apply -v'                           # Add and apply
 alias czep='cz edit --apply && cz apply -v'                     # Edit and apply
-alias code_task='cz re-add -v $HOME/Library/Application\ Support/Code/User/tasks.json'       # Re-add VSCode tasks
-alias code_set='cz re-add -v $HOME/Library/Application\ Support/Code/User/settings.json'     # Re-add VSCode settings
-alias code_key='cz re-add -v $HOME/Library/Application\ Support/Code/User/keybindings.json'  # Re-add VSCode keybindings
+alias code-task='cz re-add -v $HOME/Library/Application\ Support/Code/User/tasks.json'       # Re-add VSCode tasks
+alias code-set='cz re-add -v $HOME/Library/Application\ Support/Code/User/settings.json'     # Re-add VSCode settings
+alias code-key='cz re-add -v $HOME/Library/Application\ Support/Code/User/keybindings.json'  # Re-add VSCode keybindings
