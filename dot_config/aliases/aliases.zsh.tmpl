@@ -55,15 +55,18 @@ alias brew-restore='brew bundle --file={{ .brewfile }}'
 alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off'
 
 # System Information
-alias nt='nexttrace'                                   # Visual traceroute tool
-alias speed='networkQuality'                           # Network speed test
-alias netports="networksetup -listallhardwareports"    # List all network hardware ports
-alias digcheck="dig +nocmd +noall +answer"             # Detailed DNS query
-alias testinternet="curl -I"                           # testinternet
-alias weather='curl wttr.in/Guangzhou'                 # Show weather
-alias lsdev='ls /dev/cu.*'                             # List serial devices
-alias top='btop'                                       # A monitor of resources
+alias nt='nexttrace'                                       # Visual traceroute tool
+alias speed='networkQuality'                               # Network speed test
+alias netports="networksetup -listallhardwareports"        # List all network hardware ports
+alias digcheck="dig +nocmd +noall +answer"                 # Detailed DNS query
+alias show-route='netstat -rn'                             # Show routing table
+alias testinternet="curl -I"                               # testinternet
+alias show-interface='networksetup -listallhardwareports'  # List all network hardware ports
+alias weather='curl wttr.in/Guangzhou'                     # Show weather
+alias lsdev='ls /dev/cu.*'                                 # List serial devices
+alias top='btop'                                           # A monitor of resources
 alias xa='xattr -cr'
+
 # > -清除从互联网下载的文件的隔离标志（quarantine flag）
 # > -移除文件上可能存在的安全性或来源相关的额外元数据
 # > -解决某些因扩展属性导致的文件权限或运行问题
@@ -142,5 +145,8 @@ alias czgl='czg pull'              # Pull changes
 alias czgs='czg status'            # Git status
 
 # Common Workflows
-alias czap='cz add -v && cz apply -v'       # Add and apply
-alias czep='cz edit --apply && cz apply -v' # Edit and apply
+alias czap='cz add -v && cz apply -v'                           # Add and apply
+alias czep='cz edit --apply && cz apply -v'                     # Edit and apply
+alias code_task='cz re-add -v $HOME/Library/Application\ Support/Code/User/tasks.json'       # Re-add VSCode tasks
+alias code_set='cz re-add -v $HOME/Library/Application\ Support/Code/User/settings.json'     # Re-add VSCode settings
+alias code_key='cz re-add -v $HOME/Library/Application\ Support/Code/User/keybindings.json'  # Re-add VSCode keybindings

@@ -83,9 +83,12 @@
   "workbench.list.smoothScrolling": true,
   "git.ignoreRebaseWarning": true,
   "files.associations": {
-        "*.zsh.tmpl": "shellscript",
-        "*.toml.tmpl": "toml",
-        "*gitconfig.tmpl": "ini",
-        "config.tmpl": "ini"
+    "*.zsh.tmpl": "shellscript",
+    "*.toml.tmpl": "toml",
+    "*gitconfig.tmpl": "ini",
+    "config.tmpl": "ini"
+  },
+  "[properties]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
   }
 }
