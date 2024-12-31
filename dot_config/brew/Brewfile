@@ -4,6 +4,7 @@ tap "danielgatis/imgcat"
 tap "homebrew/bundle"
 tap "homebrew/services"
 tap "mihomo-party-org/mihomo-party"
+tap "persiliao/tap"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Interface bandwidth monitor
@@ -87,14 +88,16 @@ cask "dropbox"
 # Dictionary and translator app
 cask "easydict"
 cask "font-jetbrains-mono-nerd-font"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
 # Free and open-source media player
 cask "iina"
 # Tool for multi-language users
 cask "input-source-pro"
-# Terminal emulator as alternative to Apple's Terminal app
-cask "iterm2"
 # Menu bar manager
 cask "jordanbaird-ice"
+# Window manager
+cask "loop"
 # Utility to open, create and modify archive files
 cask "maczip"
 # Markdown editor
@@ -116,7 +119,6 @@ cask "wechat"
 # Network protocol analyzer
 cask "wireshark"
 vscode "adpyke.codesnap"
-vscode "amazonwebservices.codewhisperer-for-command-line-companion"
 vscode "christian-kohler.path-intellisense"
 vscode "dracula-theme.theme-dracula"
 vscode "dzhavat.bracket-pair-toggler"
@@ -124,10 +126,14 @@ vscode "esbenp.prettier-vscode"
 vscode "foxundermoon.shell-format"
 vscode "github.copilot"
 vscode "github.copilot-chat"
+vscode "github.vscode-github-actions"
 vscode "jamiewoodio.cisco"
 vscode "jinliming2.vscode-go-template"
 vscode "kisstkondoros.vscode-gutter-preview"
 vscode "mhutchie.git-graph"
+vscode "ms-python.debugpy"
+vscode "ms-python.python"
+vscode "ms-python.vscode-pylance"
 vscode "ms-vscode-remote.remote-ssh"
 vscode "ms-vscode-remote.remote-ssh-edit"
 vscode "ms-vscode.remote-explorer"
