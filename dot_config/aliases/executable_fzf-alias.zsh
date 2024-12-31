@@ -42,7 +42,7 @@ _check_dependencies() {
 # Generate cache with colorized content
 _generate_command_cache() {
     {
-        echo "${COLOR_CMD}╔═════════════════════════════════════════════ 󰘓 Aliases ════════════════════════════════════════════════╗${COLOR_RESET}"
+        echo "${COLOR_CMD}╔════════════════════════════════════════ 󰘓 Aliases ═══════════════════════════════════════════╗${COLOR_RESET}"
         alias | awk -v name_color="$COLOR_NAME" -v arrow_color="$COLOR_ARROW" -v cmd_color="$COLOR_RESET" '
         {
         eq_pos = index($0, "=")
@@ -52,13 +52,13 @@ _generate_command_cache() {
         gsub(/^[ \t"'\'']+|[ \t"'\'']+$/, "", alias_value)
         printf("%s%-20s%s ➜ %s%s\n", name_color, alias_name, arrow_color, cmd_color, alias_value)
         }'
-        echo "${COLOR_CMD}╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
+        echo "${COLOR_CMD}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
 
-        echo "${COLOR_CMD}╔═════════════════════════════════════════════ 󰊕 Functions ══════════════════════════════════════════════╗${COLOR_RESET}"
+        echo "${COLOR_CMD}╔════════════════════════════════════════ 󰊕 Functions ═════════════════════════════════════════╗${COLOR_RESET}"
         for key in "${(@k)CMD_DESCRIPTIONS}"; do
             printf "${COLOR_FUNC}%-20s${COLOR_ARROW} ➜ ${COLOR_RESET}%s\n" "$key" "${CMD_DESCRIPTIONS[$key]}"
         done
-        echo "${COLOR_CMD}╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
+        echo "${COLOR_CMD}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
     } > "$CACHE_FILE"
 }
 
