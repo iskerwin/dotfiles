@@ -112,6 +112,8 @@ cask "pictogram"
 cask "raycast"
 # Simple menu bar app to view and interact with reminders
 cask "reminders-menubar"
+# Messaging app with a focus on speed and security
+cask "telegram"
 # Open-source code editor
 cask "visual-studio-code"
 # Free messaging and calling application
