@@ -141,7 +141,54 @@ alias czgp='czg push'              # Push changes
 alias czgl='czg pull'              # Pull changes
 alias czgs='czg status'            # Git status
 
-# Common Workflows
+#================================================#
+# Battery Management                             #
+#================================================#
+
+# Battery status and logs
+alias bst='battery status'
+alias blog='battery logs'
+
+# Battery maintenance
+alias bm='battery maintain'
+alias bm80='battery maintain 80'      # Maintained at 80%, suitable for long-term plug-in use
+alias bm60='battery maintain 60'      # Maintained at 60%, suitable for long-term plug-in use
+alias bmstop='battery maintain stop'  # Stop maintenance mode
+
+# Voltage maintenance
+alias bmv='battery maintain'               # Voltage maintenance mode
+alias bm115='battery maintain 11.5V 0.2V'  # Maintained at 11.5V, with a fluctuation range of 0.2V
+alias bm114='battery maintain 11.4V 0.2V'  # Maintained at 11.4V, with a fluctuation range of 0.2V
+
+# Charging control
+alias bc='battery charging'
+alias bcon='battery charging on'
+alias bcoff='battery charging off'
+
+# Adapter control
+alias ba='battery adapter'
+alias baon='battery adapter on'
+alias baoff='battery adapter off'
+
+# Battery level management
+alias bch='battery charge'         # Charge to specified level
+alias bch90='battery charge 90'    # Charge to 90%
+alias bch80='battery charge 80'    # Charge to 80%
+
+# Battery discharge
+alias bd='battery discharge'       # Discharge to specified level
+alias bd40='battery discharge 40'  # Discharge to 40%
+
+# Maintenance and updates
+alias bup='battery update'         # Update tool
+alias bcal='battery calibrate'     # Battery calibration
+alias brein='battery reinstall'    # Reinstall
+alias buninst='battery uninstall'  # Uninstall tool
+
+#================================================#
+# Common Workflows                              #
+#================================================#
+
 alias czap='cz add -v && cz apply -v'                           # Add and apply
 alias czep='cz edit --apply && cz apply -v'                     # Edit and apply
 alias re-add-brewfile='cz re-add -v {{ .brewfile }}'            # Re-add Brewfile
