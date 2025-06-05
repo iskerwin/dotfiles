@@ -7,6 +7,11 @@
 # - Automated agent management
 # - Command-line and interactive modes
 
+# 直接运行脚本或使用无参数命令
+# ssha-management
+# 或
+#ssha
+
 #================================================#
 # Base Configuration                             #
 #================================================#

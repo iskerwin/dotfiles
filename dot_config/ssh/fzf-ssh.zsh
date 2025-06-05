@@ -1,4 +1,8 @@
 # ZSH Plugin for SSH with FZF integration
+# 使用 SSH 命令时按 Tab 触发 FZF 选择器
+# ssh \<Tab>
+# 或者直接使用函数
+# _fzf_complete_ssh
 
 #================================================#
 # Core SSH functionality                         #
