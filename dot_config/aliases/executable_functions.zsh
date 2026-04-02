@@ -21,33 +21,60 @@ install_missing() {
 #================================================#
 
 clean_ds() {
-    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
         echo "Usage: clean_ds [options]"
         echo "Clean .DS_Store files safely using fd and safe-rm."
         echo
         echo "Options:"
         echo "  -h, --help    Show this help message"
+        echo "  --current     Clean .DS_Store files in the current directory"
         echo "  --all         Clean .DS_Store files across the entire filesystem (requires sudo)"
         return 0
     fi
-
+ 
     if ! command -v fd &>/dev/null; then
         install_missing fd || return 1
     fi
-
+ 
     if ! command -v safe-rm &>/dev/null; then
         install_missing safe-rm || return 1
     fi
-
-    echo "Cleaning .DS_Store files in the current directory..."
-    fd -H -I -t f ".DS_Store" . -X safe-rm
-
-    if [[ "$1" == "--all" ]]; then
-        echo "Cleaning .DS_Store files across the entire filesystem (requires sudo)..."
-        sudo fd -H -I -t f ".DS_Store" / -X safe-rm
-        echo "Filesystem-wide cleanup complete."
+ 
+    if [[ "$1" == "--current" ]]; then
+        local files
+        files=$(fd -H -I -t f ".DS_Store" .)
+        if [[ -z "$files" ]]; then
+            echo "No .DS_Store files found in current directory."
+            return 0
+        fi
+        echo "Files to be removed:"
+        echo "$files"
+        echo
+        read "confirm?Clean all of the above? [y/N] "
+        [[ "$confirm" =~ ^[Yy]$ ]] || return 0
+        echo "$files" | xargs safe-rm 2>&1 | grep -v "^$"
+        echo "Done."
+ 
+    elif [[ "$1" == "--all" ]]; then
+        local files
+        echo "Scanning filesystem (this may take a while)..."
+        files=$(sudo fd -H -I -t f ".DS_Store" / 2>/dev/null)
+        if [[ -z "$files" ]]; then
+            echo "No .DS_Store files found."
+            return 0
+        fi
+        echo "Files to be removed:"
+        echo "$files"
+        echo
+        read "confirm?Clean all of the above? [y/N] "
+        [[ "$confirm" =~ ^[Yy]$ ]] || return 0
+        echo "$files" | xargs sudo safe-rm 2>&1 | grep -v "^$"
+        echo "Done."
+ 
     else
-        echo "Current directory cleanup complete."
+        echo "Unknown option: $1"
+        echo "Run 'clean_ds --help' for usage."
+        return 1
     fi
 }
 

@@ -17,7 +17,7 @@ mkdir -p "$CONFIG_DIR"
 
 # Command descriptions
 typeset -A CMD_DESCRIPTIONS=(
-    [ipw]="IP info (Usage: ip [internal|external|local|query <ip>])"
+    [ip]="IP info (Usage: ip [internal|external|local|query <ip>])"
     [srun]="Run the command in a new screen window (Usage: srun [CMD])"
     [proxy]="Proxy settings (Usage: proxy [on|off|status])"
     [czsync]="Execute the complete chezmoi sync workflow"
