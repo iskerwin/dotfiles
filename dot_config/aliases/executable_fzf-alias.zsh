@@ -17,13 +17,12 @@ mkdir -p "$CONFIG_DIR"
 
 # Command descriptions
 typeset -A CMD_DESCRIPTIONS=(
-    [ip]="IP info (Usage: ip [internal|external])"
-    [ipw]="IP where (Usage: ipw [HOST])"
+    [ipw]="IP info (Usage: ip [internal|external|local|query <ip>])"
     [srun]="Run the command in a new screen window (Usage: srun [CMD])"
-    [proxy]="Proxy settings (Usage: proxy [on|off])"
+    [proxy]="Proxy settings (Usage: proxy [on|off|status])"
     [czsync]="Execute the complete chezmoi sync workflow"
     [sattach]="Smart screen session management tool"
-    [clean_ds]="Recursively clean .DS_Store (Usage: clean_ds [PATH])"
+    [clean_ds]="Recursively clean .DS_Store (Usage: clean_ds [--all])"
     [portcheck]="Check host port (Usage: portcheck [HOST] [PORT])"
     [install_missing]="Install missing packages using Homebrew"
 )
@@ -41,34 +40,36 @@ _check_dependencies() {
 
 # Generate cache with colorized content
 _generate_command_cache() {
-    {
-        echo "${COLOR_CMD}╔════════════════════════════════════════ 󰘓 Aliases ═══════════════════════════════════════════╗${COLOR_RESET}"
-        alias | awk -v name_color="$COLOR_NAME" -v arrow_color="$COLOR_ARROW" -v cmd_color="$COLOR_RESET" '
+    if [[ "$1" == "--refresh" || ! -f "$CACHE_FILE" ]]; then
         {
-        eq_pos = index($0, "=")
-        alias_name = substr($0, 1, eq_pos - 1)
-        sub(/^alias /, "", alias_name)
-        alias_value = substr($0, eq_pos + 1)
-        gsub(/^[ \t"'\'']+|[ \t"'\'']+$/, "", alias_value)
-        printf("%s%-20s%s ➜ %s%s\n", name_color, alias_name, arrow_color, cmd_color, alias_value)
-        }'
-        echo "${COLOR_CMD}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
+            echo "${COLOR_CMD}╔════════════════════════════════════════ 󰘓 Aliases ═══════════════════════════════════════════╗${COLOR_RESET}"
+            alias | awk -v name_color="$COLOR_NAME" -v arrow_color="$COLOR_ARROW" -v cmd_color="$COLOR_RESET" '
+            {
+            eq_pos = index($0, "=")
+            alias_name = substr($0, 1, eq_pos - 1)
+            sub(/^alias /, "", alias_name)
+            alias_value = substr($0, eq_pos + 1)
+            gsub(/^[ \t"'\'']+|[ \t"'\'']+$/, "", alias_value)
+            printf("%s%-20s%s ➜ %s%s\n", name_color, alias_name, arrow_color, cmd_color, alias_value)
+            }'
+            echo "${COLOR_CMD}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
 
-        echo "${COLOR_CMD}╔════════════════════════════════════════ 󰊕 Functions ═════════════════════════════════════════╗${COLOR_RESET}"
-        for key in "${(@k)CMD_DESCRIPTIONS}"; do
-            printf "${COLOR_FUNC}%-20s${COLOR_ARROW} ➜ ${COLOR_RESET}%s\n" "$key" "${CMD_DESCRIPTIONS[$key]}"
-        done
-        echo "${COLOR_CMD}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
-    } > "$CACHE_FILE"
+            echo "${COLOR_CMD}╔════════════════════════════════════════ 󰊕 Functions ═════════════════════════════════════════╗${COLOR_RESET}"
+            for key in "${(@k)CMD_DESCRIPTIONS}"; do
+                printf "${COLOR_FUNC}%-20s${COLOR_ARROW} ➜ ${COLOR_RESET}%s\n" "$key" "${CMD_DESCRIPTIONS[$key]}"
+            done
+            echo "${COLOR_CMD}╚══════════════════════════════════════════════════════════════════════════════════════════════╝${COLOR_RESET}"
+        } > "$CACHE_FILE"
+    fi
 }
 
 # Main command finder
 command_finder() {
     _check_dependencies || return 1
-    _generate_command_cache 
+    _generate_command_cache
 
     local tmp_file="$(mktemp)"
-    trap "rm -f $tmp_file" EXIT
+    trap "rm -f $tmp_file" RETURN
 
     local header_text="
     ╭───────────────────────────────────────────────────────────╮
@@ -85,7 +86,7 @@ command_finder() {
         --marker ' 󰄲' \
         --header "$header_text" \
         --preview 'echo {}' \
-        --preview-window "${PREVIEW_WINDOW_SIZE}:hidden" \
+        --preview-window "right:40%:hidden" \
         --bind "ctrl-e:execute(echo -n {3..} | tr -d '\n' > $tmp_file)+abort" \
         --bind "enter:execute(echo -n {1} > $tmp_file)+abort" \
         --color='bg+:#44475a,fg+:#f8f8f2,hl:#50fa7b,hl+:#50fa7b,border:#6272a4' \

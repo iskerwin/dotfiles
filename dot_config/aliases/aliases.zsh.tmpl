@@ -105,7 +105,7 @@ alias rz='source ~/.zshrc'                        # Reload zsh config
 alias af='source ~/.config/aliases/fzf-alias.zsh' # Aliases tool
 alias clr='clear'                                 # Clear
 alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
-
+alias cf='_generate_command_cache --refresh && command_finder' # Clear `fzf-alias.zsh` cache
 #================================================#
 # Chezmoi Aliases                                #
 #================================================#
