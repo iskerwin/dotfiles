@@ -100,6 +100,7 @@ setopt PUSHD_TO_HOME              # Have pushd with no arguments act like 'pushd
 [ -f ~/.config/git/fzf-git.zsh ] && source ~/.config/git/fzf-git.zsh             # Custom git log
 [ -f ~/.config/aliases/aliases.zsh ] && source ~/.config/aliases/aliases.zsh     # Custom aliases
 [ -f ~/.config/aliases/functions.zsh ] && source ~/.config/aliases/functions.zsh # Custom functions
+[ -f ~/.config/command-finder/command-finder.plugin.zsh ] && source ~/.config/command-finder/command-finder.plugin.zsh
 
 # Initialize zoxide - A smarter cd command
 if command -v zoxide >/dev/null 2>&1; then
