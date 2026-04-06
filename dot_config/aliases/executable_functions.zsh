@@ -4,7 +4,9 @@
 # Package Management                             #
 #================================================#
 
-# Package Management
+# @desc: Install a missing package via Homebrew
+# @tag: brew, package, install
+# @usage: install_missing <package>
 install_missing() {
     local package="${1:?'Error: package name required'}"
     if command -v brew &>/dev/null; then
@@ -21,7 +23,9 @@ install_missing() {
 # File Cleanup                                   #
 #================================================#
 
-# Clean .DS_Store files safely using fd and safe-rm.
+# @desc: Clean .DS_Store files safely using fd and safe-rm
+# @tag: cleanup, ds_store, macos
+# @usage: clean_ds [--current | --all | -h | --help]
 clean_ds() {
     if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
         echo "Usage: clean_ds [options]"
@@ -84,7 +88,9 @@ clean_ds() {
 # System Operations                              #
 #================================================#
 
-# Usage: portcheck <host> [port]
+# @desc: Check if a host is reachable on a given port using netcat
+# @tag: network, port, connectivity
+# @usage: portcheck <host> [port]
 portcheck() {
     if [[ -z "$1" ]]; then
         echo "Usage: portcheck <host> [port]"
@@ -93,7 +99,9 @@ portcheck() {
     nc -zv "$1" "${2:-80}"
 }
 
-# Usage: proxy [on|off|status]
+# @desc: Enable, disable, or check the status of the system HTTP/SOCKS proxy
+# @tag: network, proxy
+# @usage: proxy [on | off | status]
 proxy() {
     case "$1" in
         on)
@@ -119,7 +127,9 @@ proxy() {
     esac
 }
 
-# Usage: ip [internal|external|local|query <ip>]
+# @desc: Display internal, external, or local IP info; or query a specific IP address
+# @tag: network, ip, ifconfig
+# @usage: ip [internal | external | local | query <ip>]
 ip() {
     case "$1" in
         internal)
@@ -170,12 +180,16 @@ ip() {
 # Screen Session Management                      #
 #================================================#
 
-# Run a command in a new detached screen window
+# @desc: Run a command in a new detached GNU screen session
+# @tag: screen, session, background
+# @usage: srun <command>
 srun() {
     screen -dm bash -c "$*"
 }
 
-# Intelligently attach to a screen session
+# @desc: Intelligently attach to an existing screen session, or create one named "main"
+# @tag: screen, session, attach
+# @usage: sattach
 sattach() {
     if screen -ls | grep -q "[0-9]\..*"; then
         if [[ "$(screen -ls | grep -c "[0-9]\\..*")" -eq 1 ]]; then
@@ -193,7 +207,9 @@ sattach() {
 # Chezmoi                                        #
 #================================================#
 
-# Full sync workflow
+# @desc: Full chezmoi sync workflow: pull, apply, stage all changes, commit with timestamp, and push
+# @tag: chezmoi, dotfiles, sync, git
+# @usage: czsync
 czsync() {
     czg pull && \
     czp && \

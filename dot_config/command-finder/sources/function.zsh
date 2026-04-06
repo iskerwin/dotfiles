@@ -5,31 +5,50 @@ cf::source_function() {
   [[ -f "$file" ]] || return
 
   awk '
-  /^[[:space:]]*#/ {
-    last_comment = substr($0, index($0, "#") + 2)
+  /^[[:space:]]*#[[:space:]]*@desc:/ {
+    sub(/^[[:space:]]*#[[:space:]]*@desc:[[:space:]]*/, "")
+    desc = $0
     next
   }
 
-  /^[a-zA-Z0-9_]+[[:space:]]*\(\)/ {
-    name = $0
-    sub(/[[:space:]]*\(.*/, "", name)
-    print name "\t" last_comment
-    last_comment = ""
+  /^[[:space:]]*#[[:space:]]*@usage:/ {
+    sub(/^[[:space:]]*#[[:space:]]*@usage:[[:space:]]*/, "")
+    usage = $0
+    next
   }
 
-  /^function[[:space:]]+[a-zA-Z0-9_]+/ {
+  /^[[:space:]]*#[[:space:]]*@tag:/ {
+    sub(/^[[:space:]]*#[[:space:]]*@tag:[[:space:]]*/, "")
+    tag = $0
+    next
+  }
+
+  /^[[:space:]]*#/ {
+    next
+  }
+
+  /^[a-zA-Z0-9_-]+[[:space:]]*\(\)/ {
+    name = $0
+    sub(/[[:space:]]*\(.*/, "", name)
+    printf "%s\t%s\t%s\t%s\n", name, desc, usage, tag
+    desc = ""; usage = ""; tag = ""
+    next
+  }
+
+  /^function[[:space:]]+[a-zA-Z0-9_-]+/ {
     name = $0
     sub(/^function[[:space:]]+/, "", name)
     sub(/[[:space:]]*\(.*/, "", name)
-    print name "\t" last_comment
-    last_comment = ""
+    printf "%s\t%s\t%s\t%s\n", name, desc, usage, tag
+    desc = ""; usage = ""; tag = ""
+    next
   }
 
-  !/^[[:space:]]*#/ && !/^[a-zA-Z0-9_]/ && !/^function[[:space:]]/ {
-    last_comment = ""
+  /^[^#]/ {
+    desc = ""; usage = ""; tag = ""
   }
   ' "$file" |
-  while IFS=$'\t' read -r name desc; do
-    cf::format_row 1000 "$name" "$desc" "function"
+  while IFS=$'\t' read -r name desc usage tag; do
+    cf::format_row 1000 "$name" "$desc" "function" "$usage" "$tag"
   done
 }

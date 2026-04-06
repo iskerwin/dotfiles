@@ -1,12 +1,10 @@
 #command-finder/sources/alias.zsh
 
 cf::source_alias() {
-  alias | while read -r line; do
-    local name=${line%%=*}
-    local value=${line#*=}
-    value=${value#\'}
-    value=${value%\'}
+  local name value
 
-    cf::format_row 2000 "$name" "$value" "alias"
+  for name value in ${(kv)aliases}; do
+    value=${value//$'\n'/ }
+    cf::format_row 2000 "$name" "$value" "alias" "" ""
   done
 }

@@ -16,6 +16,6 @@ cf::source_history() {
   sort -rn |
   head -5 |
   while IFS=$'\t' read -r count cmd; do
-    cf::format_row "$((3000 + count))" "$cmd" "used ${count}x" "history"
+    cf::format_row "$((3000 + count))" "$cmd" "used ${count}x" "history" "" ""
   done
 }
