@@ -4,6 +4,7 @@
 # Package Management                             #
 #================================================#
 
+# Package Management
 install_missing() {
     local package="${1:?'Error: package name required'}"
     if command -v brew &>/dev/null; then
@@ -20,6 +21,7 @@ install_missing() {
 # File Cleanup                                   #
 #================================================#
 
+# Clean .DS_Store files safely using fd and safe-rm.
 clean_ds() {
     if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
         echo "Usage: clean_ds [options]"
@@ -82,6 +84,7 @@ clean_ds() {
 # System Operations                              #
 #================================================#
 
+# Usage: portcheck <host> [port]
 portcheck() {
     if [[ -z "$1" ]]; then
         echo "Usage: portcheck <host> [port]"
@@ -90,6 +93,7 @@ portcheck() {
     nc -zv "$1" "${2:-80}"
 }
 
+# Usage: proxy [on|off|status]
 proxy() {
     case "$1" in
         on)
@@ -115,6 +119,7 @@ proxy() {
     esac
 }
 
+# Usage: ip [internal|external|local|query <ip>]
 ip() {
     case "$1" in
         internal)

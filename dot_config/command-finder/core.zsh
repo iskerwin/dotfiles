@@ -1,4 +1,5 @@
 #command-finder/core.zsh
+
 command_finder() {
   emulate -L zsh
 

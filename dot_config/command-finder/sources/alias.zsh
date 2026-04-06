@@ -1,4 +1,5 @@
 #command-finder/sources/alias.zsh
+
 cf::source_alias() {
   alias | while read -r line; do
     local name=${line%%=*}

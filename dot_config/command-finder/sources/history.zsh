@@ -1,4 +1,5 @@
 #command-finder/sources/history.zsh
+
 cf::history_add() {
   local file=$(cf::history_file)
   mkdir -p "${file:h}"

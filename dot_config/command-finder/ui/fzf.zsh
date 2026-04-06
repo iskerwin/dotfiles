@@ -1,4 +1,5 @@
 #command-finder/ui/fzf.zsh
+
 cf::fzf() {
   local header="
   ╭───────────────────────────────────────╮

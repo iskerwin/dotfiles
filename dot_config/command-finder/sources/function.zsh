@@ -1,4 +1,5 @@
 #command-finder/sources/function.zsh
+
 cf::source_function() {
   local file="$HOME/.config/aliases/functions.zsh"
   [[ -f "$file" ]] || return
