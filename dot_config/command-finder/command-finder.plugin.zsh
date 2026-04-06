@@ -1,3 +1,4 @@
+#command-finder/command-finder.plugin.zsh
 (( $+commands[fzf] )) || return
 
 source "${0:A:h}/lib/utils.zsh"

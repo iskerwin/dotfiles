@@ -1,21 +1,30 @@
+#command-finder/ui/fzf.zsh
 cf::fzf() {
+  local header="
+  ╭───────────────────────────────────────╮
+  │  󰋚 History    Aliases   󰊕 Functions  │ 
+  │  ENTER:insert • CTRL-E:expand alias   │ 
+  ╰───────────────────────────────────────╯"
   fzf \
     --ansi \
     --cycle \
     --height=80% \
+    --prompt ' 󰘧 ' \
     --layout=reverse \
     --border=rounded \
     --delimiter=$'\t' \
     --with-nth=2 \
+    --expect='ctrl-e' \
     --preview 'type={5}; if [[ "$type" == "history" ]]; then echo ""; else echo {4}; fi' \
     --preview-window=down:3:wrap \
-    --header 'History / Aliases / Functions'
+    --header "$header"
 }
 
 cf::render() {
   local width="$1"
+  local alias_width="$2"
 
-  awk -F '\t' -v w="$width" '
+  awk -F '\t' -v w="$width" -v aw="$alias_width" '
   BEGIN {
     purple = "\033[38;2;189;147;249m"   # #bd93f9  history
     orange = "\033[38;2;255;184;108m"   # #ffb86c  alias
@@ -38,11 +47,15 @@ cf::render() {
       icon  = "󰋚 "
     }
 
+    if (type == "history" && length(name) > aw) {
+      name = substr(name, 1, aw - 1) "…"
+    }
+
     if (desc == "") {
       if (type == "function") {
-        display = sprintf("%s%s%s%-*s %sNo description%s", color, icon, reset, w, name, gray, reset)
+        display = sprintf("%s%s%s%-*s %s→ %sNo description%s", color, icon, reset, w, name, pink, gray, reset)
       } else {
-          display = sprintf("%s%s%s%-*s%s", color, icon, reset, w, name, reset)
+        display = sprintf("%s%s%s%-*s%s", color, icon, reset, w, name, reset)
       }
     } else {
       display = sprintf("%s%s%s%-*s %s→ %s%s%s", color, icon, reset, w, name, pink, gray, desc, reset)

@@ -1,3 +1,4 @@
+#command-finder/sources/history.zsh
 cf::history_add() {
   local file=$(cf::history_file)
   mkdir -p "${file:h}"
@@ -10,8 +11,10 @@ cf::source_history() {
   local file=$(cf::history_file)
   [[ -f "$file" ]] || return
 
-  awk '{count[$0]++} END {
-    for (cmd in count)
-      printf "%d\t%s\t\thistory\n", 3000 + count[cmd], cmd
-  }' "$file"
+  awk '{count[$0]++} END {for (cmd in count) print count[cmd] "\t" cmd}' "$file" |
+  sort -rn |
+  head -5 |
+  while IFS=$'\t' read -r count cmd; do
+    cf::format_row "$((3000 + count))" "$cmd" "used ${count}x" "history"
+  done
 }

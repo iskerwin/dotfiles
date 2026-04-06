@@ -1,3 +1,4 @@
+#command-finder/lib/utils.zsh
 cf::require() {
   (( $+commands[$1] ))
 }

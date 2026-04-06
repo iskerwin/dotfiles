@@ -1,3 +1,4 @@
+#command-finder/sources/function.zsh
 cf::source_function() {
   local file="$HOME/.config/aliases/functions.zsh"
   [[ -f "$file" ]] || return
@@ -23,7 +24,6 @@ cf::source_function() {
     last_comment = ""
   }
 
-  # 非注释非函数定义的行，清空 last_comment
   !/^[[:space:]]*#/ && !/^[a-zA-Z0-9_]/ && !/^function[[:space:]]/ {
     last_comment = ""
   }
