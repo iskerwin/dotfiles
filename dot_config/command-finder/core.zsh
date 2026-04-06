@@ -1,59 +1,30 @@
 command_finder() {
-    emulate -L zsh
-    setopt extendedglob
+  emulate -L zsh
 
-    cf::require fzf || return 1
+  local input result cmd
 
-    local CF_HISTORY="$HOME/.config/command-finder/history"
-    mkdir -p "${CF_HISTORY:h}"
+  input=$(
+    cf::source_history
+    cf::source_alias
+    cf::source_function
+  )
 
-    cf::get_widths
+local sorted width
+sorted=$(print -r -- "$input" | sort -t $'\t' -k1,1nr)
+width=$(print -r -- "$sorted" | awk -F '\t' '{l=length($2); if(l>m) m=l} END{print m}')
+input=$(print -r -- "$sorted" | cf::render "$width")
 
-    local history_block
+  result=$(print -r -- "$input" | cf::fzf)
+  [[ -z "$result" ]] && return
 
-    if [[ -f "$CF_HISTORY" ]]; then
-        history_block=$(
-            cf::rank_history < "$CF_HISTORY" |
-            sort -nr |
-            while IFS=$'\t' read -r count cmd; do
-                cf::format_row "$cmd" "history" "used $count times" 1
-            done
-        )
-    fi
+  # 取 raw 字段（第3列）
+  cmd=$(print -r -- "$result" | cut -f3)
 
-    local result
+  cf::history_add "$cmd"
 
-    local input
-
-    input=$(
-        {
-            cf::header "󰋚 History" "$CF_COLOR_HEADER_HISTORY"
-            print "$history_block" | sort -t $'\t' -k1,1n -k2,2
-
-            cf::header " Aliases" "$CF_COLOR_HEADER_ALIAS"
-            cf::parse_aliases
-
-            cf::header "󰊕 Functions" "$CF_COLOR_HEADER_FUNC"
-            cf::parse_functions
-        }
-    )
-
-    result=$(print -r -- "$input" | cf::fzf)
-
-    [[ -z "$result" ]] && return
-    [[ "$result" == __HEADER__* ]] && return
-
-    local cmd_name
-    cmd_name=${result%%$'\t'*}
-    cmd_name=${cmd_name//$'\033'[\[\(][0-9\;]##[a-zA-Z]/}
-    cmd_name=${cmd_name%%[[:space:]]#}
-
-    echo "$cmd_name" >> "$CF_HISTORY"
-    tail -n 1000 "$CF_HISTORY" > "$CF_HISTORY.tmp" && command mv -f "$CF_HISTORY.tmp" "$CF_HISTORY"
-z
-    if [[ -n $ZLE ]]; then
-        LBUFFER+="$cmd_name"
-    else
-        print -z "$cmd_name"
-    fi
+  if [[ -n $ZLE ]]; then
+    LBUFFER+="$cmd"
+  else
+    print -z "$cmd"
+  fi
 }
