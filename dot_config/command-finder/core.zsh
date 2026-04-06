@@ -3,8 +3,11 @@
 command_finder() {
   emulate -L zsh
 
-  local input result cmd
+  if [[ -n $ZLE ]]; then
+    zle -R "  loading..."
+  fi
 
+  local input result cmd
   input=$(
     cf::source_history
     cf::source_alias
@@ -47,6 +50,12 @@ command_finder() {
     else
       return
     fi
+  elif [[ "$key" == "ctrl-y" ]]; then
+    if [[ "$type" == "alias" ]]; then
+      cmd="$desc"
+    fi
+    print -r -- "$cmd" | pbcopy
+    return
   fi
 
   cf::history_add "$cmd"

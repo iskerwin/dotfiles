@@ -2,10 +2,10 @@
 
 cf::fzf() {
   local header="
-  ╭───────────────────────────────────────╮
-  │  󰋚 History    Aliases   󰊕 Functions  │ 
-  │  ENTER:insert • CTRL-E:expand alias   │ 
-  ╰───────────────────────────────────────╯"
+  ╭────────────────────────────••─────────────────────────────╮
+  │  󰋚 History              Aliases             󰊕 Functions  │ 
+  │  ENTER:insert • CTRL-E:expand alias • CTRL-Y:copy command │ 
+  ╰────────────────────────────••─────────────────────────────╯"
   fzf \
     --ansi \
     --cycle \
@@ -15,8 +15,8 @@ cf::fzf() {
     --border=rounded \
     --delimiter=$'\t' \
     --with-nth=2 \
-    --expect='ctrl-e' \
-    --preview 'type={5}; if [[ "$type" == "history" ]]; then echo ""; else echo {4}; fi' \
+    --expect='ctrl-e,ctrl-y' \
+    --preview 'type={5}; if [[ "$type" == "history" ]]; then echo ""; elif [[ "$type" == "alias" ]]; then echo {4} | bat --language=zsh --style=plain --color=always; else echo {4}; fi' \
     --preview-window=down:3:wrap \
     --header "$header"
 }
