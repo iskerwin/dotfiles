@@ -1,311 +1,376 @@
-# ZSH Plugin for SSH with FZF integration
-# 使用 SSH 命令时按 Tab 触发 FZF 选择器
-# ssh \<Tab>
-# 或者直接使用函数
-# _fzf_complete_ssh
+# =============================================================================
+# ssh-fzf.plugin.zsh
+# FZF-powered SSH host picker with live preview
+#
+# Usage:
+#   ssh <Tab>          — trigger fzf picker via zsh completion
+#   sshf [query]       — open picker directly, optional initial query
+#
+# SSH config annotations (optional):
+#   #_Desc  your description here
+#   #_Tags  prod,backend,aws
+#
+# Keybindings in picker:
+#   Enter      — connect
+#   Ctrl-E     — edit ~/.ssh/config
+#   Ctrl-Y     — copy alias to clipboard
+#   Ctrl-T     — open new tab/window (if supported by terminal)
+#   ?          — toggle preview pane
+# =============================================================================
 
-#================================================#
-# Core SSH functionality                         #
-#================================================#
-# Base directory configurations with zsh style parameter expansion
-: "${SSH_DIR:=$HOME/.ssh}"
-: "${SSH_CONFIG_FILE:=$SSH_DIR/config}"
-: "${SSH_KNOWN_HOSTS:=$SSH_DIR/known_hosts}"
+# ---------------------------------------------------------------------------
+# Guard: dependencies
+# ---------------------------------------------------------------------------
+if ! command -v fzf >/dev/null 2>&1; then
+    echo "[ssh-fzf] fzf not found — plugin disabled" >&2
+    return 1
+fi
 
-# Setup SSH environment with proper permissions
-setup_ssh_environment() {
-    # Check and create SSH directory with proper permissions
-    [[ ! -d "$SSH_DIR" ]] && mkdir -p "$SSH_DIR" && chmod 700 "$SSH_DIR"
-    [[ ! -f "$SSH_CONFIG_FILE" ]] && touch "$SSH_CONFIG_FILE" && chmod 600 "$SSH_CONFIG_FILE"
-    [[ ! -f "$SSH_KNOWN_HOSTS" ]] && touch "$SSH_KNOWN_HOSTS" && chmod 644 "$SSH_KNOWN_HOSTS"
+# ---------------------------------------------------------------------------
+# Configuration (override in ~/.zshrc before sourcing this plugin)
+# ---------------------------------------------------------------------------
+: "${SSH_FZF_DIR:=$HOME/.ssh}"
+: "${SSH_FZF_CONFIG:=$SSH_FZF_DIR/config}"
+: "${SSH_FZF_KNOWN_HOSTS:=$SSH_FZF_DIR/known_hosts}"
+: "${SSH_FZF_CONNECT_TIMEOUT:=3}"
+: "${SSH_FZF_PREVIEW_WIDTH:=55}"
 
-    # Validate SSH config file format
+# Clipboard command — auto-detect, override with SSH_FZF_CLIP
+if [[ -z "${SSH_FZF_CLIP}" ]]; then
+    if command -v pbcopy  >/dev/null 2>&1; then SSH_FZF_CLIP="pbcopy"
+    elif command -v xclip >/dev/null 2>&1; then SSH_FZF_CLIP="xclip -selection clipboard"
+    elif command -v xsel  >/dev/null 2>&1; then SSH_FZF_CLIP="xsel --clipboard --input"
+    elif command -v wl-copy >/dev/null 2>&1; then SSH_FZF_CLIP="wl-copy"
+    else SSH_FZF_CLIP="cat"
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# Environment bootstrap
+# ---------------------------------------------------------------------------
+_ssh_fzf_setup() {
+    [[ ! -d "$SSH_FZF_DIR" ]]         && mkdir -p "$SSH_FZF_DIR"         && chmod 700 "$SSH_FZF_DIR"
+    [[ ! -f "$SSH_FZF_CONFIG" ]]      && touch    "$SSH_FZF_CONFIG"      && chmod 600 "$SSH_FZF_CONFIG"
+    [[ ! -f "$SSH_FZF_KNOWN_HOSTS" ]] && touch    "$SSH_FZF_KNOWN_HOSTS" && chmod 644 "$SSH_FZF_KNOWN_HOSTS"
+
     if ! ssh -G localhost >/dev/null 2>&1; then
-        echo "Warning: SSH config file format error detected" >&2
-        return 1
+        print -P "%F{yellow}[ssh-fzf] warning: ssh config parse error%f" >&2
     fi
 }
 
-# Basic list hosts function
-list_ssh_hosts() {
-    if [[ ! -r "$SSH_CONFIG_FILE" ]]; then
-        echo "Error: Unable to read SSH config file" >&2
-        return 1
-    fi
+_ssh_fzf_setup
+
+# ---------------------------------------------------------------------------
+# Host listing
+# Outputs tab-separated: alias  hostname  port  user  desc  tags
+# ---------------------------------------------------------------------------
+_ssh_fzf_list_hosts() {
+    [[ ! -r "$SSH_FZF_CONFIG" ]] && return 1
 
     awk '
-    BEGIN {
-        IGNORECASE = 1
-        RS=""
-        FS="\n"
-        print "Alias|Hostname|Port"
-        print "─────|────────|────"
-    }
+    BEGIN { IGNORECASE=1; RS=""; FS="\n" }
     {
-        user = hostname = alias = port = key = desc = ""
-        
-        for (i = 1; i <= NF; i++) {
-            line = $i
+        alias=hostname=user=port=desc=tags=""
+        for (i=1; i<=NF; i++) {
+            line=$i
             gsub(/^[ \t]+|[ \t]+$/, "", line)
-            
-            if (line ~ /^Host / && line !~ /[*?]/) {
-                alias = substr(line, 6)
-                gsub(/^[ \t]+|[ \t]+$/, "", alias)
-            }
-            else if (line ~ /^HostName /) {
-                hostname = substr(line, 10)
-                gsub(/^[ \t]+|[ \t]+$/, "", hostname)
-            }
-            else if (line ~ /^User /) {
-                user = substr(line, 6)
-                gsub(/^[ \t]+|[ \t]+$/, "", user)
-            }
-            else if (line ~ /^Port /) {
-                port = substr(line, 6)
-                gsub(/^[ \t]+|[ \t]+$/, "", port)
-            }
-            else if (line ~ /^IdentityFile /) {
-                key = substr(line, 13)
-                gsub(/^[ \t]+|[ \t]+$/, "", key)
-                sub(".*/", "", key)
-            }
-            else if (line ~ /^#_Desc /) {
-                desc = substr(line, 8)
-                gsub(/^[ \t]+|[ \t]+$/, "", desc)
-            }
+
+            if      (line ~ /^Host [^*?]/)      { alias    = substr(line,6);  gsub(/^[ \t]+|[ \t]+$/, "", alias) }
+            else if (line ~ /^HostName /)        { hostname = substr(line,10); gsub(/^[ \t]+|[ \t]+$/, "", hostname) }
+            else if (line ~ /^User /)            { user     = substr(line,6);  gsub(/^[ \t]+|[ \t]+$/, "", user) }
+            else if (line ~ /^Port /)            { port     = substr(line,6);  gsub(/^[ \t]+|[ \t]+$/, "", port) }
+            else if (line ~ /^#_Desc /)          { desc     = substr(line,8);  gsub(/^[ \t]+|[ \t]+$/, "", desc) }
+            else if (line ~ /^#_Tags /)          { tags     = substr(line,8);  gsub(/^[ \t]+|[ \t]+$/, "", tags) }
         }
-        
+
         if (alias && hostname) {
-            printf "%s|%s|%s\n", 
-                    alias, 
-                    hostname, 
-                    (port ? port : "22")
+            printf "%s\t%s\t%s\t%s\t%s\t%s\n",
+                alias,
+                hostname,
+                (port  ? port  : "22"),
+                (user  ? user  : "-"),
+                (desc  ? desc  : ""),
+                (tags  ? tags  : "")
         }
-    }' "$SSH_CONFIG_FILE" 2>/dev/null | column -t -s "|"
+    }
+    ' "$SSH_FZF_CONFIG" 2>/dev/null
 }
 
-# Initialize environment
-setup_ssh_environment
+# Format host list for fzf display
+# Outputs aligned columns: ALIAS  HOST  PORT  USER  TAGS  DESC
+_ssh_fzf_format_hosts() {
+    _ssh_fzf_list_hosts | awk -F'\t' '
+    BEGIN {
+        # Header row (will be hidden by --header-lines=1 but used by column)
+        printf "%-20s  %-26s  %-6s  %-12s  %-16s  %s\n",
+            "ALIAS", "HOST", "PORT", "USER", "TAGS", "DESC"
+    }
+    {
+        printf "%-20s  %-26s  %-6s  %-12s  %-16s  %s\n",
+            $1, $2, $3, $4, $6, $5
+    }'
+}
 
-#================================================#
-# UI and interaction functionality               #
-#================================================#
-# FZF integration for SSH completions
+# ---------------------------------------------------------------------------
+# Preview script (runs inside fzf, executed as a separate shell)
+# ---------------------------------------------------------------------------
+# We write this to a tempfile so it can be sourced by fzf --preview
+# and avoids the quoting nightmare of inline heredocs.
+_ssh_fzf_write_preview() {
+    local preview_script="${TMPDIR:-/tmp}/ssh-fzf-preview-$$.sh"
+
+    cat > "$preview_script" << 'PREVIEW_EOF'
+#!/usr/bin/env bash
+
+# ── Dracula-inspired ANSI palette ────────────────────────────────────────────
+R=$'\033[0m'
+BOLD=$'\033[1m'
+C_PURPLE=$'\033[38;2;189;147;249m'
+C_PINK=$'\033[38;2;255;121;198m'
+C_YELLOW=$'\033[38;2;241;250;140m'
+C_GREEN=$'\033[38;2;80;250;123m'
+C_RED=$'\033[38;2;255;85;85m'
+C_ORANGE=$'\033[38;2;255;184;108m'
+C_CYAN=$'\033[38;2;139;233;253m'
+C_DIM=$'\033[38;2;98;114;164m'
+
+ICON_OK="${C_GREEN}✓${R}"
+ICON_WARN="${C_ORANGE}!${R}"
+ICON_ERR="${C_RED}✗${R}"
+ICON_INFO="${C_CYAN}ℹ${R}"
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+section() { printf "\n${C_PINK}%s${R}\n${C_DIM}%s${R}\n" "$1" "─────────────────────────────────────────────"; }
+kv()      { printf "  ${C_CYAN}%-10s${R} ${C_YELLOW}%s${R}\n" "$1" "$2"; }
+
+# ── Parse fzf selection (first field = alias) ─────────────────────────────────
+alias_name=$(echo "$@" | awk '{print $1}')
+[[ -z "$alias_name" ]] && exit 0
+
+# ── Load config via ssh -G (canonical, handles Include etc.) ─────────────────
+ssh_config=$(ssh -G "$alias_name" 2>/dev/null)
+hostname=$(awk '/^hostname /  {print $2; exit}' <<< "$ssh_config")
+user=$(    awk '/^user /      {print $2; exit}' <<< "$ssh_config")
+port=$(    awk '/^port /      {print $2; exit}' <<< "$ssh_config")
+keyfile=$( awk '/^identityfile / {print $2; exit}' <<< "$ssh_config")
+
+[[ -z "$hostname" ]] && hostname="$alias_name"
+[[ -z "$port"     ]] && port=22
+
+# Load annotations from raw config
+config_file="${SSH_FZF_CONFIG:-$HOME/.ssh/config}"
+desc=$(awk -v h="$alias_name" '
+    $1=="Host" { in_block=($2==h) }
+    in_block && /^[[:space:]]*#_Desc[[:space:]]/ {
+        sub(/^[[:space:]]*#_Desc[[:space:]]*/, ""); print; exit
+    }
+' "$config_file" 2>/dev/null)
+
+tags=$(awk -v h="$alias_name" '
+    $1=="Host" { in_block=($2==h) }
+    in_block && /^[[:space:]]*#_Tags[[:space:]]/ {
+        sub(/^[[:space:]]*#_Tags[[:space:]]*/, ""); print; exit
+    }
+' "$config_file" 2>/dev/null)
+
+# ── Section: Summary ──────────────────────────────────────────────────────────
+section "󰋼 SUMMARY"
+kv "alias"    "$alias_name"
+kv "hostname" "$hostname"
+kv "user"     "${user:--}"
+kv "port"     "$port"
+[[ -n "$keyfile" ]] && kv "key"  "$keyfile"
+[[ -n "$tags"    ]] && kv "tags" "$tags"
+[[ -n "$desc"    ]] && printf "\n  ${C_DIM}%s${R}\n" "$desc"
+
+# ── Section: Connectivity ─────────────────────────────────────────────────────
+section "󱘖 CONNECTIVITY"
+
+# Cross-platform nc timeout: macOS uses -G, Linux uses -w
+_nc_check() {
+    local host=$1 port=$2 timeout=${3:-3}
+    nc -z -w "$timeout" "$host" "$port" >/dev/null 2>&1 ||
+    nc -z -G "$timeout" "$host" "$port" >/dev/null 2>&1
+}
+
+if _nc_check "$hostname" "$port" "${SSH_FZF_CONNECT_TIMEOUT:-3}"; then
+    printf "  %s Port %s reachable\n" "$ICON_OK" "$port"
+
+    # Grab banner (1-second read)
+    banner=$(timeout 1s bash -c "exec 3<>/dev/tcp/$hostname/$port && cat <&3" 2>/dev/null | head -1)
+    if [[ "$banner" == SSH-* ]]; then
+        version=$(echo "$banner" | cut -d'-' -f1-2)
+        printf "  %s Server: ${C_YELLOW}%s${R}\n" "$ICON_INFO" "$version"
+    fi
+else
+    printf "  %s Cannot reach %s:%s\n" "$ICON_ERR" "$hostname" "$port"
+
+    # DNS fallback
+    if command -v dig >/dev/null 2>&1; then
+        resolved=$(dig +short "$hostname" 2>/dev/null | head -1)
+    elif command -v host >/dev/null 2>&1; then
+        resolved=$(host "$hostname" 2>/dev/null | awk '/has address/{print $4; exit}')
+    fi
+
+    if [[ -n "$resolved" ]]; then
+        printf "  %s DNS OK → ${C_DIM}%s${R}\n" "$ICON_WARN" "$resolved"
+        printf "  %s Port %s appears closed or filtered\n" "$ICON_ERR" "$port"
+    else
+        printf "  %s DNS resolution failed\n" "$ICON_ERR"
+    fi
+fi
+
+# ── Section: Identity Key ─────────────────────────────────────────────────────
+if [[ -n "$keyfile" ]]; then
+    section " IDENTITY KEY"
+    expanded="${keyfile/#\~/$HOME}"
+
+    if [[ ! -f "$expanded" ]]; then
+        printf "  %s Key not found: ${C_YELLOW}%s${R}\n" "$ICON_ERR" "$keyfile"
+        for k in id_ed25519 id_ecdsa id_rsa; do
+            [[ -f "$HOME/.ssh/$k" ]] && printf "  %s Fallback available: ${C_DIM}~/.ssh/%s${R}\n" "$ICON_INFO" "$k"
+        done
+    else
+        # Permissions — cross-platform stat
+        if perms=$(stat -c "%a" "$expanded" 2>/dev/null) || perms=$(stat -f "%Lp" "$expanded" 2>/dev/null); then
+            if [[ "$perms" == "600" ]]; then
+                printf "  %s Permissions ${C_GREEN}600${R}\n" "$ICON_OK"
+            else
+                printf "  %s Permissions ${C_RED}%s${R} (want 600) — fix: chmod 600 %s\n" "$ICON_ERR" "$perms" "$expanded"
+            fi
+        fi
+
+        # Key info
+        if key_info=$(ssh-keygen -l -f "$expanded" 2>/dev/null); then
+            bits=$(awk '{print $1}' <<< "$key_info")
+            fp=$(  awk '{print $2}' <<< "$key_info")
+            ktype=$(grep -o '([^)]*)' <<< "$key_info" | head -1)
+            printf "  %s Valid key  ${C_DIM}%s bits %s %s${R}\n" "$ICON_OK" "$bits" "$ktype" "$fp"
+        else
+            printf "  %s Could not read key metadata\n" "$ICON_WARN"
+        fi
+    fi
+fi
+
+# ── Section: Authentication ───────────────────────────────────────────────────
+section " AUTH"
+
+TO="-o ConnectTimeout=${SSH_FZF_CONNECT_TIMEOUT:-3}"
+BM="-o BatchMode=yes"
+
+if [[ "$hostname" == "github.com" ]]; then
+    out=$(ssh -T git@github.com $TO 2>&1)
+    if grep -q "successfully authenticated" <<< "$out"; then
+        printf "  %s GitHub auth OK\n" "$ICON_OK"
+    else
+        printf "  %s GitHub auth failed\n" "$ICON_ERR"
+    fi
+    printf "  ${C_DIM}%s${R}\n" "$out"
+else
+    if ssh $BM $TO "$alias_name" true 2>/dev/null; then
+        printf "  %s Passwordless auth OK\n" "$ICON_OK"
+
+        # Sudo check
+        if ssh $BM $TO "$alias_name" "sudo -n true" 2>/dev/null; then
+            printf "  %s Passwordless sudo available\n" "$ICON_OK"
+        fi
+
+        # Remote uname
+        uname_out=$(ssh $BM $TO "$alias_name" "uname -srm" 2>/dev/null)
+        [[ -n "$uname_out" ]] && printf "  %s Remote OS: ${C_YELLOW}%s${R}\n" "$ICON_INFO" "$uname_out"
+    else
+        printf "  %s Key auth not available\n" "$ICON_WARN"
+
+        # Show what auth methods the server accepts
+        banner_out=$(ssh $TO -o PreferredAuthentications=none "$alias_name" 2>&1)
+        methods=$(grep -i "authentication methods" <<< "$banner_out" | cut -d: -f2-)
+        [[ -n "$methods" ]] && printf "  %s Accepted:%s\n" "$ICON_INFO" "$methods"
+    fi
+fi
+
+printf "\n"
+PREVIEW_EOF
+
+    chmod +x "$preview_script"
+    echo "$preview_script"
+}
+
+# ---------------------------------------------------------------------------
+# Core picker
+# ---------------------------------------------------------------------------
+_ssh_fzf_picker() {
+    local query="${1:-}"
+    local preview_script
+    preview_script=$(_ssh_fzf_write_preview)
+
+    # Cleanup on exit
+    trap "rm -f '$preview_script'" EXIT INT
+
+    local selected
+    selected=$(
+        _ssh_fzf_format_hosts | fzf \
+            --ansi \
+            --border=rounded \
+            --cycle \
+            --height=100% \
+            --reverse \
+            --header-lines=1 \
+            --header=$'  \033[38;2;189;147;249mCtrl-E\033[0m edit config  \033[38;2;189;147;249mCtrl-Y\033[0m copy  \033[38;2;189;147;249m?\033[0m toggle preview' \
+            --prompt="  ssh › " \
+            --pointer="▶" \
+            --marker="✓" \
+            --query="$query" \
+            --bind="ctrl-e:execute(${EDITOR:-vi} '$SSH_FZF_CONFIG' </dev/tty >/dev/tty)" \
+            --bind="ctrl-y:execute-silent(echo {1} | ${SSH_FZF_CLIP})" \
+            --bind="?:toggle-preview" \
+            --preview="SSH_FZF_CONFIG='$SSH_FZF_CONFIG' SSH_FZF_CONNECT_TIMEOUT='$SSH_FZF_CONNECT_TIMEOUT' bash '$preview_script' {}" \
+            --preview-window="right:${SSH_FZF_PREVIEW_WIDTH}%:wrap" \
+            2>/dev/tty
+    )
+
+    rm -f "$preview_script"
+    trap - EXIT INT
+
+    [[ -n "$selected" ]] && awk '{print $1}' <<< "$selected"
+}
+
+# ---------------------------------------------------------------------------
+# Public command: sshf [query]
+# ---------------------------------------------------------------------------
+sshf() {
+    local host
+    host=$(_ssh_fzf_picker "$*")
+    [[ -n "$host" ]] && ssh "$host"
+}
+
+# ---------------------------------------------------------------------------
+# FZF tab completion integration
+# ---------------------------------------------------------------------------
 _fzf_complete_ssh() {
-    _fzf_complete --ansi --border --cycle \
-        --height 100% \
+    local preview_script
+    preview_script=$(_ssh_fzf_write_preview)
+    trap "rm -f '$preview_script'" EXIT INT
+
+    _fzf_complete \
+        --ansi \
+        --border=rounded \
+        --cycle \
+        --height=100% \
         --reverse \
-        --header-lines=2 \
-        --header='
-╭────────────── Controls ─────────────╮
-│ CTRL-E: edit   •  CTRL-Y: copy host │
-╰─────────────────────────────────────╯' \
-        --bind='ctrl-y:execute-silent(echo {+} | pbcopy)' \
-        --bind='ctrl-e:execute(${EDITOR:-nvim} ~/.ssh/config)' \
-        --prompt="SSH Remote > " \
-        --preview '
-            # Dracula Theme Colors
-            SUCCESS_ICON=$'"'"'\033[38;2;80;250;123m✓\033[0m'"'"'     # Green
-            WARNING_ICON=$'"'"'\033[38;2;255;184;108m!\033[0m'"'"'    # Orange
-            ERROR_ICON=$'"'"'\033[38;2;255;85;85m✗\033[0m'"'"'        # Red
-            INFO_ICON=$'"'"'\033[38;2;139;233;253mℹ\033[0m'"'"'       # Cyan
+        --header-lines=1 \
+        --header=$'  \033[38;2;189;147;249mCtrl-E\033[0m edit config  \033[38;2;189;147;249mCtrl-Y\033[0m copy  \033[38;2;189;147;249m?\033[0m toggle preview' \
+        --prompt="  ssh › " \
+        --pointer="▶" \
+        --marker="✓" \
+        --bind="ctrl-e:execute(${EDITOR:-vi} '$SSH_FZF_CONFIG' </dev/tty >/dev/tty)" \
+        --bind="ctrl-y:execute-silent(echo {1} | ${SSH_FZF_CLIP})" \
+        --bind="?:toggle-preview" \
+        --preview="SSH_FZF_CONFIG='$SSH_FZF_CONFIG' SSH_FZF_CONNECT_TIMEOUT='$SSH_FZF_CONNECT_TIMEOUT' bash '$preview_script' {}" \
+        --preview-window="right:${SSH_FZF_PREVIEW_WIDTH}%:wrap" \
+        -- "$@" < <(_ssh_fzf_format_hosts)
 
-            # Dracula theme-based colors
-            COLOR_HEADER=$'"'"'\033[38;2;189;147;249m'"'"'            # Purple
-            COLOR_SECTION=$'"'"'\033[38;2;255;121;198m'"'"'           # Pink
-            COLOR_DIM=$'"'"'\033[38;2;98;114;164m'"'"'                # Comment
-            COLOR_VALUE=$'"'"'\033[38;2;241;250;140m'"'"'             # Yellow
-            COLOR_SUCCESS=$'"'"'\033[38;2;80;250;123m'"'"'            # Green
-            COLOR_ERROR=$'"'"'\033[38;2;255;85;85m'"'"'               # Red
-            COLOR_INFO=$'"'"'\033[38;2;139;233;253m'"'"'              # Cyan
-            COLOR_RESET=$'"'"'\033[0m'"'"'
-
-            # Connection timeouts
-            CONNECT_TIMEOUT=2
-
-            # Get the target host
-            # Helper functions
-            print_header() {
-                echo -e "\n${COLOR_SECTION}$1${COLOR_RESET}"
-                echo -e "${COLOR_HEADER}═════════════════════════════════════════════${COLOR_RESET}"
-            }
-
-            print_detail() {
-                echo -e "${COLOR_DIM}$1${COLOR_RESET}"
-            }
-
-            print_value() {
-                echo -e "${COLOR_VALUE}$1${COLOR_RESET}"
-            }
-
-            name=$(echo {} | awk "{print \$1}")
-            
-            # Get SSH config and extract info
-            ssh_config=$(ssh -G "$name" 2>/dev/null)
-            host=$(echo "$ssh_config" | grep "^hostname " | head -n1 | cut -d" " -f2)
-            [[ -z "$host" ]] && host=$name  # Fallback to name if hostname not found
-            
-            user=$(echo "$ssh_config" | grep "^user " | head -n1 | cut -d" " -f2)
-            port=$(echo "$ssh_config" | grep "^port " | head -n1 | cut -d" " -f2)
-            [[ -z "$port" ]] && port=22
-            key=$(echo "$ssh_config" | grep "^identityfile " | head -n1 | cut -d" " -f2)
-
-            # Get description from SSH config
-            if [ -f "$HOME/.ssh/config" ]; then
-                desc=$(awk -v host="$name" '"'"'
-                    $1 == "Host" { 
-                        in_block = ($2 == host || host ~ "^"$2"$")
-                    }
-                    in_block && /^[[:space:]]*#_Desc[[:space:]]/ {
-                        sub(/^[[:space:]]*#_Desc[[:space:]]*/, "")
-                        desc = $0
-                        gsub(/^[[:space:]]+|[[:space:]]+$/, "", desc)
-                        print desc
-                        exit
-                    }
-                '"'"' "$HOME/.ssh/config")
-            fi
-
-            # Print host summary
-            print_header "🔖 HOST SUMMARY"
-            {
-                [[ -n "$name" ]] && echo "${COLOR_INFO}Name:${COLOR_RESET} ${COLOR_VALUE}$name${COLOR_RESET}"
-                [[ -n "$host" ]] && echo "${COLOR_INFO}Host:${COLOR_RESET} ${COLOR_VALUE}$host${COLOR_RESET}"
-                [[ -n "$user" ]] && echo "${COLOR_INFO}User:${COLOR_RESET} ${COLOR_VALUE}$user${COLOR_RESET}"
-                [[ -n "$port" ]] && echo "${COLOR_INFO}Port:${COLOR_RESET} ${COLOR_VALUE}$port${COLOR_RESET}"
-                [[ -n "$key" ]] && echo "${COLOR_INFO}Key:${COLOR_RESET} ${COLOR_VALUE}$key${COLOR_RESET}"
-            } | column -t
-            echo -e "${COLOR_DIM}${desc:-No description}${COLOR_RESET}"
-
-            # Check connectivity
-            print_header "🌐 CONNECTIVITY"
-            
-            if ! nc -z -G 2 "$host" "$port" >/dev/null 2>&1; then
-                echo -e "$ERROR_ICON Cannot reach $host:$port"
-                echo -e "$INFO_ICON Attempting DNS lookup..."
-                if command -v host >/dev/null 2>&1; then
-                    if host "$host" >/dev/null 2>&1; then
-                        echo -e "$SUCCESS_ICON DNS resolution successful"
-                        echo -e "$ERROR_ICON port is closed or filtered"
-                    else
-                        echo -e "$ERROR_ICON DNS resolution failed"
-                    fi
-                elif command -v dig >/dev/null 2>&1; then
-                    if dig +short "$host" >/dev/null 2>&1; then
-                        echo -e "$SUCCESS_ICON DNS resolution successful"
-                        echo -e "$ERROR_ICON Port $port is closed or filtered"
-                    else
-                        echo -e "$ERROR_ICON DNS resolution failed"
-                    fi
-                fi
-            else
-                echo -e "$SUCCESS_ICON Connected to ${COLOR_VALUE}$host:$port${COLOR_RESET}"
-                
-                # Try quick version check
-                if version=$(nc -w 1 "$host" "$port" 2>/dev/null | cut -d'"'"'-'"'"' -f1,2); then
-                    if [ -n "$version" ]; then
-                        echo -e "$INFO_ICON Server version: ${COLOR_VALUE}$version${COLOR_RESET}"
-                    else
-                        echo -e "$WARNING_ICON Unable to retrieve server version"
-                    fi
-                else
-                    echo -e "$WARNING_ICON Unable to connect for version check"
-                fi
-            fi
-
-            # Check key status
-            if [[ -n "$key" ]]; then
-                print_header "🔑 KEY STATUS"
-                expanded_key="${key/#\~/$HOME}"
-                
-                if [[ ! -f "$expanded_key" ]]; then
-                    echo -e "$ERROR_ICON No identity file found: ${COLOR_VALUE}$key${COLOR_RESET}"
-                    # Check common key locations
-                    for default_key in id_rsa id_ed25519 id_ecdsa; do
-                        if [[ -f "$HOME/.ssh/$default_key" ]]; then
-                            echo -e "$INFO_ICON Found alternative key: ${COLOR_VALUE}~/.ssh/$default_key${COLOR_RESET}"
-                        fi
-                    done
-                else
-                    echo -e "$SUCCESS_ICON Key exists: ${COLOR_VALUE}$key${COLOR_RESET}"
-                    
-                    # Check permissions
-                    key_perms=$(stat -f "%Lp" "$expanded_key" 2>/dev/null)
-                    if [[ "$key_perms" = "600" ]]; then
-                        echo -e "$SUCCESS_ICON Permissions: ${COLOR_SUCCESS}OK (600)${COLOR_RESET}"
-                    else
-                        echo -e "$ERROR_ICON Invalid permissions: ${COLOR_ERROR}$key_perms (should be 600)${COLOR_RESET}"
-                        echo -e "$INFO_ICON Fix with: ${COLOR_DIM}chmod 600 $expanded_key${COLOR_RESET}"
-                    fi
-                    
-                    # Check key format
-                    if key_info=$(ssh-keygen -l -f "$expanded_key" 2>/dev/null); then
-                        echo -e "$SUCCESS_ICON Valid key format"
-                        bits=$(echo "$key_info" | awk '"'"'{print $1}'"'"')
-                        hash=$(echo "$key_info" | awk '"'"'{print $2}'"'"')
-                        comment=$(echo "$key_info" | awk '"'"'{$1=$2=""; sub(/^[ \t]+/, ""); print}'"'"' | sed '"'"'s/ (.*)//'"'"') 
-                        type=$(echo "$key_info" | grep -o '"'"'([^)]*)'"'"')
-                        
-                        echo -e "  ${COLOR_INFO}Comment:${COLOR_RESET} ${COLOR_VALUE}[$comment]${COLOR_RESET}"
-                        echo -e "  ${COLOR_INFO}Type:${COLOR_RESET}    ${COLOR_VALUE}$type${COLOR_RESET}"
-                        echo -e "  ${COLOR_INFO}Bits:${COLOR_RESET}    ${COLOR_VALUE}$bits${COLOR_RESET}"
-                        echo -e "  ${COLOR_INFO}Hash:${COLOR_RESET}    ${COLOR_VALUE}$hash${COLOR_RESET}"
-                        
-                        # Check key expiry if supported
-                        if echo "$key_info" | grep -q "valid until"; then
-                            valid_until=$(echo "$key_info" | grep -o "valid until.*")
-                            echo -e "$INFO_ICON Key $valid_until"
-                        fi
-                    else
-                        echo -e "$ERROR_ICON Invalid key format"
-                    fi
-                fi
-            fi
-
-            # Authentication check
-            print_header "🔐 AUTHENTICATION"
-            
-            if [[ $host == "github.com" ]]; then
-                ssh_output=$(ssh -T git@github.com -o ConnectTimeout=$CONNECT_TIMEOUT 2>&1)
-                if [[ $ssh_output == *"successfully authenticated"* ]]; then
-                    echo -e "$SUCCESS_ICON GitHub authentication successful"
-                    echo -e "${COLOR_DIM}$ssh_output${COLOR_RESET}"
-                else
-                    echo -e "$ERROR_ICON GitHub authentication failed"
-                    echo -e "${COLOR_DIM}$ssh_output${COLOR_RESET}"
-                fi
-            else
-                if ssh -o BatchMode=yes -o ConnectTimeout=$CONNECT_TIMEOUT "$name" exit 2>/dev/null; then
-                    echo -e "$SUCCESS_ICON Authentication successful"
-                    
-                    # Check sudo access
-                    if ssh -o BatchMode=yes -o ConnectTimeout=$CONNECT_TIMEOUT "$name" "sudo -n true" 2>/dev/null; then
-                        echo -e "$SUCCESS_ICON Sudo access available without password"
-                    fi
-                    
-                    # Try to get system info
-                    if system_info=$(ssh -o ConnectTimeout=$CONNECT_TIMEOUT "$name" "uname -a" 2>/dev/null); then
-                        echo -e "$INFO_ICON System: ${COLOR_VALUE}$system_info${COLOR_RESET}"
-                    fi
-                    
-                    # Get SSH server version
-                    if server_version=$(ssh -o ConnectTimeout=$CONNECT_TIMEOUT -v "$name" 2>&1 | grep "remote software version" | cut -d" " -f4-); then
-                        echo -e "$INFO_ICON SSH Server: ${COLOR_VALUE}$server_version${COLOR_RESET}"
-                    fi
-                else
-                    echo -e "$WARNING_ICON Authentication required"
-                    ssh_banner=$(ssh -o ConnectTimeout=$CONNECT_TIMEOUT -o PreferredAuthentications=none "$name" 2>&1)
-                    auth_methods=$(echo "$ssh_banner" | grep -i "authentication methods" | cut -d":" -f2-)
-                    [[ -n "$auth_methods" ]] && echo -e "$INFO_ICON Available methods:${COLOR_VALUE}$auth_methods${COLOR_RESET}"
-                    
-                    # Show clean banner message
-                    banner=$(echo "$ssh_banner" | grep -v -E "Permission denied|Please try again|authentication methods|Connection closed|Connection timed out" | head -n 10)
-                    [[ -n "$banner" ]] && echo -e "${COLOR_DIM}\n$banner${COLOR_RESET}"
-                fi
-            fi
-        ' \
-        --preview-window=right:60% \
-        -- "$@" < <(list_ssh_hosts)
+    rm -f "$preview_script"
+    trap - EXIT INT
 }
 
 _fzf_complete_ssh_post() {
