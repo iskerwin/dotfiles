@@ -1,7 +1,7 @@
 #command-finder/sources/function.zsh
 
 cf::source_function() {
-  local file="$HOME/.config/aliases/functions.zsh"
+  local file="$HOME/.config/shell/functions.zsh"
   [[ -f "$file" ]] || return
 
   awk '

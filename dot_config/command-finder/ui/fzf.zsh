@@ -30,9 +30,9 @@ cf::fzf() {
         [[ -n "$usage" ]] && echo -e "\033[38;2;98;114;164m󰙎  $usage\033[0m"
         [[ -n "$tag" ]]   && echo -e "\033[38;2;241;250;140m  $tag\033[0m"
       else
+        [[ -n "$usage" ]] && echo "$usage" | bat --language=zsh --style=plain --color=always
         [[ -n "$desc" ]]  && echo -e "\033[38;2;98;114;164m󰙎  $desc\033[0m"
         [[ -n "$tag" ]]   && echo -e "\033[38;2;241;250;140m  $tag\033[0m"
-        [[ -n "$usage" ]] && echo -e "\033[38;2;98;114;164m  $usage\033[0m"
       fi
     ' \
     --preview-window=down:3:wrap \

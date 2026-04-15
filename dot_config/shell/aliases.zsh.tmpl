@@ -1,0 +1,176 @@
+#!/bin/zsh
+
+# ══════════════════════════════════════════════
+#  Navigation  文件与目录导航
+# ══════════════════════════════════════════════
+
+alias cd='z'                           # 智能跳转目录 / smart jump (zoxide)
+alias home='cd ~'                      # 回到 $HOME / go home
+alias ..='cd ..'                       # 上一级 / up 1 level
+alias ...='cd ../..'                   # 上两级 / up 2 levels
+alias ....='cd ../../..'               # 上三级 / up 3 levels
+alias .....='cd ../../../..'           # 上四级 / up 4 levels
+alias icloud='cd {{ .icloud }}'        # 跳到 iCloud 目录 / iCloud dir
+
+# ── 文件列表 File listing ──────────────────────
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --group-directories-first --icons --git --git-ignore' # 增强版 ls（需要 eza）/ better ls
+else
+  alias ls='ls --color=auto'           # 系统 ls 兜底 / fallback
+fi
+
+alias l='ls -la'                       # 显示全部文件含隐藏 / list all + hidden
+alias lt='l -snew'                     # 按修改时间排序 / sort by time
+alias lz='l -ssize'                    # 按文件大小排序 / sort by size
+alias lx='l -sext'                     # 按扩展名排序 / sort by extension
+alias tree='eza --tree --level=2 --icons --git-ignore' # 两层树状结构 / tree view, depth 2
+
+# ── 危险操作加确认 Safe operations ───────────────
+alias rm='rm -i'                       # 删除前确认 / confirm before delete
+alias cp='cp -i'                       # 覆盖前确认 / confirm before overwrite
+alias mv='mv -i'                       # 移动前确认 / confirm before move
+
+
+# ══════════════════════════════════════════════
+#  System  系统与网络工具
+# ══════════════════════════════════════════════
+
+# ── Homebrew ──────────────────────────────────
+alias brew-doctor='brew doctor'                 # 检查 Homebrew 健康状态 / check health
+alias brew-clean='brew cleanup'                 # 清理旧版本缓存 / clean old versions
+alias brew-install='proxy on && brew install'   # 使用代理安装 / install with proxy
+alias brew-uninstall='brew uninstall'           # 卸载 / remove package
+alias brew-update='proxy on && brew update && brew upgrade && brew cleanup && proxy off' # 全量更新并清理 / full update + cleanup
+alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off' # 强制更新所有 Cask / force update casks
+alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}' # 导出 Brewfile 快照 / export to Brewfile
+alias brew-restore='brew bundle --file={{ .brewfile }}'   # 从 Brewfile 恢复 / restore from Brewfile
+
+# ── 网络工具 Network ──────────────────────────
+alias dns='dig +nocmd +noall +answer'            # DNS 查询（简洁输出）/ DNS lookup
+alias trace='nexttrace'                          # 路由追踪 / traceroute
+alias netif='networksetup -listallhardwareports' # 列出所有网络接口 / list network interfaces
+alias route='netstat -rn'                        # 显示路由表 / show routing table
+alias speed='networkQuality'                     # macOS 内置网速测试 / network speed test
+alias inet='curl -I'                             # 检查 URL 连通性 / check URL connectivity
+
+# ── 系统监控 Monitor ──────────────────────────
+alias top='btop'                       # 增强版系统监控 / better system monitor
+alias devs='ls /dev/cu.*'              # 列出串口设备 / list serial devices
+alias weather='curl wttr.in/Guangzhou' # 广州天气预报 / weather forecast
+alias xattr-clean='xattr -cr'          # 清除文件扩展属性（解隔离）/ strip xattrs
+alias af='command_finder'              # 命令管理工具 / command finder tool
+
+# ══════════════════════════════════════════════
+#  Development  开发工具
+# ══════════════════════════════════════════════
+
+# ── Git ───────────────────────────────────────
+alias g='git'                                         # git 缩写 / git shorthand
+alias g-s='git status'                                # 工作区状态 / working tree status
+alias g-a='git add'                                   # 暂存文件 / stage files
+alias g-c='git commit -m'                             # 提交（带消息）/ commit with message
+alias g-p='git push'                                  # 推送到远端 / push to remote
+alias g-l='git pull'                                  # 拉取远端变更 / pull from remote
+alias g-d='git diff'                                  # 查看未暂存差异 / show unstaged diff
+alias g-log='git log --oneline --graph --decorate'    # 图形化提交日志 / compact log graph
+
+# ── 工具 Utilities ────────────────────────────
+alias f='fzf'                          # 模糊搜索 / fuzzy finder
+alias lg='lazygit'                     # Git TUI 界面 / terminal UI for git
+
+# ── Shell 配置 Shell config ───────────────────
+alias reload='source ~/.zshrc'         # 重载 zsh 配置 / reload shell config
+alias zshrc='nano ~/.zshrc'            # 编辑 .zshrc / edit zsh config
+alias cls='clear'                      # 清屏 / clear terminal
+alias path='echo $PATH | tr ":" "\n"'  # 逐行打印 PATH / print PATH entries
+
+
+# ══════════════════════════════════════════════
+#  SSH  远程连接
+# ══════════════════════════════════════════════
+
+alias ssh='ct screen ssh'                           # SSH + screen 会话保持 / SSH with screen session
+alias ssh-list='grep "^Host " ~/.ssh/config'        # 列出 SSH 配置中的主机 / list configured hosts
+alias ssh-agent-start='eval "$(ssh-agent -s)"'      # 启动 ssh-agent / start SSH agent
+alias ssh-keychain='ssh-add --apple-load-keychain'  # 从 Keychain 加载 SSH 密钥 / load keys from Keychain
+alias ssha='ssha-management'                        # SSH Agent 管理 / SSH Agent Management
+
+
+# ══════════════════════════════════════════════
+#  Screen  终端会话管理
+# ══════════════════════════════════════════════
+
+alias sc='screen -S'                   # 创建命名会话 / new named session
+alias sl='screen -ls'                  # 列出所有 Screen 会话 / list sessions
+alias sr='screen -r'                   # 重新连接会话 / reattach session
+alias sd='screen -d'                   # 分离当前会话 / detach session
+alias sk='killall screen'              # 终止所有 screen 进程 / kill all sessions
+
+
+# ══════════════════════════════════════════════
+#  Chezmoi  dotfiles 管理
+# ══════════════════════════════════════════════
+
+alias cz='chezmoi'                         # chezmoi 命令缩写 / chezmoi shorthand
+alias cz-a='cz add -v'                     # 追踪文件到 chezmoi / add file to tracking
+alias cz-e='cz edit'                       # 编辑受管文件 / edit managed file
+alias cz-ap='cz apply -v'                  # 将变更应用到 $HOME / apply changes to home
+alias cz-s='cz status'                     # 查看受管文件状态 / show tracking status
+alias cz-d='cz diff -v'                    # 对比配置差异 / diff managed vs applied
+alias cz-sync='cz add -v && cz apply -v'   # 添加并立即应用（一键同步）/ add then apply
+
+
+# ══════════════════════════════════════════════
+#  Mole  系统清理与优化
+# ══════════════════════════════════════════════
+
+alias mo='mo'                          # mole 命令入口 / mole entrypoint
+
+# ── 核心操作 Core ─────────────────────────────
+alias mo-c='mo clean'                  # 清理缓存与日志释放空间 / clean caches & logs
+alias mo-u='mo uninstall'              # 彻底卸载应用及残留 / deep uninstall app
+alias mo-o='mo optimize'               # 系统维护与性能优化 / system optimization
+alias mo-a='mo analyze'                # 分析磁盘占用结构 / analyze disk usage
+alias mo-s='mo status'                 # 查看系统健康状态 / show system status
+alias mo-p='mo purge'                  # 清理构建缓存与临时文件 / purge build artifacts
+alias mo-i='mo installer'              # 清理安装包残留 / clean installer files
+alias mo-t='mo touchid'                # 配置 Touch ID 认证 / configure Touch ID for sudo
+alias mo-cp='mo completion'            # 配置 shell 自动补全 / setup shell completion
+alias mo-up='mo update'                # 更新 mole 至最新稳定版 / update to stable
+alias mo-rm='mo remove'                # 从系统卸载 mole / uninstall mole
+
+# ── 帮助 Help ─────────────────────────────────
+alias mo-h='mo --help'                 # 显示帮助文档 / show help
+alias mo-v='mo --version'              # 显示版本号 / show version
+
+# ── 预览模式（不执行）Dry-run ─────────────────
+alias mo-cd='mo clean --dry-run'       # 预览清理（不执行）/ preview clean
+alias mo-od='mo optimize --dry-run'    # 预览优化（不执行）/ preview optimize
+alias mo-ud='mo uninstall --dry-run'   # 预览卸载（不执行）/ preview uninstall
+alias mo-pd='mo purge --dry-run'       # 预览清除（不执行）/ preview purge
+alias mo-id='mo installer --dry-run'   # 预览安装包清理（不执行）/ preview installer clean
+alias mo-rd='mo remove --dry-run'      # 预览 mole 卸载（不执行）/ preview mole removal
+
+# ── 白名单 / 高级 Whitelist & advanced ────────
+alias mo-cw='mo clean --whitelist'     # 带白名单保护的清理 / clean with whitelist
+alias mo-ow='mo optimize --whitelist'  # 带白名单保护的优化 / optimize with whitelist
+alias mo-pp='mo purge --paths'         # 指定清理扫描路径 / set custom purge paths
+
+# ── 特殊场景 Special ──────────────────────────
+alias mo-av='mo analyze /Volumes'          # 分析外接磁盘 / analyze external volumes
+alias mo-upf='mo update --force'           # 强制重装最新稳定版 / force reinstall stable
+alias mo-upn='mo update --nightly'         # 安装 nightly 开发版 / install nightly build
+alias mo-td='mo touchid enable --dry-run'  # 预览 Touch ID 配置变更 / preview TouchID config
+alias mo-cpd='mo completion --dry-run'     # 预览补全配置变更 / preview completion setup
+
+
+# ══════════════════════════════════════════════
+#  Zap  zsh 插件管理器
+# ══════════════════════════════════════════════
+
+alias zp='zap'                         # zap 命令缩写 / zap shorthand
+alias zp-l='zap list'                  # 列出已安装插件 / list plugins
+alias zp-c='zap clean'                 # 清理未使用插件 / clean unused plugins
+alias zp-u='zap update'                # 更新所有插件 / update plugins
+alias zp-us='zap update self'          # 更新 zap 本身 / update zap itself
+alias zp-ua='zap update all'           # 更新 zap 和全部插件 / update zap + all plugins
