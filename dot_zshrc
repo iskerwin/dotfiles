@@ -1,110 +1,125 @@
-#================================================#
-# Zap installer                                  #
-#================================================#
+# =========================================
+# Zap Installer
+# =========================================
 
-# Initialize Zap plugin manager - A minimal zsh plugin manager
-[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ] && source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
+# Initialize Zap plugin manager (minimal zsh plugin manager)
+[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ] && \
+  source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
 
-#================================================#
-# Performance                                    #
-#================================================#
 
-# Enable Powerlevel10k instant prompt for faster startup
-# Must be at the top of ~/.zshrc before any other prompt initialization code
+# =========================================
+# Performance
+# =========================================
+
+# Powerlevel10k instant prompt (must be at top for fastest startup)
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 # Initialize Homebrew environment
-# This sets up all necessary environment variables for Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Initialize homebrew command-not-found handler
-# This will suggest package names when a command is not found
+# Homebrew command-not-found handler (suggest missing packages)
 if [ -f /opt/homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh ]; then
-    source /opt/homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh
+  source /opt/homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh
 fi
 
-#================================================#
-# Environment Variables                          #
-#================================================#
 
-# PATH configurations - Order matters, last entry takes precedence
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"  # Homebrew executables
-export PATH="$HOME/.local/bin:$PATH"                      # Local user binaries
-export PATH="$HOME/bin:$PATH"                             # Personal scripts
+# =========================================
+# Environment Variables
+# =========================================
 
-# XDG Base Directory Specification
-export XDG_CONFIG_HOME="$HOME/.config"          # User-specific configuration files
-export XDG_CACHE_HOME="$HOME/.cache"            # User-specific cache files
-export XDG_DATA_HOME="$HOME/.local/share"       # User-specific data files
+# --- PATH configuration (order matters) ---
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"    # Homebrew
+export PATH="$HOME/.local/bin:$PATH"                        # User binaries
+export PATH="$HOME/bin:$PATH"                               # Personal scripts
 
-# Language and locale settings
-export LANG=en_US.UTF-8                         # Default language
-export LC_ALL=en_US.UTF-8                       # Override all locale settings
+# --- XDG Base Directory ---
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
 
-#================================================#
-# Completion Settings                            #
-#================================================#
+# --- Locale ---
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
-# Initialize the completion system
+
+# =========================================
+# Completion System
+# =========================================
+
 autoload -Uz compinit
-compinit -d ~/.cache/zcompdump                  # Store completion dump files in cache directory
+compinit -d "$XDG_CACHE_HOME/zcompdump"
 
-#================================================#
-# Plugins                                        #
-#================================================#
 
-# Core plugins for enhanced functionality
-plug "zap-zsh/supercharge"                        # Load sensible zsh defaults
-plug "romkatv/powerlevel10k"                      # Highly customizable and fast prompt
-plug "zsh-users/zsh-autosuggestions"              # Fish-like autosuggestions
-plug "Aloxaf/fzf-tab"                             # Replace zsh's default completion with fzf
-plug "zdharma-continuum/fast-syntax-highlighting" # Syntax highlighting for commands
-plug "hlissner/zsh-autopair"                      # Autocomplete parentheses
-plug "MichaelAquilina/zsh-you-should-use"         # reminds you to use existing aliases
+# =========================================
+# Plugins
+# =========================================
 
-#================================================#
-# History Settings                               #
-#================================================#
+plug "zap-zsh/supercharge"                         # Zsh sensible defaults
+plug "romkatv/powerlevel10k"                       # Fast prompt
+plug "zsh-users/zsh-autosuggestions"               # Command suggestions
+plug "Aloxaf/fzf-tab"                              # FZF completion UI
+plug "zdharma-continuum/fast-syntax-highlighting"  # Syntax highlighting
+plug "hlissner/zsh-autopair"                       # Auto pair brackets
+plug "MichaelAquilina/zsh-you-should-use"          # Suggest existing aliases
 
-HISTFILE=~/.zsh_history            # History file location
-HISTSIZE=1000000                   # Maximum events in internal history
-SAVEHIST=1000000                   # Maximum events in history file
-setopt HIST_IGNORE_ALL_DUPS        # Remove older duplicate entries from history
-setopt HIST_SAVE_NO_DUPS           # Don't save duplicate entries to history file
-setopt HIST_REDUCE_BLANKS          # Remove superfluous blanks from history
-setopt HIST_VERIFY                 # Show command with history expansion before running it
-setopt SHARE_HISTORY               # Share history between all sessions
-setopt HIST_IGNORE_SPACE           # Don't record commands that start with space
-setopt EXTENDED_HISTORY            # Record timestamp of command in history
-setopt EXTENDED_HISTORY            # Enable more detailed history (time, command, etc.)
 
-#================================================#
-# Directory Settings                             #
-#================================================#
+# =========================================
+# History
+# =========================================
 
-setopt AUTO_CD                    # If a command isn't valid but is a directory, cd to it
-setopt AUTO_PUSHD                 # Make cd push the old directory onto the directory stack
-setopt PUSHD_IGNORE_DUPS          # Don't push multiple copies of the same directory
-setopt PUSHD_SILENT               # Don't print the directory stack after pushd or popd
-setopt PUSHD_TO_HOME              # Have pushd with no arguments act like 'pushd $HOME'
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=1000000
+SAVEHIST=1000000
 
-#================================================#
-# Config Files                                   #
-#================================================#
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_SPACE
+setopt EXTENDED_HISTORY
 
-# Source additional configuration files if they exist
-[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh                                         # Powerlevel10k configuration
-[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh                   # FZF configuration
-[ -f ~/.config/git/fzf-git.zsh ] && source ~/.config/git/fzf-git.zsh             # Custom git log
-[ -f ~/.config/aliases/aliases.zsh ] && source ~/.config/aliases/aliases.zsh     # Custom aliases
-[ -f ~/.config/aliases/functions.zsh ] && source ~/.config/aliases/functions.zsh # Custom functions
-[ -f ~/.config/command-finder/command-finder.plugin.zsh ] && source ~/.config/command-finder/command-finder.plugin.zsh
 
-# Initialize zoxide - A smarter cd command
+# =========================================
+# Directory Navigation
+# =========================================
+
+setopt AUTO_CD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_SILENT
+setopt PUSHD_TO_HOME
+
+
+# =========================================
+# External Config Files
+# =========================================
+
+[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh
+[ -f ~/.config/fzf/init.zsh ] && source ~/.config/fzf/init.zsh
+[ -f ~/.config/git/fzf-git.zsh ] && source ~/.config/git/fzf-git.zsh
+[ -f ~/.config/shell/aliases.zsh ] && source ~/.config/shell/aliases.zsh
+[ -f ~/.config/shell/functions.zsh ] && source ~/.config/shell/functions.zsh
+[ -f ~/.config/command-finder/command-finder.plugin.zsh ] && \
+  source ~/.config/command-finder/command-finder.plugin.zsh
+
+
+# =========================================
+# zoxide
+# =========================================
+
 if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh)"
+  eval "$(zoxide init zsh)"
 else
-    echo "zoxide Not installed"
+  echo "zoxide not installed"
 fi
+
+
+# =========================================
+# Homebrew behavior
+# =========================================
+
+export HOMEBREW_AUTO_UPDATE_SECS=86400
+export HOMEBREW_NO_ENV_HINTS=1
