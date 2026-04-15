@@ -1,153 +1,197 @@
 #!/bin/zsh
 
 #================================================#
-# File Navigation                                #
+# === File Navigation ===                        #
 #================================================#
 
 # Directory Navigation
-alias cd='z'
-alias home='cd ~'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias .....='cd ../../../..'
-alias icloud='cd {{ .icloud }}'
+alias cd='z'                      # 智能目录跳转（zoxide） / Smart directory jump (zoxide)
+alias home='cd ~'                 # 返回主目录 / Go to home directory
+alias ..='cd ..'                  # 返回上级目录 / Go up one directory
+alias ...='cd ../..'              # 返回两级目录 / Go up two directories
+alias ....='cd ../../..'          # 返回三级目录 / Go up three directories
+alias .....='cd ../../../..'      # 返回四级目录 / Go up four directories
+alias icloud='cd {{ .icloud }}'   # 跳转至 iCloud 目录 / Go to iCloud directory
 
 # Directory Listing (using eza/exa)
 if command -v eza >/dev/null 2>&1; then
-    alias ls='eza --group-directories-first --icons --git --git-ignore'
+    alias ls='eza --group-directories-first --icons --git --git-ignore'  # 使用 eza 替代 ls / Use eza as ls
 else
-    alias ls='ls --color=auto'
+    alias ls='ls --color=auto'    # 回退至系统 ls（带颜色） / Fallback to system ls with color
 fi
 
-alias l='ls -la'          # List all files including hidden
-alias l.='ls -ld .*'      # List only dotfiles
-alias lt='l -snew'        # Sort by modification time
-alias lz='l -ssize'       # Sort by size
-alias lx='l -sext'        # Sort by extension
-alias tree='eza --tree --level=2 --group-directories-first --icons --git-ignore'
+alias l='ls -la'                  # 显示全部文件（含隐藏） / List all files including hidden
+alias l.='ls -ld .*'              # 仅显示点文件 / List dotfiles only
+alias lt='l -snew'                # 按修改时间排序 / Sort by modification time
+alias lz='l -ssize'               # 按文件大小排序 / Sort by file size
+alias lx='l -sext'                # 按扩展名排序 / Sort by file extension
+alias tree='eza --tree --level=2 --group-directories-first --icons --git-ignore'  # 目录树（2层）/ Directory tree (depth 2)
 
 # Safe Operations
-alias rm='rm -i'   # Confirm before deleting
-alias cp='cp -i'   # Confirm before copying
-alias mv='mv -i'   # Confirm before moving
+alias rm='rm -i'                  # 删除前确认 / Confirm before deleting
+alias cp='cp -i'                  # 复制前确认 / Confirm before copying
+alias mv='mv -i'                  # 移动前确认 / Confirm before moving
 
 #================================================#
-# System Operations                              #      
+# === System Operations ===                      #
 #================================================#
 
 # Homebrew Package Management
-alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'    # Check system health
-alias cleanup='brew cleanup'                                    # Remove old versions
-alias install='proxy on && brew install'                        # Install packages with proxy
-alias uninstall='brew uninstall'                                # Remove packages
+alias doctor='echo "\nDoctor? Doctor who?\n" && brew doctor'    # 检查系统健康 / Check system health
+alias cleanup='brew cleanup'                                    # 清除旧版本包 / Remove old package versions
+alias install='proxy on && brew install'                        # 开代理后安装包 / Install packages with proxy
+alias uninstall='brew uninstall'                                # 卸载 Homebrew 包 / Remove packages
 # Homebrew Update Operations
-alias brew-update='proxy on && brew doctor && brew update && brew upgrade && brew cleanup && proxy off'  # Full system update
-alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off'   # Update all casks
+alias brew-update='proxy on && brew doctor && brew update && brew upgrade && brew cleanup && proxy off'  # 完整系统更新 / Full system update
+alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off'   # 更新所有 cask / Update all casks
 # Homebrew Backup & Restore
-alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'   # Export package list
-alias brew-restore='brew bundle --file={{ .brewfile }}'                          # Install from package list
+alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'   # 导出包列表至 Brewfile / Export package list to Brewfile
+alias brew-restore='brew bundle --file={{ .brewfile }}'                          # 从 Brewfile 恢复安装 / Restore packages from Brewfile
 
 # System Information
 # Network Tools
-alias digcheck="dig +nocmd +noall +answer"                 # Detailed DNS lookup
-alias nt='nexttrace'                                       # Visual traceroute utility
-alias show-interface='networksetup -listallhardwareports'  # List network interfaces
-alias show-route='netstat -rn'                             # Display routing table
-alias show-ports="networksetup -listallhardwareports"      # Show hardware network ports
-alias test-internet="curl -I"                              # Check internet connectivity
-alias test-speed='networkQuality'                          # Run network speed test
+alias digcheck="dig +nocmd +noall +answer"                 # 精简 DNS 查询输出 / Clean DNS lookup output
+alias nt='nexttrace'                                       # 可视化路由追踪 / Visual traceroute utility
+alias show-interface='networksetup -listallhardwareports'  # 列出所有网络接口 / List all network interfaces
+alias show-route='netstat -rn'                             # 显示路由表 / Display routing table
+alias show-ports="networksetup -listallhardwareports"      # 显示硬件网络端口 / Show hardware network ports
+alias test-internet="curl -I"                              # 测试网络连通性 / Check internet connectivity
+alias test-speed='networkQuality'                          # 测试网络速度 / Run network speed test
 
 # System Monitoring
-alias top='btop'                                           # Enhanced system monitor
-alias lsdev='ls /dev/cu.*'                                 # List serial devices
-alias weather='curl wttr.in/Guangzhou'                     # Show weather forecast
-alias xa='xattr -cr'                                       # Remove extended attributes
+alias top='btop'                                           # 增强版系统监视器 / Enhanced system monitor
+alias lsdev='ls /dev/cu.*'                                 # 列出串口设备 / List serial devices
+alias weather='curl wttr.in/Guangzhou'                     # 查看广州天气预报 / Show Guangzhou weather forecast
+alias xa='xattr -cr'                                       # 递归清除扩展属性 / Recursively remove extended attributes
 
 # > -清除从互联网下载的文件的隔离标志（quarantine flag）
 # > -移除文件上可能存在的安全性或来源相关的额外元数据
 # > -解决某些因扩展属性导致的文件权限或运行问题
 
 #================================================#
-# SSH Management                                 #
+# === SSH Management ===                         #
 #================================================#
 
-alias ssh='ct screen ssh'                         # SSH with screen support
-alias sshls='grep "^Host " ~/.ssh/config'         # List SSH hosts
-alias sshals='ps aux | grep ssh-agent'            # List SSH-agent process
-alias sshalk='ssh-add --apple-load-keychain'      # Load key with keychain
-alias sshags='eval "$(ssh-agent -s)"'             # Start SSH-agent
+alias ssh='ct screen ssh'                         # SSH 并附带 screen 支持 / SSH with screen support
+alias sshls='grep "^Host " ~/.ssh/config'         # 列出 SSH 主机列表 / List SSH hosts from config
+alias sshals='ps aux | grep ssh-agent'            # 查看 ssh-agent 进程 / Show ssh-agent process
+alias sshalk='ssh-add --apple-load-keychain'      # 从钥匙串加载密钥 / Load SSH key from Apple Keychain
+alias sshags='eval "$(ssh-agent -s)"'             # 启动 ssh-agent / Start SSH agent
 
 #================================================#
-# Screen Management                              #
+# === Screen Management ===                      #
 #================================================#
 
 alias screen='ct screen'
-alias sn='screen -S'                              # Create/attach screen session
-alias sl='screen -ls'                             # List screen sessions
-alias sr='screen -r'                              # Reattach to screen
-alias sm='screen -DR main'                        # Main screen session
-alias sk='killall screen'                         # Kill all screens
-alias sd='screen -d'                              # Detach screen
-alias snw='screen -X screen'                      # New window in current session
-alias snd='screen -dm'                            # Create detached session
-alias console='screen -fn /dev/cu.BTConsole 9600' # # Connect to Bluetooth console (9600 baud rate)
+alias sn='screen -S'                              # 创建或附加 screen 会话 / Create or attach a named session
+alias sl='screen -ls'                             # 列出所有 screen 会话 / List all screen sessions
+alias sr='screen -r'                              # 重新附加至 screen 会话 / Reattach to a session
+alias sm='screen -DR main'                        # 附加到 main 会话（断开其他）/ Attach to main session
+alias sk='killall screen'                         # 终止所有 screen 进程 / Kill all screen sessions
+alias sd='screen -d'                              # 分离当前 screen 会话 / Detach current screen session
+alias snw='screen -X screen'                      # 在当前会话中新建窗口 / Open new window in current session
+alias snd='screen -dm'                            # 创建后台（分离态）会话 / Create a detached session
+alias console='screen -fn /dev/cu.BTConsole 9600' # 连接蓝牙串口控制台（9600 波特率）/ Connect to Bluetooth console at 9600 baud
 
-alias telnet='ct screen telnet'
+alias telnet='ct screen telnet'                   # 通过 screen 使用 telnet / Use telnet via screen
+
 #================================================#
-# Miscellaneous                                  #
+# === Miscellaneous ===                          #
 #================================================#
 
-alias f='fzf'                                     # FZF
-alias g='git'                                     # Git
-alias lg='lazygit'                                # lazygit
-alias rz='source ~/.zshrc'                        # Reload zsh config
-# alias af='source ~/.config/aliases/fzf-alias.zsh' # Aliases tool
-alias clr='clear'                                 # Clear
-alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # Pretty print PATH
-# alias cf='_generate_command_cache --refresh && command_finder' # Clear `fzf-alias.zsh` cache
+alias f='fzf'                                     # 模糊搜索工具 / Fuzzy finder
+alias g='git'                                     # Git 快捷命令 / Git shorthand
+alias lg='lazygit'                                # 终端 Git 可视化界面 / Terminal Git UI
+alias rz='source ~/.zshrc'                        # 重新加载 zsh 配置 / Reload zsh configuration
+alias af='source ~/.config/aliases/fzf-alias.zsh' # 加载 fzf alias 工具 / Load fzf alias utility
+alias clr='clear'                                 # 清空终端屏幕 / Clear terminal screen
+alias path='echo; tr ":" "\n" <<< "$PATH"; echo;' # 格式化输出 PATH 变量 / Pretty-print PATH entries
+
 #================================================#
-# Chezmoi Aliases                                #
+# === Chezmoi Aliases ===                        #
 #================================================#
 
 # Core Commands
-alias cz='chezmoi'                 # Base command with shorter alias
-alias cza='cz add -v'              # Add files
-alias czd='cz diff -v'             # Show differences
-alias cze='cz edit'                # Edit files
-alias czp='cz apply -v'            # Apply changes
-alias czs='cz status'              # Show status
-alias czcd='cz cd'                 # Navigate to source directory
+alias cz='chezmoi'                 # Chezmoi 主命令 / Base chezmoi command
+alias cza='cz add -v'              # 添加文件至管理 / Add files to chezmoi
+alias czd='cz diff -v'             # 查看差异 / Show differences
+alias cze='cz edit'                # 编辑托管文件 / Edit managed files
+alias czp='cz apply -v'            # 应用更改至目标 / Apply changes to target
+alias czs='cz status'              # 查看管理状态 / Show status of managed files
+alias czcd='cz cd'                 # 进入源目录 / Navigate to chezmoi source directory
 
 # Extended Operations
-alias czf='cz apply --force'       # Force apply
-alias czr='cz re-add -v'           # Re-add files
-alias czea='cz edit --apply'       # Edit and apply
-alias czup='cz update -v'          # Update from source
-alias czug='cz upgrade'            # Upgrade chezmoi
+alias czf='cz apply --force'       # 强制应用更改 / Force apply changes
+alias czr='cz re-add -v'           # 重新添加文件 / Re-add files to chezmoi
+alias czea='cz edit --apply'       # 编辑后立即应用 / Edit and apply immediately
+alias czup='cz update -v'          # 从源拉取更新 / Update from source
+alias czug='cz upgrade'            # 升级 chezmoi 本体 / Upgrade chezmoi binary
 
 # Information & Debug
-alias czv='cz verify'              # Verify configuration
-alias czls='cz managed'            # List managed files
-alias czda='cz data'               # Show template data
-alias czdc='cz doctor'             # Check installation
+alias czv='cz verify'              # 验证配置一致性 / Verify configuration integrity
+alias czls='cz managed'            # 列出托管文件 / List all managed files
+alias czda='cz data'               # 显示模板变量数据 / Show template data
+alias czdc='cz doctor'             # 检查安装状态 / Check chezmoi installation health
 
 # Git Integration
 # Using czg prefix for consistency with git operations
-alias czg='cz git --'              # Git operations
-alias czga='czg add'               # Stage changes
-alias czgc='czg commit -m'         # Commit changes
-alias czgp='czg push'              # Push changes
-alias czgl='czg pull'              # Pull changes
-alias czgs='czg status'            # Git status
+alias czg='cz git --'              # 在源目录执行 git / Run git in chezmoi source dir
+alias czga='czg add'               # 暂存更改 / Stage changes
+alias czgc='czg commit -m'         # 提交更改 / Commit with message
+alias czgp='czg push'              # 推送至远端 / Push to remote
+alias czgl='czg pull'              # 从远端拉取 / Pull from remote
+alias czgs='czg status'            # 查看 git 状态 / Show git status
 
 #================================================#
-# Common Workflows                              #
+# === Common Workflows ===                       #
 #================================================#
 
-alias czap='cz add -v && cz apply -v'                           # Add and apply
-alias czep='cz edit --apply && cz apply -v'                     # Edit and apply
-alias re-add-brewfile='cz re-add -v {{ .brewfile }}'            # Re-add Brewfile
-alias re-add-code-task='cz re-add -v $HOME/Library/Application\ Support/Code/User/tasks.json'       # Re-add VSCode tasks
-alias re-add-code-set='cz re-add -v $HOME/Library/Application\ Support/Code/User/settings.json'     # Re-add VSCode settings
-alias re-add-code-key='cz re-add -v $HOME/Library/Application\ Support/Code/User/keybindings.json'  # Re-add VSCode keybindings
+alias czap='cz add -v && cz apply -v'                           # 添加并应用 / Add and apply
+alias czep='cz edit --apply && cz apply -v'                     # 编辑并应用 / Edit and apply
+alias re-add-brewfile='cz re-add -v {{ .brewfile }}'            # 重新添加 Brewfile / Re-add Brewfile to chezmoi
+alias re-add-code-task='cz re-add -v $HOME/Library/Application\ Support/Code/User/tasks.json'       # 重新添加 VSCode 任务配置 / Re-add VSCode tasks config
+alias re-add-code-set='cz re-add -v $HOME/Library/Application\ Support/Code/User/settings.json'     # 重新添加 VSCode 设置 / Re-add VSCode settings
+alias re-add-code-key='cz re-add -v $HOME/Library/Application\ Support/Code/User/keybindings.json'  # 重新添加 VSCode 快捷键 / Re-add VSCode keybindings
+
+#================================================#
+# === Mole aliases (with comments) ===           #
+#================================================#
+
+# ===== 基础信息 / Basic Info =====
+alias mom='mo'                     # 打开 Mole 主菜单 / Main menu
+alias moh='mo --help'              # 查看帮助信息 / Show help
+alias mov='mo --version'           # 查看版本号 / Show version
+alias mostatus='mo status'         # 监控系统健康 / Monitor system health
+alias modebug='mo --debug'         # 显示详细操作日志 / Show detailed operation logs
+
+# ===== 常用功能 / Core Functions =====
+alias moc='mo clean'               # 释放磁盘空间 / Free up disk space
+alias mou='mo uninstall'           # 彻底移除应用 / Remove apps completely
+alias moo='mo optimize'            # 检查并维护系统 / Check and maintain system
+alias moa='mo analyze'             # 探索磁盘占用 / Explore disk usage
+alias mop='mo purge'               # 清理旧项目构建残留 / Remove old project artifacts
+alias moi='mo installer'           # 查找并删除安装包 / Find and remove installer files
+alias mot='mo touchid'             # 配置 sudo Touch ID / Configure Touch ID for sudo
+alias mocomp='mo completion'       # 设置 shell 补全 / Setup shell tab completion
+alias moup='mo update'             # 更新至最新版本 / Update to latest version
+alias morm='mo remove'             # 从系统中移除 Mole / Remove Mole from system
+
+# ===== dry-run（仅预览，不执行）/ Dry-run (Preview Only) =====
+alias mocd='mo clean --dry-run'               # 预览清理内容 / Preview cleanup
+alias mood='mo optimize --dry-run'            # 预览优化操作 / Preview optimization
+alias moud='mo uninstall --dry-run'           # 预览卸载应用 / Preview app uninstall
+alias mopd='mo purge --dry-run'               # 预览项目清理 / Preview project purge
+alias moid='mo installer --dry-run'           # 预览安装包清理 / Preview installer cleanup
+alias motd='mo touchid enable --dry-run'      # 预览 Touch ID 配置 / Preview Touch ID setup
+alias mocompd='mo completion --dry-run'       # 预览补全配置修改 / Preview shell completion edits
+alias mormd='mo remove --dry-run'             # 预览卸载 Mole / Preview Mole removal
+
+# ===== 白名单 / 自定义配置 / Whitelist & Custom Config =====
+alias mocw='mo clean --whitelist'             # 管理受保护的缓存 / Manage protected caches
+alias moow='mo optimize --whitelist'          # 管理受保护的项目 / Manage protected items
+alias mopp='mo purge --paths'                 # 配置扫描目录 / Configure scan directories
+
+# ===== 特殊用法 / Special Usage =====
+alias moaext='mo analyze /Volumes'            # 仅分析外接磁盘 / Analyze external drives only
+alias moupf='mo update --force'               # 强制重装最新稳定版 / Force reinstall latest stable version
+alias moupn='mo update --nightly'             # 安装最新未发布的 main 分支构建 / Install latest unreleased main branch build

@@ -19,13 +19,16 @@ cf::fzf() {
     --expect='ctrl-e,ctrl-y' \
     --preview '
       type={5}
-      desc={4}
-      usage={6}
+      desc={4}      # alias展开值 / function的@desc（历史无）
+      usage={6}     # alias/@desc 或 function/@usage
       tag={7}
+
       if [[ "$type" == "history" ]]; then
         echo ""
       elif [[ "$type" == "alias" ]]; then
-        echo {4} | bat --language=zsh --style=plain --color=always
+        echo "$desc" | bat --language=zsh --style=plain --color=always
+        [[ -n "$usage" ]] && echo -e "\033[38;2;98;114;164m󰙎  $usage\033[0m"
+        [[ -n "$tag" ]]   && echo -e "\033[38;2;241;250;140m  $tag\033[0m"
       else
         [[ -n "$desc" ]]  && echo -e "\033[38;2;98;114;164m󰙎  $desc\033[0m"
         [[ -n "$tag" ]]   && echo -e "\033[38;2;241;250;140m  $tag\033[0m"

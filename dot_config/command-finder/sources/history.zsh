@@ -2,9 +2,12 @@
 
 cf::history_add() {
   local file=$(cf::history_file)
-  mkdir -p "${file:h}"
+  # trim 掉首尾空白，空白命令直接跳过
+  local cmd="${1## }"; cmd="${cmd%% }"
+  [[ -z "${cmd// }" ]] && return
 
-  print -r -- "$1" >> "$file"
+  mkdir -p "${file:h}"
+  print -r -- "$cmd" >> "$file"
   tail -n 1000 "$file" > "$file.tmp" && mv -f "$file.tmp" "$file"
 }
 
