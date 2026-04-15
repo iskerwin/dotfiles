@@ -1,4 +1,4 @@
-#command-finder/command-finder.plugin.zsh
+# command-finder/command-finder.plugin.zsh
 
 (( $+commands[fzf] )) || return
 

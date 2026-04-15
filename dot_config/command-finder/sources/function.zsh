@@ -1,4 +1,4 @@
-#command-finder/sources/function.zsh
+# command-finder/sources/function.zsh
 
 cf::source_function() {
   local file="$HOME/.config/shell/functions.zsh"

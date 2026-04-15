@@ -1,4 +1,4 @@
-#command-finder/lib/format.zsh
+# command-finder/lib/format.zsh
 
 # score \t name \t desc \t type \t usage \t tag
 cf::format_row() {

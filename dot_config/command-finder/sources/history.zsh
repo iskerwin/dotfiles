@@ -1,4 +1,4 @@
-#command-finder/sources/history.zsh
+# command-finder/sources/history.zsh
 
 cf::history_add() {
   local file=$(cf::history_file)
