@@ -18,21 +18,18 @@ cf::fzf() {
     --with-nth=2 \
     --expect='ctrl-e,ctrl-y' \
     --preview '
+      desc={4}
       type={5}
-      desc={4}      # alias展开值 / function的@desc（历史无）
-      usage={6}     # alias/@desc 或 function/@usage
-      tag={7}
+      usage={6}
 
       if [[ "$type" == "history" ]]; then
         echo ""
       elif [[ "$type" == "alias" ]]; then
         echo "$desc" | bat --language=zsh --style=plain --color=always
         [[ -n "$usage" ]] && echo -e "\033[38;2;98;114;164m󰙎  $usage\033[0m"
-        [[ -n "$tag" ]]   && echo -e "\033[38;2;241;250;140m  $tag\033[0m"
       else
         [[ -n "$usage" ]] && echo "$usage" | bat --language=zsh --style=plain --color=always
         [[ -n "$desc" ]]  && echo -e "\033[38;2;98;114;164m󰙎  $desc\033[0m"
-        [[ -n "$tag" ]]   && echo -e "\033[38;2;241;250;140m  $tag\033[0m"
       fi
     ' \
     --preview-window=down:3:wrap \
@@ -53,7 +50,7 @@ cf::render() {
     reset  = "\033[0m"
   }
   {
-    score=$1; name=$2; desc=$3; type=$4; usage=$5; tag=$6
+    score=$1; name=$2; desc=$3; type=$4; usage=$5
 
     if (type == "alias") {
       color = orange
@@ -80,6 +77,6 @@ cf::render() {
       display = sprintf("%s%s%s%-*s %s→ %s%s%s", color, icon, reset, w, name, pink, gray, desc, reset)
     }
 
-    printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", score, display, name, desc, type, usage, tag
+    printf "%s\t%s\t%s\t%s\t%s\t%s\n", score, display, name, desc, type, usage
   }'
 }

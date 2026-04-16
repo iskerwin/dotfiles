@@ -133,8 +133,7 @@ alias cz-d='cz diff'                                 # 对比源与目标差异 
 alias cz-ls='cz managed'                             # 列出所有受管文件 / list all managed files
 
 # ── 应用变更 ──────────────────────────────────────
-alias cz-ap='cz apply -v --exclude encrypted'        # 应用变更（跳过加密文件）到 $HOME / apply changes excluding encrypted files to Apply changes (skip encrypted files) to $HOME
-alias cz-ap-all='cz apply -v'                        # 应用全部变更含加密文件 / apply all including encrypted files
+alias cz-ap='cz apply -v --exclude encrypted'        # 应用变更到 $HOME / apply changes to Apply changes to $HOME
 alias cz-dry='cz apply --dry-run -v'                 # 预演应用，不实际修改 / dry run apply without making changes
 alias cz-mg='cz merge'                               # 冲突时三路合并 / three-way merge on conflict
 alias cz-up='cz update -v'                           # 拉取远端并应用，跨机同步首选 / pull remote and apply, preferred for multi-machine sync

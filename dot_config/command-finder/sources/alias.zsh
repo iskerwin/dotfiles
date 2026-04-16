@@ -1,7 +1,7 @@
 # command-finder/sources/alias.zsh
 
 cf::source_alias() {
-  local -A alias_desc alias_tag
+  local -A alias_desc
   # 收集你自己文件里定义的 alias 名（白名单）
   local -A my_alias_names
 
@@ -44,6 +44,6 @@ cf::source_alias() {
     [[ -n "${my_alias_names[$name]}" ]] || continue   # ← 不在白名单就跳过
     value=${value//$'\n'/ }
     local adesc="${alias_desc[$name]:-}"
-    cf::format_row 2000 "$name" "$value" "alias" "$adesc" ""
+    cf::format_row 2000 "$name" "$value" "alias" "$adesc"
   done
 }

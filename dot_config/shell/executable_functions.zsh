@@ -1,11 +1,10 @@
 #!/bin/zsh
 
-#================================================#
-# Package Management                             #
-#================================================#
+# ══════════════════════════════════════════════
+# Package Management
+# ══════════════════════════════════════════════
 
-# @desc: 通过 Homebrew 安装丢失的软件包 / Install a missing package via Homebrew
-# @tag: brew, package, install
+# @desc: 通过 Homebrew 安装缺失的软件包 / Install a missing package via Homebrew
 # @usage: install_missing <package>
 install_missing() {
     local package="${1:?'Error: package name required'}"
@@ -19,12 +18,11 @@ install_missing() {
     fi
 }
 
-#================================================#
-# File Cleanup                                   #
-#================================================#
+# ══════════════════════════════════════════════
+# File Cleanup
+# ══════════════════════════════════════════════
 
-# @desc: Clean .DS_Store files safely using fd and safe-rm
-# @tag: cleanup, ds_store, macos
+# @desc: 安全清理 .DS_Store 文件，依赖 fd 和 safe-rm / Clean .DS_Store files safely using fd and safe-rm
 # @usage: clean_ds [--current | --all | -h | --help]
 clean_ds() {
     if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
@@ -84,12 +82,11 @@ clean_ds() {
     fi
 }
 
-#================================================#
-# System Operations                              #
-#================================================#
+# ══════════════════════════════════════════════
+# System Operations
+# ══════════════════════════════════════════════
 
-# @desc: Check if a host is reachable on a given port using netcat
-# @tag: network, port, connectivity
+# @desc: 检查目标主机的指定端口是否可达 / Check if a host is reachable on a given port using netcat
 # @usage: portcheck <host> [port]
 portcheck() {
     if [[ -z "$1" ]]; then
@@ -99,8 +96,7 @@ portcheck() {
     nc -zv "$1" "${2:-80}"
 }
 
-# @desc: Enable, disable, or check the status of the system HTTP/SOCKS proxy
-# @tag: network, proxy
+# @desc: 开启、关闭或查看系统 HTTP/SOCKS 代理状态 / Enable, disable, or check the status of the system HTTP/SOCKS proxy
 # @usage: proxy [on | off | status]
 proxy() {
     case "$1" in
@@ -127,8 +123,7 @@ proxy() {
     esac
 }
 
-# @desc: Display internal, external, or local IP info; or query a specific IP address
-# @tag: network, ip, ifconfig
+# @desc: 查看内网、外网或本机 IP 信息，或查询指定 IP 地址 / Display internal, external, or local IP info; or query a specific IP address
 # @usage: ip [internal | external | local | query <ip>]
 ip() {
     case "$1" in
@@ -176,19 +171,17 @@ ip() {
     esac
 }
 
-#================================================#
-# Screen Session Management                      #
-#================================================#
+# ══════════════════════════════════════════════
+# Screen Session Management
+# ══════════════════════════════════════════════
 
-# @desc: Run a command in a new detached GNU screen session
-# @tag: screen, session, background
+# @desc: 在新的后台 screen 会话中运行指定命令 / Run a command in a new detached GNU screen session
 # @usage: srun <command>
 srun() {
     screen -dm bash -c "$*"
 }
 
-# @desc: Intelligently attach to an existing screen session, or create one named "main"
-# @tag: screen, session, attach
+# @desc: 智能附加到已有 screen 会话，若不存在则新建名为 main 的会话 / Attach to an existing screen session, or create one named "main" if none exists
 # @usage: sattach
 sattach() {
     if screen -ls | grep -q "[0-9]\..*"; then
@@ -203,14 +196,12 @@ sattach() {
     fi
 }
 
-#================================================#
-# Chezmoi                                        #
-#================================================#
+# ══════════════════════════════════════════════
+# Chezmoi
+# ══════════════════════════════════════════════
 
-# @desc: Push local dotfile changes to remote / commit and push local changes
-# @tag: chezmoi
+# @desc: 将本地改动提交并推送到远端 / Commit and push local dotfile changes to remote
 # @usage: cz-save
-# 本地改动 → 提交推送（改完配置后用）
 cz-save() {
     cz re-add -v && \
     cz git -- add -A && \
@@ -218,10 +209,8 @@ cz-save() {
     cz git -- push origin main || { echo "❌ cz-save failed"; return 1; }
 }
 
-# @desc: Pull remote changes and apply after confirmation / multi-machine sync
-# @tag: chezmoi
+# @desc: 拉取远端变更，预览差异后确认应用 / Pull remote changes, preview diff, and apply after confirmation
 # @usage: cz-sync
-# 拉取远端 → 预演 → 确认后应用（多机同步时用）
 cz-sync() {
     cz git -- pull origin main && \
     cz diff && \

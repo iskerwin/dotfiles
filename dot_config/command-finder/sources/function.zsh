@@ -17,12 +17,6 @@ cf::source_function() {
     next
   }
 
-  /^[[:space:]]*#[[:space:]]*@tag:/ {
-    sub(/^[[:space:]]*#[[:space:]]*@tag:[[:space:]]*/, "")
-    tag = $0
-    next
-  }
-
   /^[[:space:]]*#/ {
     next
   }
@@ -30,8 +24,8 @@ cf::source_function() {
   /^[a-zA-Z0-9_-]+[[:space:]]*\(\)/ {
     name = $0
     sub(/[[:space:]]*\(.*/, "", name)
-    printf "%s\t%s\t%s\t%s\n", name, desc, usage, tag
-    desc = ""; usage = ""; tag = ""
+    printf "%s\t%s\t%s\n", name, desc, usage
+    desc = ""; usage = ""
     next
   }
 
@@ -39,16 +33,16 @@ cf::source_function() {
     name = $0
     sub(/^function[[:space:]]+/, "", name)
     sub(/[[:space:]]*\(.*/, "", name)
-    printf "%s\t%s\t%s\t%s\n", name, desc, usage, tag
-    desc = ""; usage = ""; tag = ""
+    printf "%s\t%s\t%s\n", name, desc, usage
+    desc = ""; usage = ""
     next
   }
 
   /^[^#]/ {
-    desc = ""; usage = ""; tag = ""
+    desc = ""; usage = ""
   }
   ' "$file" |
-  while IFS=$'\t' read -r name desc usage tag; do
-    cf::format_row 1000 "$name" "$desc" "function" "$usage" "$tag"
+  while IFS=$'\t' read -r name desc usage; do
+    cf::format_row 1000 "$name" "$desc" "function" "$usage"
   done
 }
