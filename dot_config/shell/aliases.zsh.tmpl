@@ -4,26 +4,25 @@
 #  Navigation  文件与目录导航
 # ══════════════════════════════════════════════
 
-alias cd='z'                           # 智能跳转目录 / smart jump (zoxide)
-alias home='cd ~'                      # 回到 $HOME / go home
-alias ..='cd ..'                       # 上一级 / up 1 level
-alias ...='cd ../..'                   # 上两级 / up 2 levels
-alias ....='cd ../../..'               # 上三级 / up 3 levels
-alias .....='cd ../../../..'           # 上四级 / up 4 levels
-alias icloud='cd {{ .icloud }}'        # 跳到 iCloud 目录 / iCloud dir
+alias cd='z'                           # 智能跳转目录（依赖 zoxide）/ smart cd (requires zoxide)
+alias ..='cd ..'                       # 上一级目录 / up 1 level
+alias ...='cd ../..'                   # 上两级目录 / up 2 levels
+alias ....='cd ../../..'               # 上三级目录 / up 3 levels
+alias .....='cd ../../../..'           # 上四级目录 / up 4 levels
+alias icloud='cd {{ .icloud }}'        # 跳到 iCloud 目录（chezmoi 模板）/ iCloud dir (chezmoi template)
 
 # ── 文件列表 File listing ──────────────────────
 if command -v eza >/dev/null 2>&1; then
-  alias ls='eza --group-directories-first --icons --git --git-ignore' # 增强版 ls（需要 eza）/ better ls
+  alias ls='eza --group-directories-first --icons --git --git-ignore' # 增强版 ls（依赖 eza）/ better ls (requires eza)
 else
-  alias ls='ls --color=auto'           # 系统 ls 兜底 / fallback
+  alias ls='ls --color=auto'           # 系统 ls 兜底（无 eza 环境）/ fallback ls
 fi
 
-alias l='ls -la'                       # 显示全部文件含隐藏 / list all + hidden
-alias lt='l -snew'                     # 按修改时间排序 / sort by time
+alias l='ls -la'                       # 显示全部文件含隐藏（继承上方 ls）/ list all + hidden
+alias lt='l -snew'                     # 按修改时间排序 / sort by modified time
 alias lz='l -ssize'                    # 按文件大小排序 / sort by size
 alias lx='l -sext'                     # 按扩展名排序 / sort by extension
-alias tree='eza --tree --level=2 --icons --git-ignore' # 两层树状结构 / tree view, depth 2
+alias tree='eza --tree --level=2 --icons --git-ignore' # 两层树状，可加 --level=N 改变深度、--no-ignore 显示 gitignore 文件 / tree depth 2, use --level=N to change depth, --no-ignore to show gitignored files
 
 # ── 危险操作加确认 Safe operations ───────────────
 alias rm='rm -i'                       # 删除前确认 / confirm before delete
@@ -36,29 +35,31 @@ alias mv='mv -i'                       # 移动前确认 / confirm before move
 # ══════════════════════════════════════════════
 
 # ── Homebrew ──────────────────────────────────
-alias brew-doctor='brew doctor'                 # 检查 Homebrew 健康状态 / check health
-alias brew-clean='brew cleanup'                 # 清理旧版本缓存 / clean old versions
-alias brew-install='proxy on && brew install'   # 使用代理安装 / install with proxy
-alias brew-uninstall='brew uninstall'           # 卸载 / remove package
-alias brew-update='proxy on && brew update && brew upgrade && brew cleanup && proxy off' # 全量更新并清理 / full update + cleanup
-alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off' # 强制更新所有 Cask / force update casks
-alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}' # 导出 Brewfile 快照 / export to Brewfile
-alias brew-restore='brew bundle --file={{ .brewfile }}'   # 从 Brewfile 恢复 / restore from Brewfile
+alias brew-doctor='brew doctor'                 # 检查 Homebrew 健康状态 / check Homebrew health
+alias brew-clean='brew cleanup'                 # 清理旧版本缓存 / remove old versions & cache
+alias brew-install='proxy on && brew install'   # 使用代理安装包 / install package via proxy
+alias brew-uninstall='brew uninstall'           # 卸载包 / remove package
+alias brew-update='proxy on && brew update && brew upgrade && brew cleanup && proxy off' # 更新包索引 + 升级所有 CLI 包 + 清理（不含 GUI 应用）/ update index + upgrade CLI formulae + cleanup, excludes Casks
+alias brew-cask-update='proxy on && brew cu -a -f -v --no-brew-update -y && brew cleanup && proxy off' # 强制升级所有 GUI 应用（Cask）+ 清理（不含 CLI 包）/ force upgrade all GUI Casks + cleanup, excludes formulae
+alias brew-backup='brew bundle dump --describe --force --file={{ .brewfile }}'  # 导出 Brewfile 快照（chezmoi 模板）/ export Brewfile snapshot (chezmoi template)
+alias brew-restore='brew bundle --file={{ .brewfile }}'                         # 从 Brewfile 恢复安装（chezmoi 模板）/ restore packages from Brewfile (chezmoi template)
 
 # ── 网络工具 Network ──────────────────────────
-alias dns='dig +nocmd +noall +answer'            # DNS 查询（简洁输出）/ DNS lookup
-alias trace='nexttrace'                          # 路由追踪 / traceroute
-alias netif='networksetup -listallhardwareports' # 列出所有网络接口 / list network interfaces
+alias dns='dig +nocmd +noall +answer'            # DNS 查询（仅显示 answer 段）/ DNS lookup, answer section only
+alias trace='nexttrace'                          # 可视化路由追踪 / visual traceroute
+alias netif='networksetup -listallhardwareports' # 列出所有网络接口 / list all network interfaces
 alias route='netstat -rn'                        # 显示路由表 / show routing table
-alias speed='networkQuality'                     # macOS 内置网速测试 / network speed test
-alias inet='curl -I'                             # 检查 URL 连通性 / check URL connectivity
+alias speed='networkQuality'                     # macOS 内置网速测试 / built-in network speed test
+alias inet='curl -I'                             # 检查 URL 响应头 / fetch URL response headers
 
 # ── 系统监控 Monitor ──────────────────────────
-alias top='btop'                       # 增强版系统监控 / better system monitor
-alias devs='ls /dev/cu.*'              # 列出串口设备 / list serial devices
-alias weather='curl wttr.in/Guangzhou' # 广州天气预报 / weather forecast
-alias xattr-clean='xattr -cr'          # 清除文件扩展属性（解隔离）/ strip xattrs
-alias af='command_finder'              # 命令管理工具 / command finder tool
+alias top='btop'                            # 增强版系统监控（依赖 btop）/ better system monitor (requires btop)
+alias devs='ls /dev/cu.*'                   # 列出串口设备（配置网络设备用）/ list serial devices for console access
+alias weather='curl wttr.in/Guangzhou'      # 广州天气预报，可换城市：curl wttr.in/城市 / Guangzhou weather, change city: curl wttr.in/<city>
+alias xattr-clean='xattr -cr'               # 清除文件扩展属性（解除隔离）/ strip extended attributes (remove quarantine)
+alias ports='lsof -iTCP -sTCP:LISTEN -n -P' # 查看所有监听端口 / list all listening TCP ports
+alias af='command_finder'                   # 命令管理工具 / command finder tool
+
 
 # ══════════════════════════════════════════════
 #  Development  开发工具
@@ -72,7 +73,10 @@ alias g-c='git commit -m'                             # 提交（带消息）/ c
 alias g-p='git push'                                  # 推送到远端 / push to remote
 alias g-l='git pull'                                  # 拉取远端变更 / pull from remote
 alias g-d='git diff'                                  # 查看未暂存差异 / show unstaged diff
-alias g-log='git log --oneline --graph --decorate'    # 图形化提交日志 / compact log graph
+alias g-ds='git diff --staged'                        # 查看已暂存差异 / show staged diff
+alias g-b='git branch'                                # 列出分支 / list branches
+alias g-sw='git switch'                               # 切换分支 / switch branch
+alias g-log='git log --oneline --graph --decorate'    # 图形化提交日志，可加 -N 限制条数 / compact log graph, append -N to limit entries
 
 # ── 工具 Utilities ────────────────────────────
 alias f='fzf'                          # 模糊搜索 / fuzzy finder
@@ -82,49 +86,72 @@ alias lg='lazygit'                     # Git TUI 界面 / terminal UI for git
 alias reload='source ~/.zshrc'         # 重载 zsh 配置 / reload shell config
 alias zshrc='nano ~/.zshrc'            # 编辑 .zshrc / edit zsh config
 alias cls='clear'                      # 清屏 / clear terminal
-alias path='echo $PATH | tr ":" "\n"'  # 逐行打印 PATH / print PATH entries
+alias path='echo $PATH | tr ":" "\n"'  # 逐行打印 PATH / print PATH entries line by line
 
 
 # ══════════════════════════════════════════════
 #  SSH  远程连接
 # ══════════════════════════════════════════════
 
-alias ssh='ct screen ssh'                           # SSH + screen 会话保持 / SSH with screen session
-alias ssh-list='grep "^Host " ~/.ssh/config'        # 列出 SSH 配置中的主机 / list configured hosts
+alias ssh='ct screen ssh'                           # SSH + ChromaTerm 高亮 + screen 会话保持 / SSH with ChromaTerm highlight + screen session
+alias ssh-list='grep "^Host " ~/.ssh/config'        # 列出 SSH 配置中的主机 / list configured SSH hosts
 alias ssh-agent-start='eval "$(ssh-agent -s)"'      # 启动 ssh-agent / start SSH agent
-alias ssh-keychain='ssh-add --apple-load-keychain'  # 从 Keychain 加载 SSH 密钥 / load keys from Keychain
-alias ssha='ssha-management'                        # SSH Agent 管理 / SSH Agent Management
+alias ssh-keychain='ssh-add --apple-load-keychain'  # 从 Keychain 加载 SSH 密钥 / load SSH keys from Keychain
+alias ssha='ssha-management'                        # 交互式 SSH Agent 管理（fzf）/ interactive SSH agent manager (fzf)
 
 
 # ══════════════════════════════════════════════
-#  Screen  终端会话管理
+#  Screen  终端会话管理（配置网络设备）
 # ══════════════════════════════════════════════
 
-alias sc='screen -S'                   # 创建命名会话 / new named session
+alias sc='screen -S'                   # 创建命名会话 / create named session
 alias sl='screen -ls'                  # 列出所有 Screen 会话 / list sessions
 alias sr='screen -r'                   # 重新连接会话 / reattach session
 alias sd='screen -d'                   # 分离当前会话 / detach session
-alias sk='killall screen'              # 终止所有 screen 进程 / kill all sessions
+alias sk='killall screen'              # 终止所有 screen 进程 / kill all screen sessions
 
 
 # ══════════════════════════════════════════════
 #  Chezmoi  dotfiles 管理
 # ══════════════════════════════════════════════
 
-alias cz='chezmoi'                         # chezmoi 命令缩写 / chezmoi shorthand
-alias cz-a='cz add -v'                     # 追踪文件到 chezmoi / add file to tracking
-alias cz-e='cz edit'                       # 编辑受管文件 / edit managed file
-alias cz-ap='cz apply -v'                  # 将变更应用到 $HOME / apply changes to home
-alias cz-s='cz status'                     # 查看受管文件状态 / show tracking status
-alias cz-d='cz diff -v'                    # 对比配置差异 / diff managed vs applied
-alias cz-sync='cz add -v && cz apply -v'   # 添加并立即应用（一键同步）/ add then apply
+alias cz='chezmoi'                                   # chezmoi 命令缩写 / chezmoi shorthand
 
+# ── 文件管理 ──────────────────────────────────────
+alias cz-a='cz add -v'                               # 纳入追踪 / add file to tracking
+alias cz-ra='cz re-add -v'                           # 将 $HOME 修改反向同步回源目录 / sync $HOME edits back to source
+alias cz-rm='cz forget'                              # 停止追踪，不删除实际文件 / untrack file without deleting it
+alias cz-init='cz init --apply'                      # 新机器一键初始化并应用 / init and apply on a new machine
+
+# ── 编辑与查看 ────────────────────────────────────
+alias cz-e='cz edit --apply'                         # 编辑后立即应用 / edit and apply immediately
+alias cz-cat='cz cat'                                # 预览渲染后内容，调试模板用 / preview rendered output for template debugging
+
+# ── 状态与差异 ────────────────────────────────────
+alias cz-s='cz status'                               # 查看受管文件状态 / show managed file status
+alias cz-d='cz diff'                                 # 对比源与目标差异 / diff source vs applied
+alias cz-ls='cz managed'                             # 列出所有受管文件 / list all managed files
+
+# ── 应用变更 ──────────────────────────────────────
+alias cz-ap='cz apply -v --exclude encrypted'        # 应用变更（跳过加密文件）到 $HOME / apply changes excluding encrypted files to Apply changes (skip encrypted files) to $HOME
+alias cz-ap-all='cz apply -v'                        # 应用全部变更含加密文件 / apply all including encrypted files
+alias cz-dry='cz apply --dry-run -v'                 # 预演应用，不实际修改 / dry run apply without making changes
+alias cz-mg='cz merge'                               # 冲突时三路合并 / three-way merge on conflict
+alias cz-up='cz update -v'                           # 拉取远端并应用，跨机同步首选 / pull remote and apply, preferred for multi-machine sync
+
+# ── Git 操作（无需 cd 进源目录）────────────────────
+alias cz-git='cz git --'                             # 在源目录执行 git 命令 / run git inside source dir
+alias cz-push='cz git -- push origin main'           # 推送到远端 / push to remote
+alias cz-pull='cz git -- pull origin main'           # 拉取远端（不自动应用）/ pull from remote without applying
+
+# ── 导航与调试 ────────────────────────────────────
+alias cz-cd='cd "$(chezmoi source-path)"'            # 跳转到源目录 / cd into chezmoi source dir
+alias cz-data='cz data'                              # 查看模板变量 / inspect template variables
+alias cz-doc='cz doctor'                             # 检查环境配置 / check environment and config
 
 # ══════════════════════════════════════════════
 #  Mole  系统清理与优化
 # ══════════════════════════════════════════════
-
-alias mo='mo'                          # mole 命令入口 / mole entrypoint
 
 # ── 核心操作 Core ─────────────────────────────
 alias mo-c='mo clean'                  # 清理缓存与日志释放空间 / clean caches & logs
@@ -136,7 +163,7 @@ alias mo-p='mo purge'                  # 清理构建缓存与临时文件 / pur
 alias mo-i='mo installer'              # 清理安装包残留 / clean installer files
 alias mo-t='mo touchid'                # 配置 Touch ID 认证 / configure Touch ID for sudo
 alias mo-cp='mo completion'            # 配置 shell 自动补全 / setup shell completion
-alias mo-up='mo update'                # 更新 mole 至最新稳定版 / update to stable
+alias mo-up='mo update'                # 更新 mole 至最新稳定版 / update to latest stable
 alias mo-rm='mo remove'                # 从系统卸载 mole / uninstall mole
 
 # ── 帮助 Help ─────────────────────────────────
@@ -169,8 +196,8 @@ alias mo-cpd='mo completion --dry-run'     # 预览补全配置变更 / preview 
 # ══════════════════════════════════════════════
 
 alias zp='zap'                         # zap 命令缩写 / zap shorthand
-alias zp-l='zap list'                  # 列出已安装插件 / list plugins
+alias zp-l='zap list'                  # 列出已安装插件 / list installed plugins
 alias zp-c='zap clean'                 # 清理未使用插件 / clean unused plugins
-alias zp-u='zap update'                # 更新所有插件 / update plugins
+alias zp-u='zap update'                # 更新所有插件 / update all plugins
 alias zp-us='zap update self'          # 更新 zap 本身 / update zap itself
 alias zp-ua='zap update all'           # 更新 zap 和全部插件 / update zap + all plugins
