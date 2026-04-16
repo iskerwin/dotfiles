@@ -207,13 +207,26 @@ sattach() {
 # Chezmoi                                        #
 #================================================#
 
-# @desc: Full chezmoi sync workflow: pull, apply, stage all changes, commit with timestamp, and push
-# @tag: chezmoi, dotfiles, sync, git
-# @usage: czsync
-czsync() {
-    czg pull && \
-    czp && \
-    czg add -A && \
-    czg commit -m "Auto sync: $(date +%Y-%m-%d_%H:%M:%S)" && \
-    czg push || echo "Sync failed - please check the output above"
+# @desc: Push local dotfile changes to remote / commit and push local changes
+# @tag: chezmoi
+# @usage: cz-save
+# 本地改动 → 提交推送（改完配置后用）
+cz-save() {
+    cz re-add -v && \
+    cz git -- add -A && \
+    cz git -- commit -m "sync: $(date +%Y-%m-%d_%H:%M:%S)" && \
+    cz git -- push origin main || { echo "❌ cz-save failed"; return 1; }
+}
+
+# @desc: Pull remote changes and apply after confirmation / multi-machine sync
+# @tag: chezmoi
+# @usage: cz-sync
+# 拉取远端 → 预演 → 确认后应用（多机同步时用）
+cz-sync() {
+    cz git -- pull origin main && \
+    cz diff && \
+    echo "👆 Review the diff above." && \
+    read "?Apply changes? [y/N] " confirm && \
+    [[ "$confirm" == [yY] ]] && \
+    cz apply -v --exclude encrypted || { echo "❌ Aborted or failed"; return 1; }
 }
