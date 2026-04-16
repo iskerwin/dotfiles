@@ -1,20 +1,20 @@
 ```
  .
+├──  dot_chromaterm.yml
 ├──  dot_config
-│   ├──  aliases
-│   │   ├──  aliases.zsh.tmpl
-│   │   └──  executable_functions.zsh
 │   ├──  bat
-│   │   └──  config
+│   │   └── 󱁻 config
 │   ├──  brew
 │   │   └── 󱄖 Brewfile
 │   ├──  btop
-│   │   ├──  themes
-│   │   │   └──  dracula.theme
-│   │   └──  btop.conf
+│   │   ├── 󱁻 btop.conf
+│   │   └──  themes
+│   │       └──  dracula.theme
 │   ├──  chezmoi
 │   │   └──  chezmoi.toml.tmpl
 │   ├──  command-finder
+│   │   ├──  command-finder.plugin.zsh
+│   │   ├──  core.zsh
 │   │   ├──  lib
 │   │   │   ├──  format.zsh
 │   │   │   └──  utils.zsh
@@ -22,41 +22,37 @@
 │   │   │   ├──  alias.zsh
 │   │   │   ├──  function.zsh
 │   │   │   └──  history.zsh
-│   │   ├──  ui
-│   │   │   └──  fzf.zsh
-│   │   ├──  command-finder.plugin.zsh
-│   │   └──  core.zsh
+│   │   └──  ui
+│   │       └──  fzf.zsh
 │   ├──  fzf
-│   │   ├──  dot_rgignore
+│   │   ├── 󰡯 dot_rgignore
 │   │   ├──  fzf-tab-colors.zsh
 │   │   └──  init.zsh
 │   ├──  ghostty
-│   │   └──  config
+│   │   └── 󱁻 config
 │   ├──  git
 │   │   ├──  config.tmpl
-│   │   ├──  fzf-git.zsh
-│   │   └──  ignore
+│   │   └── 󰡯 ignore
 │   ├──  iterm2
 │   │   ├──  Default.json
 │   │   └──  key.itermkeymap
 │   ├──  lazygit
 │   │   └──  config.yml
+│   ├── 󰡯 safe-rm
 │   ├──  script
+│   ├──  shell
+│   │   ├──  aliases.zsh.tmpl
+│   │   └──  executable_functions.zsh
 │   └── 󰢬 ssh
 │       ├──  fzf-ssh-agent.zsh
 │       └──  fzf-ssh.zsh
+├──  dot_p10k.zsh
+├── 󰡯 dot_screenrc
+├── 󰡯 dot_zshrc
+├── 󰡯 empty_dot_hushlogin
 ├──  private_dot_ssh
 │   ├── 󰦝 encrypted_private_config.asc
 │   ├── 󰦝 encrypted_private_id_ed25519.asc
 │   └── 󰷖 id_ed25519.pub
-├──  private_Library
-│   └──  'private_Application Support'
-│       └──  private_Code
-│           └──  User
-├──  dot_chromaterm.yml
-├──  dot_p10k.zsh
-├──  dot_screenrc
-├──  dot_zshrc
-├──  empty_dot_hushlogin
 └── 󰂺 README.md
 ```
