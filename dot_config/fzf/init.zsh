@@ -1,8 +1,8 @@
 # ~/.config/fzf/init.zsh
 
-#================================================#
-# Basic settings                                 #
-#================================================#
+# ══════════════════════════════════════════════
+# Basic settings
+# ══════════════════════════════════════════════
 
 # Setup fzf path
 if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
@@ -12,9 +12,9 @@ fi
 # Load fzf
 source <(fzf --zsh)
 
-#================================================#
-# Basic command configuration                    #
-#================================================#
+# ══════════════════════════════════════════════
+# Basic command configuration
+# ══════════════════════════════════════════════
 
 # Create .rgignore file if it doesn't exist
 RGIGNORE="$HOME/.config/fzf/.rgignore"
@@ -88,9 +88,9 @@ fi
 # Set completion trigger
 export FZF_COMPLETION_TRIGGER='\'
 
-#================================================#
-# Preview configuration                          #
-#================================================#
+# ══════════════════════════════════════════════
+# Preview configuration
+# ══════════════════════════════════════════════
 
 # Define preview commands
 show_file_or_dir_preview="if [ -d {} ]; then eza --tree --color=always {} | head -200; else bat -n --color=always --line-range :500 {}; fi"
@@ -102,9 +102,9 @@ export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -200'"
 # Disable preview of CTRL-R history
 export FZF_CTRL_R_OPTS="--preview-window=hidden"
 
-#================================================#
-# Appearance configuration                       #
-#================================================#
+# ══════════════════════════════════════════════
+# Appearance configuration
+# ══════════════════════════════════════════════
 
 export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
     --height=90%
